@@ -1,0 +1,20 @@
+/* Root Variables */
+:root {
+    --primary-color: #2196F3;
+    --secondary-color: #607D8B;
+    --success-color: #4CAF50;
+    --danger-color: #f44336;
+    --warning-color: #FF9800;
+    --text-primary: #333;
+    --text-secondary: #666;
+    --border-color: #E0E0E0;
+    --background-light: #F5F5F5;
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --transition: all 0.3s ease;
+}
+
+/* All the CSS from output_css_styles() and render_modals() functions */
+/* ... rest of the CSS ... */
