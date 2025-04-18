@@ -185,6 +185,7 @@ function cleanup_unused_images() {
 /**
  * Display car listing with improved performance
  */
+
 function display_car_listing() {
     $xml = get_cached_xml();
     if (!$xml) {
