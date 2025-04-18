@@ -1,20 +1,36 @@
 <?php
+/*
+Plugin Name: VWE Auto Manager
+Plugin URI:
+Description: Een plugin voor het beheren en weergeven van auto's via VWE data
+Version: 1.0
+Author: Anouar
+License: GPL2
+*/
+
+// Prevent direct access to this file
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 // Increase execution time and memory limit
 set_time_limit(300); // 5 minutes
 ini_set('memory_limit', '256M');
 
 // Configuration
+define('VWE_PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('VWE_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('FTP_SERVER', '91.184.31.234');
 define('FTP_USER', 'anmvs-auto');
 define('FTP_PASS', 'f6t23U~8t');
 define('REMOTE_IMAGES_PATH', '/staging.mvsautomotive.nl/wp-content/plugins/xml/images/');
-define('LOCAL_IMAGES_PATH', __DIR__ . '/images/');
-define('LOCAL_XML_PATH', __DIR__ . '/local_file.xml');
+define('LOCAL_IMAGES_PATH', VWE_PLUGIN_DIR . 'images/');
+define('LOCAL_XML_PATH', VWE_PLUGIN_DIR . 'local_file.xml');
 define('XML_CACHE_TIME', 86400); // 24 hours
 define('ENABLE_XML_CACHE', true);
-define('XML_CACHE_FILE', __DIR__ . '/xml_cache.json');
+define('XML_CACHE_FILE', VWE_PLUGIN_DIR . 'xml_cache.json');
 define('DEBUG_MODE', false);
-define('LAST_UPDATE_FILE', __DIR__ . '/last_update.txt');
+define('LAST_UPDATE_FILE', VWE_PLUGIN_DIR . 'last_update.txt');
 define('UPDATE_INTERVAL', 86400); // 24 hours in seconds
 
 /**
@@ -185,7 +201,6 @@ function cleanup_unused_images() {
 /**
  * Display car listing with improved performance
  */
-
 function display_car_listing() {
     $xml = get_cached_xml();
     if (!$xml) {
@@ -446,7 +461,9 @@ function display_car_listing() {
 
     echo '<div class="description-content">' .
         '<h4>Beschrijving</h4>' .
-        '<p>Hier vindt u een overzicht van onze beschikbare auto\'s. Bekijk de details en specificaties van elke auto en neem contact met ons op voor meer informatie.</p>' .
+        '<p>Hier vindt u een overzicht van onze beschikbare auto\'s. Bekijk de details en specificaties van elke auto en neem contact met ons op voor meer informatie.
+        bla bla bla
+        </p>' .
     '</div>';
 
     foreach ($cars as $car) {
@@ -1163,5 +1180,47 @@ function output_image_preload($cars) {
     }
 }
 
-// Execute only the display function
-display_car_listing();
+// Voeg WordPress hooks toe
+add_action('init', 'vwe_init');
+add_action('wp_enqueue_scripts', 'vwe_enqueue_scripts');
+add_shortcode('vwe_auto_listing', 'vwe_display_car_listing');
+
+/**
+ * Initialize plugin
+ */
+function vwe_init() {
+    // Maak benodigde directories aan
+    if (!file_exists(LOCAL_IMAGES_PATH)) {
+        wp_mkdir_p(LOCAL_IMAGES_PATH);
+    }
+}
+
+/**
+ * Enqueue scripts and styles
+ */
+function vwe_enqueue_scripts() {
+    wp_enqueue_style('vwe-styles', VWE_PLUGIN_URL . 'styling.css', array(), filemtime(VWE_PLUGIN_DIR . 'styling.css'));
+    wp_enqueue_script('vwe-scripts', VWE_PLUGIN_URL . 'scripts.js', array('jquery'), filemtime(VWE_PLUGIN_DIR . 'scripts.js'), true);
+}
+
+/**
+ * Shortcode function to display car listing
+ */
+function vwe_display_car_listing($atts) {
+    ob_start();
+    display_car_listing();
+    return ob_get_clean();
+}
+
+function check_last_update() {
+    if (file_exists(LAST_UPDATE_FILE)) {
+        $last_update = file_get_contents(LAST_UPDATE_FILE);
+        $next_update = (int)$last_update + UPDATE_INTERVAL;
+        $time_until_next = $next_update - time();
+
+        error_log("Last update: " . date('Y-m-d H:i:s', (int)$last_update));
+        error_log("Next update in: " . round($time_until_next / 3600, 2) . " hours");
+    } else {
+        error_log("No last update found - update needed");
+    }
+}
