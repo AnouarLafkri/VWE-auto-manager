@@ -1127,7 +1127,7 @@ function download_xml_from_ftp() {
 
     // Download XML file to temporary location
     if (!@ftp_get($ftp_conn, $temp_xml_path, $remote_xml_path, FTP_BINARY)) {
-        error_log('Failed to download XML file from FTP');
+        error_log('Failed to download XML file from: ' . $remote_xml_path);
         if ($is_ssl) {
             @ftp_close($ftp_conn);
         } else {
@@ -1136,18 +1136,16 @@ function download_xml_from_ftp() {
         return false;
     }
 
-    // Close FTP connection
-    if ($is_ssl) {
-        @ftp_close($ftp_conn);
-    } else {
-        ftp_close($ftp_conn);
-    }
-
-    // Validate downloaded XML
+    // Verify the downloaded XML is valid
     $xml_content = file_get_contents($temp_xml_path);
     if (!$xml_content || !simplexml_load_string($xml_content)) {
-        error_log('Downloaded XML file is invalid');
+        error_log('Downloaded XML file is invalid or empty');
         unlink($temp_xml_path);
+        if ($is_ssl) {
+            @ftp_close($ftp_conn);
+        } else {
+            ftp_close($ftp_conn);
+        }
         return false;
     }
 
@@ -1157,27 +1155,59 @@ function download_xml_from_ftp() {
     }
     rename($temp_xml_path, $local_xml_path);
 
-    error_log('Successfully downloaded and updated XML file');
+    // Properly close the connection
+    if ($is_ssl) {
+        @ftp_close($ftp_conn);
+    } else {
+        ftp_close($ftp_conn);
+    }
+
     return true;
 }
 
 /**
- * Get XML data from local file
+ * Update all data (XML and images)
  */
-function get_xml_data() {
-    // Check if we need to update
+function update_all_data() {
     if (needs_update()) {
         if (DEBUG_MODE) {
             error_log('Performing daily update');
         }
+
         // Download and update XML file
         if (!download_xml_from_ftp()) {
-            error_log('Failed to update XML file from FTP');
+            error_log('Failed to update XML file');
+            return false;
         }
+
+        // Update images
         fetch_images_from_ftp();
         cleanup_unused_images();
         update_timestamp();
+
+        if (DEBUG_MODE) {
+            error_log('Update completed successfully');
+        }
     }
+    return true;
+}
+
+// Update the cronjob script to include XML updates
+function create_cronjob_script() {
+    $cron_script = __DIR__ . '/update_cars.php';
+    if (!file_exists($cron_script)) {
+        $script_content = '<?php
+require_once __DIR__ . "/VWE-auto-manager.php";
+update_all_data();
+?>';
+        file_put_contents($cron_script, $script_content);
+    }
+}
+
+// Update the get_xml_data function to use the new update mechanism
+function get_xml_data() {
+    // Check if we need to update and perform update if needed
+    update_all_data();
 
     if (!file_exists(LOCAL_XML_PATH)) {
         error_log('XML file not found: ' . LOCAL_XML_PATH);
@@ -1209,22 +1239,6 @@ function get_xml_data() {
     }
 
     return $xml;
-}
-
-/**
- * Create cronjob script if it doesn't exist
- */
-function create_cronjob_script() {
-    $cron_script = __DIR__ . '/update_cars.php';
-    if (!file_exists($cron_script)) {
-        $script_content = '<?php
-require_once __DIR__ . "/VWE-auto-manager.php";
-download_xml_from_ftp();
-fetch_images_from_ftp();
-cleanup_unused_images();
-?>';
-        file_put_contents($cron_script, $script_content);
-    }
 }
 
 /**
