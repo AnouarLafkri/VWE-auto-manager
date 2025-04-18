@@ -23,9 +23,6 @@ define('FTP_PASS', 'f6t23U~8t');
 define('REMOTE_IMAGES_PATH', '/staging.mvsautomotive.nl/wp-content/plugins/xml/images/');
 define('LOCAL_IMAGES_PATH', VWE_PLUGIN_DIR . 'images/');
 define('LOCAL_XML_PATH', VWE_PLUGIN_DIR . 'local_file.xml');
-define('XML_CACHE_TIME', 86400); // 24 hours
-define('ENABLE_XML_CACHE', true);
-define('XML_CACHE_FILE', VWE_PLUGIN_DIR . 'xml_cache.json');
 define('DEBUG_MODE', false);
 define('LAST_UPDATE_FILE', VWE_PLUGIN_DIR . 'last_update.txt');
 define('UPDATE_INTERVAL', 86400); // 24 hours in seconds
@@ -199,7 +196,7 @@ function cleanup_unused_images() {
  * Display car listing with improved performance
  */
 function display_car_listing() {
-    $xml = get_cached_xml();
+    $xml = get_xml_data();
     if (!$xml) {
         echo "<div class='error-message'>Error loading XML data. Please check the error logs for more information.</div>";
         return;
@@ -1077,29 +1074,109 @@ function output_javascript() {
 }
 
 /**
- * Get cached XML data with improved performance
+ * Download XML file from FTP server
  */
-function get_cached_xml() {
+function download_xml_from_ftp() {
+    // Set FTP timeout
+    $timeout = 30;
+    $is_ssl = false;
+
+    // Try SSL connection first
+    if (function_exists('ftp_ssl_connect')) {
+        $ftp_conn = @ftp_ssl_connect(FTP_SERVER, 21, $timeout);
+        if ($ftp_conn) {
+            $is_ssl = true;
+        }
+    }
+
+    // Fallback to regular FTP if SSL fails
+    if (!$ftp_conn) {
+        $ftp_conn = @ftp_connect(FTP_SERVER, 21, $timeout);
+    }
+
+    if (!$ftp_conn) {
+        error_log('Could not connect to FTP server: ' . FTP_SERVER);
+        return false;
+    }
+
+    // Set additional FTP options
+    ftp_set_option($ftp_conn, FTP_TIMEOUT_SEC, $timeout);
+    ftp_set_option($ftp_conn, FTP_AUTOSEEK, true);
+
+    if (!@ftp_login($ftp_conn, FTP_USER, FTP_PASS)) {
+        if ($is_ssl) {
+            @ftp_close($ftp_conn);
+        } else {
+            ftp_close($ftp_conn);
+        }
+        error_log('FTP login failed for user: ' . FTP_USER);
+        return false;
+    }
+
+    ftp_pasv($ftp_conn, true);
+
+    // Enable SSL if available
+    if ($is_ssl) {
+        ftp_set_option($ftp_conn, FTP_USEPASVADDRESS, true);
+    }
+
+    // Define remote and local XML paths
+    $remote_xml_path = '/staging.mvsautomotive.nl/wp-content/plugins/xml/voertuigen.xml';
+    $local_xml_path = LOCAL_XML_PATH;
+    $temp_xml_path = $local_xml_path . '.temp';
+
+    // Download XML file to temporary location
+    if (!@ftp_get($ftp_conn, $temp_xml_path, $remote_xml_path, FTP_BINARY)) {
+        error_log('Failed to download XML file from FTP');
+        if ($is_ssl) {
+            @ftp_close($ftp_conn);
+        } else {
+            ftp_close($ftp_conn);
+        }
+        return false;
+    }
+
+    // Close FTP connection
+    if ($is_ssl) {
+        @ftp_close($ftp_conn);
+    } else {
+        ftp_close($ftp_conn);
+    }
+
+    // Validate downloaded XML
+    $xml_content = file_get_contents($temp_xml_path);
+    if (!$xml_content || !simplexml_load_string($xml_content)) {
+        error_log('Downloaded XML file is invalid');
+        unlink($temp_xml_path);
+        return false;
+    }
+
+    // Replace old XML file with new one
+    if (file_exists($local_xml_path)) {
+        unlink($local_xml_path);
+    }
+    rename($temp_xml_path, $local_xml_path);
+
+    error_log('Successfully downloaded and updated XML file');
+    return true;
+}
+
+/**
+ * Get XML data from local file
+ */
+function get_xml_data() {
     // Check if we need to update
     if (needs_update()) {
         if (DEBUG_MODE) {
             error_log('Performing daily update');
         }
+        // Download and update XML file
+        if (!download_xml_from_ftp()) {
+            error_log('Failed to update XML file from FTP');
+        }
         fetch_images_from_ftp();
         cleanup_unused_images();
         update_timestamp();
-    }
-
-    if (ENABLE_XML_CACHE && file_exists(XML_CACHE_FILE)) {
-        $cache = json_decode(file_get_contents(XML_CACHE_FILE), true);
-        if ($cache && isset($cache['timestamp']) && isset($cache['data'])) {
-            if (time() - $cache['timestamp'] < XML_CACHE_TIME) {
-                if (DEBUG_MODE) {
-                    error_log('Loading XML from cache');
-                }
-                return simplexml_load_string($cache['data']);
-            }
-        }
     }
 
     if (!file_exists(LOCAL_XML_PATH)) {
@@ -1131,15 +1208,6 @@ function get_cached_xml() {
         return false;
     }
 
-    // Cache the XML data
-    if (ENABLE_XML_CACHE) {
-        $cache_data = [
-            'timestamp' => time(),
-            'data' => $xml_content
-        ];
-        file_put_contents(XML_CACHE_FILE, json_encode($cache_data));
-    }
-
     return $xml;
 }
 
@@ -1151,6 +1219,7 @@ function create_cronjob_script() {
     if (!file_exists($cron_script)) {
         $script_content = '<?php
 require_once __DIR__ . "/VWE-auto-manager.php";
+download_xml_from_ftp();
 fetch_images_from_ftp();
 cleanup_unused_images();
 ?>';
