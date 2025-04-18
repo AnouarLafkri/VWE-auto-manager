@@ -1,11 +1,8 @@
 <?php
 /*
 Plugin Name: VWE Auto Manager
-Plugin URI:
-Description: Een plugin voor het beheren en weergeven van auto's via VWE data
-Version: 1.0
+Description: A plugin that advertises the cars from VWE
 Author: Anouar
-License: GPL2
 */
 
 // Prevent direct access to this file

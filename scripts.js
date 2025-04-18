@@ -163,6 +163,7 @@ function openModal(carData) {
     modal.style.display = "block";
 }
 
+
 function updateCarousel() {
     const slides = document.querySelector(".carousel-slides");
     if (!slides || totalSlides === 0) return;
