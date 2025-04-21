@@ -490,6 +490,7 @@ function generate_options($items) {
 /**
  * Helper function to get base URL for images
  */
+
 function get_image_base_url() {
     $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
     return rtrim($protocol . $_SERVER['HTTP_HOST'] . dirname($_SERVER['SCRIPT_NAME']), '/') . '/images/';
