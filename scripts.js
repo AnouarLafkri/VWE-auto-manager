@@ -24,6 +24,7 @@ function openModal(carData) {
     carouselDots.innerHTML = "";
 
     // Setup carousel with images
+
     if (carData.afbeeldingen && carData.afbeeldingen.length > 0) {
         carData.afbeeldingen.forEach((image, index) => {
             const slide = document.createElement("div");
