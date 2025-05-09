@@ -27,6 +27,15 @@ define('DEBUG_MODE', false);
 define('LAST_UPDATE_FILE', VWE_PLUGIN_DIR . 'last_update.txt');
 define('UPDATE_INTERVAL', 86400); // 24 hours in seconds
 
+// Cronjob configuration
+add_action('init', function() {
+    if (!wp_next_scheduled('vwe_daily_update')) {
+        wp_schedule_event(time(), 'daily', 'vwe_daily_update');
+    }
+});
+
+add_action('vwe_daily_update', 'update_all_data');
+
 /**
  * Check if update is needed
  */
@@ -453,12 +462,6 @@ function display_car_listing() {
         echo '</div>';
     }
 
-    echo '<div class="description-content">' .
-        '<h4>Beschrijving</h4>' .
-        '<p>Hier vindt u een overzicht van onze beschikbare auto\'s. Bekijk de details en specificaties van elke auto en neem contact met ons op voor meer informatie.
-        bla bla bla
-        </p>' .
-    '</div>';
 
     foreach ($cars as $car) {
         $car_data = extract_car_data($car, $image_url_base);
@@ -1191,18 +1194,6 @@ function update_all_data() {
         }
     }
     return true;
-}
-
-// Update the cronjob script to include XML updates
-function create_cronjob_script() {
-    $cron_script = __DIR__ . '/update_cars.php';
-    if (!file_exists($cron_script)) {
-        $script_content = '<?php
-require_once __DIR__ . "/VWE-auto-manager.php";
-update_all_data();
-?>';
-        file_put_contents($cron_script, $script_content);
-    }
 }
 
 // Update the get_xml_data function to use the new update mechanism
