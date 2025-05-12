@@ -124,7 +124,10 @@ function fetch_images_from_ftp() {
         $local_file = LOCAL_IMAGES_PATH . basename($file);
 
         if (!file_exists($local_file)) {
-            if (!@ftp_get($ftp_conn, $local_file, $remote_file, FTP_BINARY)) {
+            if (@ftp_get($ftp_conn, $local_file, $remote_file, FTP_BINARY)) {
+                // Optimize the downloaded image
+                optimize_downloaded_image($local_file);
+            } else {
                 error_log('Failed to download file: ' . $remote_file);
             }
         }
@@ -495,8 +498,133 @@ function generate_options($items) {
  */
 
 function get_image_base_url() {
-    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
-    return rtrim($protocol . $_SERVER['HTTP_HOST'] . dirname($_SERVER['SCRIPT_NAME']), '/') . '/images/';
+    return 'https://staging.mvsautomotive.nl/wp-content/plugins/VWE-auto-manager/images/';
+}
+
+/**
+ * Generate optimized image HTML with WebP support
+ */
+function get_optimized_image_html($image_url, $alt_text, $class = '') {
+    // Convert image URL to WebP version
+    $webp_url = str_replace(['.jpg', '.jpeg', '.png'], '.webp', $image_url);
+
+    // Generate srcset for different sizes
+    $srcset = sprintf(
+        '%s 400w, %s 800w, %s 1200w',
+        str_replace('.webp', '-400.webp', $webp_url),
+        str_replace('.webp', '-800.webp', $webp_url),
+        str_replace('.webp', '-1200.webp', $webp_url)
+    );
+
+    // Generate fallback srcset for browsers that don't support WebP
+    $fallback_srcset = sprintf(
+        '%s 400w, %s 800w, %s 1200w',
+        str_replace('.webp', '-400.jpg', $image_url),
+        str_replace('.webp', '-800.jpg', $image_url),
+        str_replace('.webp', '-1200.jpg', $image_url)
+    );
+
+    return sprintf(
+        '<picture>
+            <source type="image/webp" srcset="%s" sizes="(max-width: 400px) 400px, (max-width: 800px) 800px, 1200px">
+            <source type="image/jpeg" srcset="%s" sizes="(max-width: 400px) 400px, (max-width: 800px) 800px, 1200px">
+            <img src="%s"
+                 alt="%s"
+                 class="%s"
+                 loading="lazy"
+                 decoding="async"
+                 width="1200"
+                 height="800"
+                 onerror="this.onerror=null; this.src=\'%splaceholder.jpg\';"
+                 fetchpriority="high">
+        </picture>',
+        $srcset,
+        $fallback_srcset,
+        $image_url,
+        htmlspecialchars($alt_text, ENT_QUOTES, 'UTF-8'),
+        htmlspecialchars($class, ENT_QUOTES, 'UTF-8'),
+        get_image_base_url()
+    );
+}
+
+/**
+ * Optimize images when they are fetched from FTP
+ */
+function optimize_downloaded_image($local_file) {
+    if (!file_exists($local_file)) {
+        return false;
+    }
+
+    $image_info = getimagesize($local_file);
+    if (!$image_info) {
+        return false;
+    }
+
+    // Create different sizes
+    $sizes = [400, 800, 1200];
+    $formats = ['jpg', 'webp'];
+
+    foreach ($sizes as $size) {
+        foreach ($formats as $format) {
+            $output_file = str_replace(
+                ['.jpg', '.jpeg', '.png'],
+                "-{$size}.{$format}",
+                $local_file
+            );
+
+            // Use ImageMagick if available
+            if (extension_loaded('imagick')) {
+                $imagick = new Imagick($local_file);
+                $imagick->resizeImage($size, $size, Imagick::FILTER_LANCZOS, 1);
+                $imagick->setImageCompressionQuality(85);
+
+                if ($format === 'webp') {
+                    $imagick->setImageFormat('webp');
+                    $imagick->setOption('webp:method', '6');
+                    $imagick->setOption('webp:lossless', 'false');
+                }
+
+                $imagick->writeImage($output_file);
+                $imagick->clear();
+            }
+            // Fallback to GD if ImageMagick is not available
+            else if (extension_loaded('gd')) {
+                $source_image = imagecreatefromstring(file_get_contents($local_file));
+                $width = imagesx($source_image);
+                $height = imagesy($source_image);
+
+                $ratio = $width / $height;
+                $new_width = $size;
+                $new_height = $size / $ratio;
+
+                $new_image = imagecreatetruecolor($new_width, $new_height);
+
+                // Preserve transparency for PNG
+                if ($image_info[2] === IMAGETYPE_PNG) {
+                    imagealphablending($new_image, false);
+                    imagesavealpha($new_image, true);
+                }
+
+                imagecopyresampled(
+                    $new_image, $source_image,
+                    0, 0, 0, 0,
+                    $new_width, $new_height,
+                    $width, $height
+                );
+
+                if ($format === 'webp') {
+                    imagewebp($new_image, $output_file, 85);
+                } else {
+                    imagejpeg($new_image, $output_file, 85);
+                }
+
+                imagedestroy($source_image);
+                imagedestroy($new_image);
+            }
+        }
+    }
+
+    return true;
 }
 
 /**
@@ -631,14 +759,22 @@ function display_car_card($car) {
     $status_class = $car['status'];
 
     echo '<div class="car-card" data-car=\'' . $jsonData . '\'>
-        <div class="car-image">
-            <img src="' . $car['eersteAfbeelding'] . '" alt="' . $car['merk'] . ' ' . $car['model'] . '">
-            <div class="car-badges">
-                <span class="status-badge ' . $status_class . '">' . $status_label . '</span>
-                <span class="year-badge">' . $car['bouwjaar'] . '</span>
-            </div>
+        <div class="car-image">';
+
+    // Use the new optimized image function
+    echo get_optimized_image_html(
+        $car['eersteAfbeelding'],
+        $car['merk'] . ' ' . $car['model'],
+        'car-image'
+    );
+
+    echo '<div class="car-badges">
+            <span class="status-badge ' . $status_class . '">' . $status_label . '</span>
+            <span class="year-badge">' . $car['bouwjaar'] . '</span>
         </div>
-        <div class="car-info">
+    </div>';
+
+    echo '<div class="car-info">
             <div class="car-brand">' . strtoupper($car['merk']) . '</div>
             <h3 class="car-title">' . $car['model'] . '</h3>
             <div class="car-price">€ ' . number_format((float)$car['prijs'], 0, ',', '.') . '</div>
