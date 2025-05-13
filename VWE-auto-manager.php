@@ -26,6 +26,7 @@ define('LOCAL_XML_PATH', VWE_PLUGIN_DIR . 'local_file.xml');
 define('DEBUG_MODE', false);
 define('LAST_UPDATE_FILE', VWE_PLUGIN_DIR . 'last_update.txt');
 define('UPDATE_INTERVAL', 86400); // 24 hours in seconds
+define('IMAGE_URL_BASE', 'https://staging.mvsautomotive.nl/wp-content/plugins/VWE-auto-manager/images/');
 
 // Cronjob configuration
 add_action('init', function() {
@@ -707,9 +708,8 @@ function generate_options($items) {
 /**
  * Helper function to get base URL for images
  */
-
 function get_image_base_url() {
-    return 'https://staging.mvsautomotive.nl/wp-content/plugins/VWE-auto-manager/images/';
+    return IMAGE_URL_BASE;
 }
 
 /**
@@ -747,7 +747,7 @@ function get_optimized_image_html($image_url, $alt_text, $class = '') {
                  width="1200"
                  height="800"
                  onerror="this.onerror=null; this.src=\'%splaceholder.jpg\';"
-                 fetchpriority="high">
+                 fetchpriority="low">
         </picture>',
         $srcset,
         $fallback_srcset,
@@ -1033,6 +1033,7 @@ function render_modals() {
  * Output JavaScript functionality
  */
 function output_javascript() {
+    $image_url_base = get_image_base_url();
     echo '<script>
         let currentSlide = 0;
         let totalSlides = 0;
@@ -1083,7 +1084,7 @@ function output_javascript() {
                     <div class="modal-section">
                         <h3>${carData.merk} ${carData.model}</h3>
                         <div class="price-tag">€ ${Number(carData.prijs).toLocaleString("nl-NL")}</div>
-                        </div>
+                    </div>
                     <div class="modal-section">
                         <h4>Belangrijke Specificaties</h4>
                         <div class="specs-grid">
@@ -1091,7 +1092,7 @@ function output_javascript() {
                             <div class="spec-item"><span class="spec-label">Kilometerstand</span><span class="spec-value">${carData.kilometerstand || "N/A"}</span></div>
                             <div class="spec-item"><span class="spec-label">Brandstof</span><span class="spec-value">${carData.brandstof || "N/A"}</span></div>
                             <div class="spec-item"><span class="spec-label">Transmissie</span><span class="spec-value">${carData.transmissie || "N/A"}</span></div>
-                    </div>
+                        </div>
                     </div>
                     <div class="modal-section">
                         <h4>Technische Details</h4>
@@ -1121,84 +1122,11 @@ function output_javascript() {
                             </div>
                         </div>
                     ` : ""}
-                    <!-- Delivery Packages -->
-                    <div class="delivery-packages">
-                        <h4>Afleverpakketten</h4>
-                        <div class="packages-grid">
-                            <div class="package-card basic">
-                                <div class="package-header">
-                                    <h5 class="package-title">Basis Pakket</h5>
-                                    <div class="package-price">€ 0,-</div>
-                                </div>
-                                <div class="package-features">
-                                    <div class="package-feature">
-                                        <span class="feature-icon">✓</span>
-                                        <span class="feature-text">APK (minimaal 6 maanden)</span>
-                                    </div>
-                                    <div class="package-feature">
-                                        <span class="feature-icon">✓</span>
-                                        <span class="feature-text">Technische controlebeurt</span>
-                                    </div>
-                                    <div class="package-feature">
-                                        <span class="feature-icon">✓</span>
-                                        <span class="feature-text">Reinigen interieur & exterieur</span>
-                                    </div>
-                                    <div class="package-feature">
-                                        <span class="feature-icon">✓</span>
-                                        <span class="feature-text">Tenaamstellen nieuwe auto</span>
-                                    </div>
-                                    <div class="package-feature">
-                                        <span class="feature-icon">✓</span>
-                                        <span class="feature-text">Vrijwaren inruilauto</span>
-                                    </div>
-                                </div>
-                                <button class="package-select-btn" onclick="selectPackage(1, \'${carData.merk} ${carData.model}\')">
-                                    Selecteer Pakket
-                                </button>
-                            </div>
-
-                            <div class="package-card premium">
-                                <div class="package-header">
-                                    <h5 class="package-title">Premium Pakket</h5>
-                                    <div class="package-price">€ 795,-</div>
-                                </div>
-                                <div class="package-features">
-                                    <div class="package-feature">
-                                        <span class="feature-icon">✓</span>
-                                        <span class="feature-text">APK (minimaal 6 maanden)</span>
-                                    </div>
-                                    <div class="package-feature">
-                                        <span class="feature-icon">✓</span>
-                                        <span class="feature-text">Onderhoudsbeurt conform fabrieksopgave</span>
-                                    </div>
-                                    <div class="package-feature">
-                                        <span class="feature-icon">✓</span>
-                                        <span class="feature-text">12 Maanden BOVAG garantie</span>
-                                    </div>
-                                    <div class="package-feature">
-                                        <span class="feature-icon">✓</span>
-                                        <span class="feature-text">Reinigen interieur & exterieur</span>
-                                    </div>
-                                    <div class="package-feature">
-                                        <span class="feature-icon">✓</span>
-                                        <span class="feature-text">Tenaamstellen nieuwe auto</span>
-                                    </div>
-                                    <div class="package-feature">
-                                        <span class="feature-icon">✓</span>
-                                        <span class="feature-text">Vrijwaren inruilauto</span>
-                                    </div>
-                                </div>
-                                <button class="package-select-btn" onclick="selectPackage(2, \'${carData.merk} ${carData.model}\')">
-                                    Selecteer Pakket
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                            </div>
-                        `;
+                </div>
+            `;
 
             modal.style.display = "block";
-            }
+        }
 
         function updateCarousel() {
             const slides = document.querySelector(".carousel-slides");
@@ -1213,45 +1141,28 @@ function output_javascript() {
 
         function nextSlide() {
             if (totalSlides > 0) {
-            currentSlide = (currentSlide + 1) % totalSlides;
-            updateCarousel();
+                currentSlide = (currentSlide + 1) % totalSlides;
+                updateCarousel();
             }
         }
 
         function prevSlide() {
             if (totalSlides > 0) {
-            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-            updateCarousel();
+                currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+                updateCarousel();
             }
         }
 
         function goToSlide(index) {
             if (index >= 0 && index < totalSlides) {
-            currentSlide = index;
-            updateCarousel();
-        }
+                currentSlide = index;
+                updateCarousel();
+            }
         }
 
         function closeModal() {
             const modal = document.getElementById("carModal");
             modal.style.display = "none";
-        }
-
-        function selectPackage(packageNumber, carName) {
-            const packageNames = {
-                1: "Basis Pakket",
-                2: "Comfort Pakket",
-                3: "Premium Pakket"
-            };
-            const packagePrices = {
-                1: "€ 0,-",
-                2: "€ 495,-",
-                3: "€ 795,-"
-            };
-
-            if (confirm("Wilt u het " + packageNames[packageNumber] + " selecteren voor " + carName + " voor " + packagePrices[packageNumber] + "?")) {
-                alert("Bedankt voor het selecteren van het " + packageNames[packageNumber] + " voor " + carName + ". Ons team neemt contact met u op voor de volgende stappen.");
-            }
         }
 
         // Make functions globally available
@@ -1261,7 +1172,6 @@ function output_javascript() {
         window.nextSlide = nextSlide;
         window.prevSlide = prevSlide;
         window.goToSlide = goToSlide;
-        window.selectPackage = selectPackage;
 
         // Close modal on click outside
         window.addEventListener("click", function(event) {
@@ -1278,226 +1188,186 @@ function output_javascript() {
             }
         });
 
-        document.addEventListener("DOMContentLoaded", function() {
-            const carCards = document.querySelectorAll(".car-card");
-            const carsGrid = document.getElementById("carsGrid");
-            const resetFilters = document.getElementById("resetFilters");
-            const sortSelect = document.getElementById("sortSelect");
-            const showSelect = document.getElementById("showSelect");
+        // Filter functionality
+        function applyFilters() {
+            const brandFilter = document.getElementById("brandFilter").value;
+            const modelFilter = document.getElementById("modelFilter").value;
+            const fuelFilter = document.getElementById("fuelFilter").value;
+            const transmissionFilter = document.getElementById("transmissionFilter").value;
+            const bodyFilter = document.getElementById("bodyFilter").value;
+            const doorsFilter = document.getElementById("doorsFilter").value;
+            const seatsFilter = document.getElementById("seatsFilter").value;
+            const priceMin = document.getElementById("priceMin").value;
+            const priceMax = document.getElementById("priceMax").value;
+            const kmMin = document.getElementById("kmMin").value;
+            const kmMax = document.getElementById("kmMax").value;
+            const powerMin = document.getElementById("powerMin").value;
+            const powerMax = document.getElementById("powerMax").value;
 
-            // Handle filter events
-            const filterElements = [
-                "brandFilter", "modelFilter", "fuelFilter",
-                "transmissionFilter", "bodyFilter", "doorsFilter",
-                "seatsFilter", "priceMin", "priceMax",
-                "kmMin", "kmMax", "powerMin", "powerMax"
+            // Get selected years
+            const selectedYears = Array.from(document.querySelectorAll('input[name="year"]:checked'))
+                .map(cb => cb.value)
+                .filter(value => value !== 'all');
+
+            // Get selected statuses
+            const selectedStatuses = Array.from(document.querySelectorAll('input[name="status"]:checked'))
+                .map(cb => cb.value)
+                .filter(value => value !== 'all');
+
+            const cards = document.querySelectorAll('.car-card');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const carData = JSON.parse(card.dataset.car);
+                let visible = true;
+
+                // Brand filter
+                if (brandFilter && carData.merk !== brandFilter) {
+                    visible = false;
+                }
+
+                // Model filter
+                if (modelFilter && carData.model !== modelFilter) {
+                    visible = false;
+                }
+
+                // Fuel filter
+                if (fuelFilter && carData.brandstof !== fuelFilter) {
+                    visible = false;
+                }
+
+                // Transmission filter
+                if (transmissionFilter && carData.transmissie !== transmissionFilter) {
+                    visible = false;
+                }
+
+                // Body type filter
+                if (bodyFilter && carData.carrosserie !== bodyFilter) {
+                    visible = false;
+                }
+
+                // Doors filter
+                if (doorsFilter && carData.deuren !== doorsFilter) {
+                    visible = false;
+                }
+
+                // Seats filter
+                if (seatsFilter && carData.aantal_zitplaatsen !== seatsFilter) {
+                    visible = false;
+                }
+
+                // Price range filter
+                const price = parseFloat(carData.prijs);
+                if (priceMin && price < parseFloat(priceMin)) {
+                    visible = false;
+                }
+                if (priceMax && price > parseFloat(priceMax)) {
+                    visible = false;
+                }
+
+                // Kilometer range filter
+                const km = parseFloat(carData.kilometerstand.replace(/[^\d]/g, ''));
+                if (kmMin && km < parseFloat(kmMin)) {
+                    visible = false;
+                }
+                if (kmMax && km > parseFloat(kmMax)) {
+                    visible = false;
+                }
+
+                // Power range filter
+                const power = parseFloat(carData.vermogen_pk);
+                if (powerMin && power < parseFloat(powerMin)) {
+                    visible = false;
+                }
+                if (powerMax && power > parseFloat(powerMax)) {
+                    visible = false;
+                }
+
+                // Year range filter
+                if (selectedYears.length > 0) {
+                    const year = parseInt(carData.bouwjaar);
+                    let yearMatch = false;
+                    selectedYears.forEach(yearRange => {
+                        const [min, max] = yearRange.split('-').map(Number);
+                        if (year >= min && year <= max) {
+                            yearMatch = true;
+                        }
+                    });
+                    if (!yearMatch) {
+                        visible = false;
+                    }
+                }
+
+                // Status filter
+                if (selectedStatuses.length > 0 && !selectedStatuses.includes(carData.status)) {
+                    visible = false;
+                }
+
+                // Update card visibility
+                card.style.display = visible ? 'block' : 'none';
+                if (visible) {
+                    visibleCount++;
+                }
+            });
+
+            // Update results count
+            updateResultsCount();
+        }
+
+        // Add event listeners to all filter inputs
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterInputs = [
+                'brandFilter', 'modelFilter', 'fuelFilter', 'transmissionFilter',
+                'bodyFilter', 'doorsFilter', 'seatsFilter', 'priceMin', 'priceMax',
+                'kmMin', 'kmMax', 'powerMin', 'powerMax'
             ];
 
-            filterElements.forEach(id => {
-                document.getElementById(id).addEventListener("input", filterCars);
+            filterInputs.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('change', applyFilters);
+                }
             });
 
-            document.querySelectorAll("input[name=\'year\']").forEach(cb => {
-                cb.addEventListener("change", filterCars);
+            // Add event listeners to checkboxes
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    // If "all" is checked, uncheck others
+                    if (this.value === 'all' && this.checked) {
+                        document.querySelectorAll(`input[name="${this.name}"]:not([value="all"])`).forEach(cb => {
+                            cb.checked = false;
+                        });
+                    } else if (this.checked) {
+                        // If a specific option is checked, uncheck "all"
+                        document.querySelector(`input[name="${this.name}"][value="all"]`).checked = false;
+                    }
+                    applyFilters();
+                });
             });
 
-            document.querySelectorAll("input[name=\'status\']").forEach(cb => {
-                cb.addEventListener("change", filterCars);
-            });
+            // Add event listener to reset button
+            const resetButton = document.getElementById('resetFilters');
+            if (resetButton) {
+                resetButton.addEventListener('click', function() {
+                    // Reset all select elements
+                    document.querySelectorAll('select').forEach(select => {
+                        select.value = '';
+                    });
 
-            resetFilters.addEventListener("click", resetAllFilters);
-            sortSelect.addEventListener("change", sortCars);
-            showSelect.addEventListener("change", showSelectedCars);
+                    // Reset all number inputs
+                    document.querySelectorAll('input[type="number"]').forEach(input => {
+                        input.value = '';
+                    });
 
-            function filterCars() {
-                carCards.forEach(card => {
-                    try {
-                    const carData = JSON.parse(card.dataset.car);
+                    // Reset all checkboxes
+                    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                        checkbox.checked = checkbox.value === 'all';
+                    });
 
-                        // Collect all matching criteria
-                        const criteria = {
-                            brandMatch: !brandFilter.value || carData.merk === brandFilter.value,
-                            modelMatch: !modelFilter.value || carData.model === modelFilter.value,
-                            fuelMatch: !fuelFilter.value || carData.brandstof === fuelFilter.value,
-                            transmissionMatch: !transmissionFilter.value || carData.transmissie === transmissionFilter.value,
-                            bodyMatch: !bodyFilter.value || carData.carrosserie === bodyFilter.value,
-                            doorsMatch: !doorsFilter.value || carData.deuren === doorsFilter.value,
-                            seatsMatch: !seatsFilter.value || carData.aantal_zitplaatsen === seatsFilter.value,
-                            priceMatch: (isInRange(parseFloat(carData.prijs), priceMin.value, priceMax.value)),
-                            kmMatch: (isInRange(parseFloat(carData.kilometerstand), kmMin.value, kmMax.value)),
-                            powerMatch: (isInRange(parseFloat(carData.vermogen_pk), powerMin.value, powerMax.value)),
-                            yearMatch: getYearMatch(carData.bouwjaar),
-                            statusMatch: getStatusMatch(carData.status)
-                        };
-
-                        const shouldShow = Object.values(criteria).every(match => match);
-                        card.style.display = shouldShow ? "block" : "none";
-
-                    } catch (e) {
-                        console.error("Error filtering car:", e);
-                        card.style.display = "none";
-                    }
-                });
-                updateResultsCount();
-            }
-
-            function isInRange(value, min, max) {
-                return (value >= (parseFloat(min) || 0)) && (value <= (parseFloat(max) || Infinity));
-            }
-
-            function getYearMatch(year) {
-                const selectedYears = Array.from(document.querySelectorAll("input[name=\'year\']:checked"))
-                    .map(cb => cb.value);
-                return selectedYears.includes("all") || selectedYears.some(range => {
-                    if (range === "all") return true;
-                    const [start, end] = range.split("-").map(Number);
-                    return year >= start && year <= end;
+                    // Reapply filters
+                    applyFilters();
                 });
             }
-
-            function getStatusMatch(carStatus) {
-                const selectedStatuses = Array.from(document.querySelectorAll("input[name=\'status\']:checked"))
-                    .map(cb => cb.value);
-                return selectedStatuses.includes("all") || selectedStatuses.includes(carStatus);
-            }
-
-            function sortCars() {
-                const sortValue = sortSelect.value;
-                const cards = Array.from(carCards);
-
-                cards.sort((a, b) => {
-                    const carA = JSON.parse(a.dataset.car);
-                    const carB = JSON.parse(b.dataset.car);
-                    return compareCars(carA, carB, sortValue);
-                });
-
-                cards.forEach(card => carsGrid.appendChild(card));
-                updateResultsCount();
-            }
-
-            function compareCars(carA, carB, criteria) {
-                switch (criteria) {
-                        case "price-asc":
-                            return parseFloat(carA.prijs) - parseFloat(carB.prijs);
-                        case "price-desc":
-                            return parseFloat(carB.prijs) - parseFloat(carA.prijs);
-                        case "year-desc":
-                            return parseInt(carB.bouwjaar) - parseInt(carA.bouwjaar);
-                        case "year-asc":
-                            return parseInt(carA.bouwjaar) - parseInt(carB.bouwjaar);
-                        case "km-asc":
-                            return parseFloat(carA.kilometerstand) - parseFloat(carB.kilometerstand);
-                        case "km-desc":
-                            return parseFloat(carB.kilometerstand) - parseFloat(carA.kilometerstand);
-                        default:
-                            return 0;
-                    }
-            }
-
-            function showSelectedCars() {
-                const showValue = parseInt(showSelect.value);
-                carCards.forEach((card, index) => {
-                    card.style.display = (showValue === 0 || index < showValue) ? "block" : "none";
-                });
-                updateResultsCount();
-            }
-
-            function resetAllFilters() {
-                // Reset all filter inputs
-                filterElements.forEach(id => {
-                    const element = document.getElementById(id);
-                    if (element) {
-                        element.value = "";
-                    }
-                });
-
-                // Reset checkboxes
-                document.querySelectorAll(\'input[name="year"]\').forEach(cb => {
-                    cb.checked = cb.value === "all";
-                });
-                document.querySelectorAll(\'input[name="status"]\').forEach(cb => {
-                    cb.checked = cb.value === "all";
-                });
-
-                // Reset sort and show selects
-                sortSelect.value = "default";
-                showSelect.value = "all";
-
-                // Show all car cards
-                carCards.forEach(card => {
-                    card.style.display = "block";
-                });
-
-                // Reset to first page
-                currentPage = 1;
-                const start = 0;
-                const end = Math.min(carsPerPage, totalItems);
-
-                // Update results count
-                const resultsText = document.getElementById("resultsText");
-                const filteredResults = document.getElementById("filteredResults");
-
-                resultsText.innerHTML = `Viewing <span id="currentResults">${start + 1}-${end}</span> of <span id="totalResults">${totalItems}</span> TOTAL CARS`;
-                filteredResults.style.display = "none";
-
-                // Update pagination controls
-                document.getElementById("currentPage").textContent = "1";
-                document.querySelector(".pagination-prev").disabled = true;
-                document.querySelector(".pagination-next").disabled = totalPages <= 1;
-
-                // Re-render the first page of cars
-                const carsGrid = document.getElementById("carsGrid");
-                carsGrid.innerHTML = "";
-
-                const firstPageCars = allCars.slice(0, carsPerPage);
-                firstPageCars.forEach(car => {
-                    const carData = {
-                        merk: car.merk,
-                        model: car.model,
-                        bouwjaar: car.bouwjaar,
-                        prijs: car.verkoopprijs_particulier,
-                        kilometerstand: car.tellerstand,
-                        brandstof: car.brandstof,
-                        transmissie: car.transmissie,
-                        deuren: car.aantal_deuren,
-                        cilinders: car.cilinder_aantal,
-                        vermogen: car.vermogen_motor_kw,
-                        vermogen_pk: car.vermogen_motor_pk,
-                        kenteken: car.kenteken,
-                        gewicht: car.massa,
-                        cilinder_inhoud: car.cilinder_inhoud,
-                        aantal_zitplaatsen: car.aantal_zitplaatsen,
-                        interieurkleur: car.interieurkleur,
-                        bekleding: car.bekleding,
-                        opmerkingen: car.opmerkingen,
-                        carrosserie: car.carrosserie,
-                        status: car.verkocht === "j" ? "verkocht" : (car.gereserveerd === "j" ? "gereserveerd" : "beschikbaar"),
-                        afbeeldingen: [],
-                        eersteAfbeelding: ""
-                    };
-
-                    // Process images
-                    if (car.afbeeldingen && car.afbeeldingen.afbeelding) {
-                        const images = Array.isArray(car.afbeeldingen.afbeelding)
-                            ? car.afbeeldingen.afbeelding
-                            : [car.afbeeldingen.afbeelding];
-
-                        carData.afbeeldingen = images.map(img => "' . $image_url_base . '" + img.bestandsnaam);
-                        carData.eersteAfbeelding = carData.afbeeldingen[0] || "' . $image_url_base . 'placeholder.jpg";
-                    } else {
-                        carData.eersteAfbeelding = "' . $image_url_base . 'placeholder.jpg";
-                    }
-
-                    displayCarCard(carData);
-                });
-
-                // Scroll to top of cars grid
-                carsGrid.scrollIntoView({ behavior: "smooth" });
-            }
-
-            // Initialize
-            updateModelOptions();
-            filterCars();
         });
     </script>';
 }
@@ -1796,15 +1666,25 @@ function get_xml_data() {
  * Preload images for better performance
  */
 function output_image_preload($cars) {
-    echo '<link rel="preload" as="image" href="' . get_image_base_url() . 'placeholder.jpg">';
+    // Preload placeholder image with high priority
+    echo '<link rel="preload" as="image" href="' . get_image_base_url() . 'placeholder.jpg" fetchpriority="high">';
+
+    // Track already preloaded images to avoid duplicates
+    $preloaded_images = array();
+
+    // Only preload the first image of each car
     foreach ($cars as $car) {
         if (isset($car->afbeeldingen) && isset($car->afbeeldingen->afbeelding)) {
-            foreach ($car->afbeeldingen->afbeelding as $afbeelding) {
-                if (isset($afbeelding->bestandsnaam)) {
-                    $bestandsnaam = (string)$afbeelding->bestandsnaam;
-                    if ($bestandsnaam !== '') {
-                        echo '<link rel="preload" as="image" href="' . get_image_base_url() . $bestandsnaam . '">';
-                    }
+            // Get the first image
+            $first_image = is_array($car->afbeeldingen->afbeelding)
+                ? $car->afbeeldingen->afbeelding[0]
+                : $car->afbeeldingen->afbeelding;
+
+            if (isset($first_image->bestandsnaam)) {
+                $bestandsnaam = (string)$first_image->bestandsnaam;
+                if ($bestandsnaam !== '' && !in_array($bestandsnaam, $preloaded_images)) {
+                    echo '<link rel="preload" as="image" href="' . get_image_base_url() . $bestandsnaam . '" fetchpriority="high">';
+                    $preloaded_images[] = $bestandsnaam;
                 }
             }
         }
