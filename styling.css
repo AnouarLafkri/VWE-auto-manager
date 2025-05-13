@@ -1459,3 +1459,75 @@ body {
         font-size: 18px;
     }
 }
+
+/* Pagination Controls */
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 2rem 0;
+    gap: 1rem;
+}
+
+.pagination-prev,
+.pagination-next {
+    padding: 0.75rem 1.5rem;
+    border: 2px solid #333;
+    background: white;
+    color: #333;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+}
+
+.pagination-prev:hover:not(:disabled),
+.pagination-next:hover:not(:disabled) {
+    background: #333;
+    color: white;
+}
+
+.pagination-prev:disabled,
+.pagination-next:disabled {
+    border-color: #ccc;
+    color: #ccc;
+    cursor: not-allowed;
+}
+
+.pagination-info {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #333;
+}
+
+/* Cars Container */
+.cars-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* Cars Grid */
+.cars-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 1200px) {
+    .cars-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .cars-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .pagination-controls {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
