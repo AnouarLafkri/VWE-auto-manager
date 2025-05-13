@@ -1595,6 +1595,139 @@ function download_xml_from_ftp() {
 }
 
 /**
+ * Ensure all images from XML exist locally
+ */
+function ensure_all_images_exist() {
+    if (!file_exists(LOCAL_XML_PATH)) {
+        error_log('XML file not found');
+        return false;
+    }
+
+    $xml_content = file_get_contents(LOCAL_XML_PATH);
+    if (!$xml_content) {
+        error_log('Could not read XML file');
+        return false;
+    }
+
+    $xml = new SimpleXMLElement($xml_content);
+    if (!$xml) {
+        error_log('Error parsing XML content');
+        return false;
+    }
+
+    $missing_images = [];
+    $max_retries = 3;
+    $retry_count = 0;
+
+    // Collect all image filenames from XML
+    foreach ($xml->voertuig as $car) {
+        if (isset($car->afbeeldingen)) {
+            foreach ($car->afbeeldingen->children() as $afbeelding) {
+                if ($afbeelding->getName() === 'afbeelding') {
+                    if (isset($afbeelding->bestandsnaam)) {
+                        $filename = trim((string)$afbeelding->bestandsnaam);
+                        if ($filename !== '') {
+                            $local_file = LOCAL_IMAGES_PATH . $filename;
+                            if (!file_exists($local_file)) {
+                                $missing_images[] = $filename;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // If there are missing images, try to download them
+    while (!empty($missing_images) && $retry_count < $max_retries) {
+        $retry_count++;
+        error_log("Attempt $retry_count to download missing images. Missing count: " . count($missing_images));
+
+        // Set FTP timeout
+        $timeout = 30;
+        $is_ssl = false;
+
+        // Try SSL connection first
+        if (function_exists('ftp_ssl_connect')) {
+            $ftp_conn = @ftp_ssl_connect(FTP_SERVER, 21, $timeout);
+            if ($ftp_conn) {
+                $is_ssl = true;
+            }
+        }
+
+        // Fallback to regular FTP if SSL fails
+        if (!$ftp_conn) {
+            $ftp_conn = @ftp_connect(FTP_SERVER, 21, $timeout);
+        }
+
+        if (!$ftp_conn) {
+            error_log('Could not connect to FTP server: ' . FTP_SERVER);
+            continue;
+        }
+
+        // Set additional FTP options
+        ftp_set_option($ftp_conn, FTP_TIMEOUT_SEC, $timeout);
+        ftp_set_option($ftp_conn, FTP_AUTOSEEK, true);
+
+        if (!@ftp_login($ftp_conn, FTP_USER, FTP_PASS)) {
+            if ($is_ssl) {
+                @ftp_close($ftp_conn);
+            } else {
+                ftp_close($ftp_conn);
+            }
+            error_log('FTP login failed for user: ' . FTP_USER);
+            continue;
+        }
+
+        ftp_pasv($ftp_conn, true);
+
+        // Enable SSL if available
+        if ($is_ssl) {
+            ftp_set_option($ftp_conn, FTP_USEPASVADDRESS, true);
+        }
+
+        $still_missing = [];
+        foreach ($missing_images as $filename) {
+            $remote_file = REMOTE_IMAGES_PATH . $filename;
+            $local_file = LOCAL_IMAGES_PATH . $filename;
+
+            if (@ftp_get($ftp_conn, $local_file, $remote_file, FTP_BINARY)) {
+                // Optimize the downloaded image
+                optimize_downloaded_image($local_file);
+                error_log("Successfully downloaded and optimized: $filename");
+            } else {
+                $still_missing[] = $filename;
+                error_log("Failed to download: $filename");
+            }
+        }
+
+        // Properly close the connection
+        if ($is_ssl) {
+            @ftp_close($ftp_conn);
+        } else {
+            ftp_close($ftp_conn);
+        }
+
+        // Update missing images list
+        $missing_images = $still_missing;
+
+        // If we still have missing images, wait before retrying
+        if (!empty($missing_images)) {
+            sleep(5); // Wait 5 seconds before retrying
+        }
+    }
+
+    // Log final status
+    if (empty($missing_images)) {
+        error_log("All images successfully downloaded after $retry_count attempts");
+        return true;
+    } else {
+        error_log("Failed to download " . count($missing_images) . " images after $max_retries attempts");
+        return false;
+    }
+}
+
+/**
  * Update all data (XML and images)
  */
 function update_all_data() {
@@ -1609,8 +1742,9 @@ function update_all_data() {
             return false;
         }
 
-        // Update images
+        // Update images and ensure all images exist
         fetch_images_from_ftp();
+        ensure_all_images_exist();
         cleanup_unused_images();
         update_timestamp();
 
