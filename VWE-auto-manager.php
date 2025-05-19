@@ -645,6 +645,36 @@ function display_car_listing() {
                                (car.status === "verkocht" ? "VERKOCHT" : "GERESERVEERD");
             const status_class = car.status;
 
+            // Create a detailed title with specifications
+            const title_parts = [];
+            title_parts.push(car.merk + " " + car.model);
+
+            // Add engine info if available
+            if (car.cilinder_inhoud) {
+                title_parts.push(car.cilinder_inhoud);
+            }
+
+            // Add transmission if available
+            if (car.transmissie) {
+                title_parts.push(car.transmissie);
+            }
+
+            // Add fuel type if available
+            if (car.brandstof) {
+                title_parts.push(car.brandstof);
+            }
+
+            // Add doors if available
+            if (car.deuren) {
+                title_parts.push(car.deuren + " Deurs");
+            }
+
+            // Add NL Auto if it\'s a Dutch car
+            title_parts.push("NL Auto");
+
+            // Join all parts with spaces
+            const detailed_title = title_parts.join(" / ");
+
             const card = document.createElement("div");
             card.className = "car-card";
             card.dataset.car = jsonData;
@@ -659,11 +689,11 @@ function display_car_listing() {
                 </div>
                 <div class="car-info">
                     <div class="car-brand">${car.merk.toUpperCase()}</div>
-                    <h3 class="car-title">${car.model}</h3>
+                    <h3 class="car-title">${detailed_title}</h3>
                     <div class="car-price">€ ${Number(car.prijs).toLocaleString("nl-NL")}</div>
                     <div class="car-specs">
-                        <span>€ ' . number_format(2.065, 3, ',', '.') . ' p/m</span>
                         <span>${car.kilometerstand}</span>
+                        <span>${car.vermogen}</span>
                     </div>
                     <button type="button" class="view-button" onclick="showCarDetails(this)">
                         BEKIJKEN <span class="arrow">→</span>
@@ -969,6 +999,36 @@ function display_car_card($car) {
                    ($car['status'] === "verkocht" ? "VERKOCHT" : "GERESERVEERD"));
     $status_class = $car['status'];
 
+    // Create a detailed title with specifications
+    $title_parts = [];
+    $title_parts[] = $car['merk'] . ' ' . $car['model'];
+
+    // Add engine info if available
+    if (!empty($car['cilinder_inhoud'])) {
+        $title_parts[] = $car['cilinder_inhoud'];
+    }
+
+    // Add transmission if available
+    if (!empty($car['transmissie'])) {
+        $title_parts[] = $car['transmissie'];
+    }
+
+    // Add fuel type if available
+    if (!empty($car['brandstof'])) {
+        $title_parts[] = $car['brandstof'];
+    }
+
+    // Add doors if available
+    if (!empty($car['deuren'])) {
+        $title_parts[] = $car['deuren'] . ' Deurs';
+    }
+
+    // Add NL Auto if it's a Dutch car
+    $title_parts[] = 'NL Auto';
+
+    // Join all parts with spaces
+    $detailed_title = implode(' / ', $title_parts);
+
     echo '<div class="car-card" data-car=\'' . $jsonData . '\'>
         <div class="car-image">';
 
@@ -987,11 +1047,12 @@ function display_car_card($car) {
 
     echo '<div class="car-info">
             <div class="car-brand">' . strtoupper($car['merk']) . '</div>
-            <h3 class="car-title">' . $car['model'] . '</h3>
+            <h3 class="car-title">' . $detailed_title . '</h3>
             <div class="car-price">€ ' . number_format((float)$car['prijs'], 0, ',', '.') . '</div>
             <div class="car-specs">
                 <span>€ ' . number_format(2.065, 3, ',', '.') . ' p/m</span>
                 <span>' . $car['kilometerstand'] . '</span>
+                <span>' . $car['vermogen'] . '</span>
             </div>
             <button type="button" class="view-button" onclick="showCarDetails(this)">
                 BEKIJKEN <span class="arrow">→</span>
