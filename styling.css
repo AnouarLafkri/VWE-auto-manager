@@ -32,6 +32,8 @@ body {
 
 /* Top Controls */
 .top-controls {
+    width: 75%;
+    margin-left: auto; /* pushes it to the right */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -41,6 +43,7 @@ body {
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-sm);
 }
+
 
 .results-count {
     font-size: 14px;
