@@ -1,0 +1,2233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<voertuig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://eigenwebsite.dv.nl/docs/2.23/voertuig.xsd" actie="add" versie="2.23">
+	<voertuignr_hexon>44916687</voertuignr_hexon>
+	<voertuignr>3150445</voertuignr>
+	<voertuignr_klant/>
+	<hexon_id>79a854a0-f3da-47f8-953e-db9dfcdb42c0</hexon_id>
+	<klantnummer>21698</klantnummer>
+	<invoerdatum>12-05-2025</invoerdatum>
+	<kenteken>N889XS</kenteken>
+	<merk>Ford</merk>
+	<model>Fiesta</model>
+	<type>1.1 * Bluetooth / Airco / LM Velgen / Parkeersensoren *</type>
+	<toevoeging/>
+	<merk_orig>Ford</merk_orig>
+	<model_orig>Fiesta</model_orig>
+	<type_orig>1.1 * Bluetooth / Airco / LM Velgen / Parkeersensoren *</type_orig>
+	<oud_model/>
+	<modeljaar/>
+	<voertuigsoort>AUTO</voertuigsoort>
+	<carrosserie>Hatchback</carrosserie>
+	<carrosserie_orig>Hatchback</carrosserie_orig>
+	<aantal_deuren>5</aantal_deuren>
+	<tellerstand eenheid="K">71268</tellerstand>
+	<rdw_tellerrapport_url/>
+	<brandstof>B</brandstof>
+	<transmissie>H</transmissie>
+	<aantal_versnellingen>5</aantal_versnellingen>
+	<btw_marge>M</btw_marge>
+	<nieuw_voertuig>n</nieuw_voertuig>
+	<laktint/>
+	<kleur_nederlands/>
+	<kleur_engels/>
+	<kleur_duits/>
+	<kleur_frans/>
+	<kleur_spaans/>
+	<kleur_portugees/>
+	<kleur_italiaans/>
+	<kleur_grieks/>
+	<kleur_russisch/>
+	<kleur_roemeens/>
+	<kleur_hongaars/>
+	<kleur_pools/>
+	<kleur_tsjechisch/>
+	<kleur_bulgaars/>
+	<kleur_kroatisch/>
+	<kleur_deens/>
+	<kleur_slowaaks/>
+	<kleur_turks/>
+	<kleur_fins/>
+	<kleur_zweeds/>
+	<kleur_noors/>
+	<basiskleur>wit</basiskleur>
+	<laksoort/>
+	<constructiedatum/>
+	<bouwjaar>2019</bouwjaar>
+	<datum_deel_1>13-06-2019</datum_deel_1>
+	<datum_deel_1a>16-09-2022</datum_deel_1a>
+	<datum_deel_1b/>
+	<verkoopprijs_particulier>
+		<prijzen land="nl">
+			<prijs nr="1">
+				<bedrag>9975</bedrag>
+				<munteenheid>EUR</munteenheid>
+				<btw/>
+				<btw_percentage/>
+				<bpm>j</bpm>
+			</prijs>
+		</prijzen>
+	</verkoopprijs_particulier>
+	<actieprijs>
+		<prijzen/>
+	</actieprijs>
+	<verkoopprijs_handel>
+		<prijzen/>
+	</verkoopprijs_handel>
+	<veiling/>
+	<wederverkoop_toegestaan/>
+	<type_hybride/>
+	<hybride_aandrijving/>
+	<plugin_hybride/>
+	<aanwezige_accu/>
+	<accutype/>
+	<accu_laadvermogen/>
+	<accu_snellaadvermogen/>
+	<accu_laadtijd/>
+	<accu_snellaadtijd/>
+	<accu_laadsnelheid/>
+	<accu_snellaadsnelheid/>
+	<accu_conditie/>
+	<aantal_fasen_acculader/>
+	<stekkeraansluiting/>
+	<stekkeraansluiting_snellader/>
+	<geschikt_voor_snelladen/>
+	<apk tot="16-09-2026" bij_aflevering="n"></apk>
+	<au-datum/>
+	<hu-datum/>
+	<massa>1031</massa>
+	<max_trekgewicht>750</max_trekgewicht>
+	<cilinder_aantal>3</cilinder_aantal>
+	<cilinder_inhoud>1084</cilinder_inhoud>
+	<vermogen_motor_kw>51</vermogen_motor_kw>
+	<vermogen_motor_pk>70</vermogen_motor_pk>
+	<vermogen_brandstof_kw>51</vermogen_brandstof_kw>
+	<vermogen_brandstof_pk>70</vermogen_brandstof_pk>
+	<vermogen_elektrisch_kw/>
+	<vermogen_elektrisch_pk/>
+	<koppel/>
+	<koppel_elektrisch/>
+	<koppel_brandstof/>
+	<koppelinrichting/>
+	<aandrijfmethode/>
+	<fiscaal_vermogen_fr/>
+	<fiscaal_vermogen_be/>
+	<maximaal_toegelaten_massa/>
+	<aantal_zitplaatsen>5</aantal_zitplaatsen>
+	<bpm_bedrag>
+		<prijs nr="1">
+			<bedrag>4294</bedrag>
+			<munteenheid>EUR</munteenheid>
+			<btw/>
+			<btw_percentage/>
+			<bpm/>
+		</prijs>
+	</bpm_bedrag>
+	<rest_bpm_bedrag>
+		<prijs nr="">
+			<bedrag>1309</bedrag>
+			<munteenheid>EUR</munteenheid>
+			<btw/>
+			<btw_percentage/>
+			<bpm/>
+		</prijs>
+	</rest_bpm_bedrag>
+	<interieurkleur>Donkergrijs</interieurkleur>
+	<basisinterieurkleur>grijs</basisinterieurkleur>
+	<bekleding>Stof</bekleding>
+	<plaatsing_stuurwiel/>
+	<aantal_sleutels>2</aantal_sleutels>
+	<aantal_handzenders>2</aantal_handzenders>
+	<code_pas_sleutel/>
+	<nap_weblabel>n</nap_weblabel>
+	<carpass/>
+	<carpass_url/>
+	<onderhoudsboekjes>ja</onderhoudsboekjes>
+	<locatie_voertuig/>
+	<meeneemprijs>
+		<prijzen/>
+	</meeneemprijs>
+	<inkoopprijs/>
+	<bieden_vanaf/>
+	<reserveringsprijs/>
+	<opknapkosten/>
+	<waarderingsprijs/>
+	<kosten_rijklaar/>
+	<gemiddeld_verbruik>5.2</gemiddeld_verbruik>
+	<nedc_brandstofverbruik_gemiddeld/>
+	<wltp_brandstofverbruik_combined/>
+	<schadevoertuig/>
+	<consignatie/>
+	<demovoertuig/>
+	<wielbasis>249</wielbasis>
+	<laadvermogen>584</laadvermogen>
+	<gvw>1615</gvw>
+	<loopvlakbreedte/>
+	<bandhoogte/>
+	<aantal_assen>2</aantal_assen>
+	<draaicirkel/>
+	<lengte/>
+	<breedte/>
+	<hoogte/>
+	<vin>WF0FXXGAHFKL83138</vin>
+	<emissieklasse>6</emissieklasse>
+	<energielabel>C</energielabel>
+	<milieusticker_de/>
+	<milieusticker_fr/>
+	<volautomatisch/>
+	<voortbeweging_zelfstandig/>
+	<verplaatsingsmediums/>
+	<verplaatsingswijzes/>
+	<mobiel>j</mobiel>
+	<bediening/>
+	<generatorvermogen/>
+	<compressorsoort/>
+	<doorvoercapaciteit/>
+	<maximale_reikwijdte/>
+	<voedingsspanning/>
+	<mastlengte/>
+	<bovenarmlengte/>
+	<rupsbandbreedte/>
+	<laadschopinhoud/>
+	<minimale_koeltemperatuur/>
+	<maximale_koeltemperatuur/>
+	<toepassingsmaterialen/>
+	<toepassingsgebieden/>
+	<toepassingsschalen/>
+	<ce_markering/>
+	<staat_algemeen/>
+	<staat_technisch/>
+	<staat_optisch/>
+	<staat_interieur/>
+	<diepte/>
+	<rompmateriaal/>
+	<ligplaats/>
+	<aantal_staanplaatsen/>
+	<merk_motor/>
+	<type_motor/>
+	<land_nieuw/>
+	<aandrijving>motorisch</aandrijving>
+	<prijs_nieuw_herberekend/>
+	<werkbreedte/>
+	<werkhoogte/>
+	<hefhoogte/>
+	<vrije_hefhoogte/>
+	<hefcapaciteit/>
+	<aantal_wielen/>
+	<aantal_ventielen/>
+	<mast/>
+	<mast_aantal_delen/>
+	<voortbeweging></voortbeweging>
+	<chassisvorm/>
+	<besturing/>
+	<fiets_uitvoering/>
+	<typenummer/>
+	<modeldatum_vanaf/>
+	<modeldatum_tot/>
+	<modelcode/>
+	<vorklengte/>
+	<vorkbreedte/>
+	<lastzwaartepunt/>
+	<accucapaciteit/>
+	<accuspanning/>
+	<accubouwjaar/>
+	<accubouwmaand/>
+	<accumerk/>
+	<pomp_aansluitingsmaat/>
+	<attachment_passend_ops/>
+	<hefwerktuigaansluiting/>
+	<snelwisselsysteem/>
+	<pantograaf/>
+	<breker_soort/>
+	<wals_trillend/>
+	<wals_oppervlak/>
+	<serienummer/>
+	<prijstype>vaste prijs</prijstype>
+	<bieden_toestaan>n</bieden_toestaan>
+	<oldtimer>n</oldtimer>
+	<onderdeel_geschikt_voor/>
+	<ktype/>
+	<fiets_versnelling/>
+	<vrachtwagen_transmissie></vrachtwagen_transmissie>
+	<powershuttle/>
+	<gesynchroniseerde_transmissie/>
+	<transmissie_groepen/>
+	<maaier_soort/>
+	<aantal_ploegscharen/>
+	<seizoen/>
+	<bedoelde_positie_voor_achter/>
+	<bedoelde_positie_links_rechts/>
+	<minimaal_octaangetal/>
+	<e10_geschikt/>
+	<framehoogte/>
+	<maximale_doorrijhoogte/>
+	<leasevoorstellen/>
+	<asconfiguratie>
+		<as nr="1">
+			<positie>voor</positie>
+			<merk_type/>
+			<max_as_last/>
+			<bandenmaat/>
+			<loopvlakbreedte/>
+			<bandhoogte/>
+			<velgmaat/>
+			<loadindex/>
+			<snelheidsindex/>
+			<aangedreven>j</aangedreven>
+			<liftas/>
+			<dubbellucht/>
+			<meesturend/>
+			<differentieelslot/>
+			<lichtmetalen_velgen/>
+			<profiel_banden_perc/>
+			<profiel_banden_mm/>
+			<reductie/>
+			<remmen/>
+			<vering/>
+		</as>
+		<as nr="2">
+			<positie>achter</positie>
+			<merk_type/>
+			<max_as_last/>
+			<bandenmaat/>
+			<loopvlakbreedte/>
+			<bandhoogte/>
+			<velgmaat/>
+			<loadindex/>
+			<snelheidsindex/>
+			<aangedreven>n</aangedreven>
+			<liftas/>
+			<dubbellucht/>
+			<meesturend/>
+			<differentieelslot/>
+			<lichtmetalen_velgen/>
+			<profiel_banden_perc/>
+			<profiel_banden_mm/>
+			<reductie/>
+			<remmen/>
+			<vering/>
+		</as>
+	</asconfiguratie>
+	<asconfiguratie_svg/>
+	<nieuwprijs/>
+	<netto_catalogusprijs/>
+	<fiscale_waarde/>
+	<bijtelling_pct>22</bijtelling_pct>
+	<verkocht_datum/>
+	<eigen_garantielabel/>
+	<verlengd></verlengd>
+	<verhoogd></verhoogd>
+	<assen_aangedreven>1</assen_aangedreven>
+	<bedrijfsuren/>
+	<geremd/>
+	<datum_binnenkomst/>
+	<verhuur/>
+	<klassieker/>
+	<aantal_eigenaren/>
+	<onderhoudshistorie/>
+	<onderhouden_volgens_voorschriften/>
+	<afleverpakketten>
+		<afleverpakket volgorde="1">
+			<naam>Pakket 1: (standaard)</naam>
+			<omschrijving>APK (minimaal 6 maanden geldig) / Technische controle / Tenaamstelling voertuig / Vrijwaren inruilauto (inruil bespreekbaar) / Reinigen interieur en exterieur / Nationale AutoPas&lt;br /&gt;Deze Ford wordt standaard met dit afleverpakket geleverd.</omschrijving>
+			<inhoud/>
+			<prijs>
+				<prijs nr="">
+					<bedrag>0</bedrag>
+					<munteenheid>EUR</munteenheid>
+					<btw>ex</btw>
+					<btw_percentage/>
+					<bpm/>
+				</prijs>
+				<prijs nr="">
+					<bedrag>0</bedrag>
+					<munteenheid>EUR</munteenheid>
+					<btw>in</btw>
+					<btw_percentage/>
+					<bpm/>
+				</prijs>
+			</prijs>
+			<prijs_rel>
+				<prijs nr="">
+					<bedrag>0</bedrag>
+					<munteenheid>EUR</munteenheid>
+					<btw>ex</btw>
+					<btw_percentage/>
+					<bpm/>
+				</prijs>
+				<prijs nr="">
+					<bedrag>0</bedrag>
+					<munteenheid>EUR</munteenheid>
+					<btw>in</btw>
+					<btw_percentage/>
+					<bpm/>
+				</prijs>
+			</prijs_rel>
+			<accessoires/>
+			<apk_bij_aflevering/>
+			<garantie_opmerking></garantie_opmerking>
+			<garanties>
+				<merkgarantie/>
+				<garanties/>
+				<bovag_40puntencheck>n</bovag_40puntencheck>
+				<bovag_afleverbeurt>n</bovag_afleverbeurt>
+				<aanvullende_garantie/>
+				<opmerkingen></opmerkingen>
+			</garanties>
+		</afleverpakket>
+		<afleverpakket volgorde="2">
+			<naam>Pakket 2:</naam>
+			<omschrijving>12 Maanden BOVAG garantie /  Onderhoudsbeurt conform onderhoudshistorie / APK (minimaal 6 maanden geldig) / Gratis vervangend vervoer (tijdens de garantieperiode) / Reinigen interieur en exterieur / Nationale AutoPas&lt;br /&gt;Deze Ford is verkrijgbaar met dit afleverpakket in plaats van het standaardpakket voor een meerprijs van &amp;euro;&amp;nbsp;657.</omschrijving>
+			<inhoud>
+				<element>BOVAG garantie (12 maanden)</element>
+			</inhoud>
+			<prijs>
+				<prijs nr="">
+					<bedrag>657.025</bedrag>
+					<munteenheid>EUR</munteenheid>
+					<btw>ex</btw>
+					<btw_percentage/>
+					<bpm/>
+				</prijs>
+				<prijs nr="">
+					<bedrag>795</bedrag>
+					<munteenheid>EUR</munteenheid>
+					<btw>in</btw>
+					<btw_percentage/>
+					<bpm/>
+				</prijs>
+			</prijs>
+			<prijs_rel>
+				<prijs nr="">
+					<bedrag>657.025</bedrag>
+					<munteenheid>EUR</munteenheid>
+					<btw>ex</btw>
+					<btw_percentage/>
+					<bpm/>
+				</prijs>
+				<prijs nr="">
+					<bedrag>795</bedrag>
+					<munteenheid>EUR</munteenheid>
+					<btw>in</btw>
+					<btw_percentage/>
+					<bpm/>
+				</prijs>
+			</prijs_rel>
+			<accessoires/>
+			<apk_bij_aflevering/>
+			<garantie_opmerking></garantie_opmerking>
+			<garanties>
+				<merkgarantie/>
+				<garanties>
+					<garantie nr="1">
+						<naam>BOVAG Garantie</naam>
+						<maanden>12</maanden>
+						<type>branch</type>
+						<id>41</id>
+					</garantie>
+				</garanties>
+				<bovag_40puntencheck>n</bovag_40puntencheck>
+				<bovag_afleverbeurt>n</bovag_afleverbeurt>
+				<aanvullende_garantie/>
+				<opmerkingen></opmerkingen>
+			</garanties>
+		</afleverpakket>
+	</afleverpakketten>
+	<afleverpakket_toegepast>1</afleverpakket_toegepast>
+	<aantal_slaapplaatsen/>
+	<aantal_bedden/>
+	<merk_chassis/>
+	<model_chassis/>
+	<meldcode/>
+	<land>nl</land>
+	<topsnelheid>160</topsnelheid>
+	<tankinhoud/>
+	<actieradius/>
+	<actieradius_elektrisch/>
+	<actieradius_brandstof/>
+	<nedc_actieradius_elektrisch_gemiddeld/>
+	<nedc_actieradius_elektrisch_snelweg/>
+	<nedc_actieradius_elektrisch_stad/>
+	<wltp_actieradius_elektrisch_combined/>
+	<wltp_actieradius_elektrisch_low/>
+	<wltp_actieradius_elektrisch_medium/>
+	<wltp_actieradius_elektrisch_high/>
+	<wltp_actieradius_elektrisch_extrahigh/>
+	<max_trekgewicht_ongeremd>565</max_trekgewicht_ongeremd>
+	<acceleratie>14.9</acceleratie>
+	<max_dakbelasting/>
+	<inhoud_laadruimte_banken_weggeklapt/>
+	<verbruik_stad/>
+	<verbruik_snelweg/>
+	<nedc_brandstofverbruik_stad/>
+	<nedc_brandstofverbruik_snelweg/>
+	<wltp_brandstofverbruik_low/>
+	<wltp_brandstofverbruik_medium/>
+	<wltp_brandstofverbruik_high/>
+	<wltp_brandstofverbruik_extrahigh/>
+	<elektriciteitsverbruik_gemiddeld/>
+	<elektriciteitsverbruik_snelweg/>
+	<elektriciteitsverbruik_stad/>
+	<nedc_elektriciteitsverbruik_gemiddeld/>
+	<nedc_elektriciteitsverbruik_snelweg/>
+	<nedc_elektriciteitsverbruik_stad/>
+	<wltp_elektriciteitsverbruik_combined/>
+	<wltp_elektriciteitsverbruik_low/>
+	<wltp_elektriciteitsverbruik_medium/>
+	<wltp_elektriciteitsverbruik_high/>
+	<wltp_elektriciteitsverbruik_extrahigh/>
+	<co2_uitstoot>117</co2_uitstoot>
+	<nedc_co2_uitstoot_gemiddeld/>
+	<nedc_co2_uitstoot_snelweg/>
+	<nedc_co2_uitstoot_stad/>
+	<wltp_co2_uitstoot_combined/>
+	<wltp_co2_uitstoot_low/>
+	<wltp_co2_uitstoot_medium/>
+	<wltp_co2_uitstoot_high/>
+	<wltp_co2_uitstoot_extrahigh/>
+	<fijnstof_uitstoot/>
+	<adblue_systeem/>
+	<cabine_soort/>
+	<cabine_type/>
+	<cabine_lengte/>
+	<transmissie_merk/>
+	<transmissie_type/>
+	<opbouw>
+		<merk/>
+		<type/>
+		<lengte/>
+		<breedte/>
+		<hoogte/>
+		<kipper_rechts/>
+		<kipper_links/>
+		<kipper_achter/>
+		<aantal_compartimenten/>
+		<pomp/>
+		<uitschuifbaar/>
+		<slangen/>
+		<telwerk/>
+		<waterinstallatie/>
+		<schoonwatertank/>
+		<schoonwatertank_inhoud/>
+		<hogedrukpomp/>
+		<laadvloer_hoogte/>
+		<inhoud_laadruimte/>
+		<schuifdak/>
+		<soort_koelmotor/>
+		<draaiuren_elektrisch/>
+		<draaiuren_diesel/>
+		<wanddikte/>
+		<aantal_autos/>
+	</opbouw>
+	<alternatieve_onderdelen/>
+	<fabrieksgarantie_tot/>
+	<fabrieksgarantie_aantal_kms/>
+	<fabrieksgarantie_aantal_maanden/>
+	<garantielabels/>
+	<honderd_procent_onderhouden/>
+	<bovag_40puntencheck>n</bovag_40puntencheck>
+	<bovag_afleverbeurt>n</bovag_afleverbeurt>
+	<garantie_maanden/>
+	<garantie_km/>
+	<opmerkingen_garantie_nederlands></opmerkingen_garantie_nederlands>
+	<opmerkingen_garantie_engels></opmerkingen_garantie_engels>
+	<opmerkingen_garantie_duits></opmerkingen_garantie_duits>
+	<opmerkingen_garantie_frans></opmerkingen_garantie_frans>
+	<opmerkingen_garantie_spaans></opmerkingen_garantie_spaans>
+	<opmerkingen_garantie_portugees></opmerkingen_garantie_portugees>
+	<opmerkingen_garantie_italiaans></opmerkingen_garantie_italiaans>
+	<opmerkingen_garantie_grieks></opmerkingen_garantie_grieks>
+	<opmerkingen_garantie_russisch></opmerkingen_garantie_russisch>
+	<opmerkingen_garantie_roemeens></opmerkingen_garantie_roemeens>
+	<opmerkingen_garantie_hongaars></opmerkingen_garantie_hongaars>
+	<opmerkingen_garantie_pools></opmerkingen_garantie_pools>
+	<opmerkingen_garantie_tsjechisch></opmerkingen_garantie_tsjechisch>
+	<opmerkingen_garantie_bulgaars></opmerkingen_garantie_bulgaars>
+	<opmerkingen_garantie_kroatisch></opmerkingen_garantie_kroatisch>
+	<opmerkingen_garantie_deens></opmerkingen_garantie_deens>
+	<opmerkingen_garantie_slowaaks></opmerkingen_garantie_slowaaks>
+	<opmerkingen_garantie_turks></opmerkingen_garantie_turks>
+	<opmerkingen_garantie_fins></opmerkingen_garantie_fins>
+	<opmerkingen_garantie_zweeds></opmerkingen_garantie_zweeds>
+	<opmerkingen_garantie_noors></opmerkingen_garantie_noors>
+	<euro_ncap_rating/>
+	<upc_a/>
+	<ean_8/>
+	<ean_13/>
+	<bed1_type/>
+	<bed1_positie/>
+	<bed1_richting/>
+	<bed2_type/>
+	<bed2_positie/>
+	<bed2_richting/>
+	<bed3_type/>
+	<bed3_positie/>
+	<bed3_richting/>
+	<zit1_type/>
+	<zit1_positie/>
+	<zit2_type/>
+	<zit2_positie/>
+	<keuken_positie/>
+	<sanitair_opstelling/>
+	<directe_link></directe_link>
+	<contactpersonen/>
+	<opmerkingen>In nette staat verkerende Ford Fiesta welke van de 2e eigenaar afkomstig is. Motorisch is de beschikking over een sterke 1.1 benzinemotor en levert een vermogen van 71 PK. De vorige eigenaar heeft deze auto altijd keurig onder- en bijgehouden, waarbij zowel het interieur en exterieur er verzorgd uitzien. Daarbij is het onderhoud periodiek uitgevoerd en afgestempeld in het bijgevoegde serviceboekje. Geleverd met het juiste optiepakket is deze Ford Fiesta voorzien van de juiste opties, welke in en rond de auto aanwezig zijn. &lt;br /&gt;&lt;br /&gt;&lt;br /&gt;Bij Autobedrijf Kooy kunt u een keuze maken uit onderstaande opleverpakketten. Op die manier bepaalt u zelf alle aanvullende garanties, diensten en zekerheden. Bij beide opleverpakketten is het mogelijk om uw huidige auto in te ruilen. &lt;br /&gt;&lt;br /&gt;Opleverpakket 1.     &amp;euro; 0,-&lt;br /&gt;   -   APK (minimaal 6 maanden)&lt;br /&gt;   -   Technische controlebeurt &lt;br /&gt;   -   Reinigen interieur &amp;amp; exterieur&lt;br /&gt;   -   Tenaamstellen nieuwe auto&lt;br /&gt;   -   Vrijwaren inruilauto&lt;br /&gt;&lt;br /&gt;Opleverpakket 2.     &amp;euro;795,-&lt;br /&gt;   -   APK (minimaal 6 maanden)&lt;br /&gt;   -   Onderhoudsbeurt conform fabrieksopgave&lt;br /&gt;   -   6 Maanden BOVAG garantie&lt;br /&gt;   -   Reinigen interieur &amp;amp; exterieur&lt;br /&gt;   -   Tenaamstellen nieuwe auto&lt;br /&gt;   -   Vrijwaren inruilauto</opmerkingen>
+	<opmerkingen_engels></opmerkingen_engels>
+	<opmerkingen_duits></opmerkingen_duits>
+	<opmerkingen_frans></opmerkingen_frans>
+	<opmerkingen_spaans></opmerkingen_spaans>
+	<opmerkingen_portugees></opmerkingen_portugees>
+	<opmerkingen_italiaans></opmerkingen_italiaans>
+	<opmerkingen_grieks></opmerkingen_grieks>
+	<opmerkingen_russisch></opmerkingen_russisch>
+	<opmerkingen_roemeens></opmerkingen_roemeens>
+	<opmerkingen_hongaars></opmerkingen_hongaars>
+	<opmerkingen_pools></opmerkingen_pools>
+	<opmerkingen_tsjechisch></opmerkingen_tsjechisch>
+	<opmerkingen_bulgaars></opmerkingen_bulgaars>
+	<opmerkingen_kroatisch></opmerkingen_kroatisch>
+	<opmerkingen_deens></opmerkingen_deens>
+	<opmerkingen_slowaaks></opmerkingen_slowaaks>
+	<opmerkingen_turks></opmerkingen_turks>
+	<opmerkingen_fins></opmerkingen_fins>
+	<opmerkingen_zweeds></opmerkingen_zweeds>
+	<opmerkingen_noors></opmerkingen_noors>
+	<opmerkingen_handel></opmerkingen_handel>
+	<opmerkingen_handel_engels></opmerkingen_handel_engels>
+	<opmerkingen_handel_duits></opmerkingen_handel_duits>
+	<opmerkingen_handel_frans></opmerkingen_handel_frans>
+	<opmerkingen_handel_spaans></opmerkingen_handel_spaans>
+	<opmerkingen_handel_portugees></opmerkingen_handel_portugees>
+	<opmerkingen_handel_italiaans></opmerkingen_handel_italiaans>
+	<opmerkingen_handel_grieks></opmerkingen_handel_grieks>
+	<opmerkingen_handel_russisch></opmerkingen_handel_russisch>
+	<opmerkingen_handel_roemeens></opmerkingen_handel_roemeens>
+	<opmerkingen_handel_hongaars></opmerkingen_handel_hongaars>
+	<opmerkingen_handel_pools></opmerkingen_handel_pools>
+	<opmerkingen_handel_tsjechisch></opmerkingen_handel_tsjechisch>
+	<opmerkingen_handel_bulgaars></opmerkingen_handel_bulgaars>
+	<opmerkingen_handel_kroatisch></opmerkingen_handel_kroatisch>
+	<opmerkingen_handel_deens></opmerkingen_handel_deens>
+	<opmerkingen_handel_slowaaks></opmerkingen_handel_slowaaks>
+	<opmerkingen_handel_turks></opmerkingen_handel_turks>
+	<opmerkingen_handel_fins></opmerkingen_handel_fins>
+	<opmerkingen_handel_zweeds></opmerkingen_handel_zweeds>
+	<opmerkingen_handel_noors></opmerkingen_handel_noors>
+	<titel>Ford Fiesta 1.1 * Bluetooth / Airco / LM Velgen / Parkeersensoren *</titel>
+	<titel_engels></titel_engels>
+	<titel_duits></titel_duits>
+	<titel_frans></titel_frans>
+	<titel_spaans></titel_spaans>
+	<titel_portugees></titel_portugees>
+	<titel_italiaans></titel_italiaans>
+	<titel_grieks></titel_grieks>
+	<titel_russisch></titel_russisch>
+	<titel_roemeens></titel_roemeens>
+	<titel_hongaars></titel_hongaars>
+	<titel_pools></titel_pools>
+	<titel_tsjechisch></titel_tsjechisch>
+	<titel_bulgaars></titel_bulgaars>
+	<titel_kroatisch></titel_kroatisch>
+	<titel_deens></titel_deens>
+	<titel_slowaaks></titel_slowaaks>
+	<titel_turks></titel_turks>
+	<titel_fins></titel_fins>
+	<titel_zweeds></titel_zweeds>
+	<titel_noors></titel_noors>
+	<highlights></highlights>
+	<highlights_engels></highlights_engels>
+	<highlights_duits></highlights_duits>
+	<highlights_frans></highlights_frans>
+	<highlights_spaans></highlights_spaans>
+	<highlights_portugees></highlights_portugees>
+	<highlights_italiaans></highlights_italiaans>
+	<highlights_grieks></highlights_grieks>
+	<highlights_russisch></highlights_russisch>
+	<highlights_roemeens></highlights_roemeens>
+	<highlights_hongaars></highlights_hongaars>
+	<highlights_pools></highlights_pools>
+	<highlights_tsjechisch></highlights_tsjechisch>
+	<highlights_bulgaars></highlights_bulgaars>
+	<highlights_kroatisch></highlights_kroatisch>
+	<highlights_deens></highlights_deens>
+	<highlights_slowaaks></highlights_slowaaks>
+	<highlights_turks></highlights_turks>
+	<highlights_fins></highlights_fins>
+	<highlights_zweeds></highlights_zweeds>
+	<highlights_noors></highlights_noors>
+	<zoektermen></zoektermen>
+	<zoektermen_engels></zoektermen_engels>
+	<zoektermen_duits></zoektermen_duits>
+	<zoektermen_frans></zoektermen_frans>
+	<zoektermen_spaans></zoektermen_spaans>
+	<zoektermen_portugees></zoektermen_portugees>
+	<zoektermen_italiaans></zoektermen_italiaans>
+	<zoektermen_grieks></zoektermen_grieks>
+	<zoektermen_russisch></zoektermen_russisch>
+	<zoektermen_roemeens></zoektermen_roemeens>
+	<zoektermen_hongaars></zoektermen_hongaars>
+	<zoektermen_pools></zoektermen_pools>
+	<zoektermen_tsjechisch></zoektermen_tsjechisch>
+	<zoektermen_bulgaars></zoektermen_bulgaars>
+	<zoektermen_kroatisch></zoektermen_kroatisch>
+	<zoektermen_deens></zoektermen_deens>
+	<zoektermen_slowaaks></zoektermen_slowaaks>
+	<zoektermen_turks></zoektermen_turks>
+	<zoektermen_fins></zoektermen_fins>
+	<zoektermen_zweeds></zoektermen_zweeds>
+	<zoektermen_noors></zoektermen_noors>
+	<standaardopmerkingen></standaardopmerkingen>
+	<standaardopmerkingen_engels></standaardopmerkingen_engels>
+	<standaardopmerkingen_duits></standaardopmerkingen_duits>
+	<standaardopmerkingen_frans></standaardopmerkingen_frans>
+	<standaardopmerkingen_spaans></standaardopmerkingen_spaans>
+	<standaardopmerkingen_portugees></standaardopmerkingen_portugees>
+	<standaardopmerkingen_italiaans></standaardopmerkingen_italiaans>
+	<standaardopmerkingen_grieks></standaardopmerkingen_grieks>
+	<standaardopmerkingen_russisch></standaardopmerkingen_russisch>
+	<standaardopmerkingen_roemeens></standaardopmerkingen_roemeens>
+	<standaardopmerkingen_hongaars></standaardopmerkingen_hongaars>
+	<standaardopmerkingen_pools></standaardopmerkingen_pools>
+	<standaardopmerkingen_tsjechisch></standaardopmerkingen_tsjechisch>
+	<standaardopmerkingen_bulgaars></standaardopmerkingen_bulgaars>
+	<standaardopmerkingen_kroatisch></standaardopmerkingen_kroatisch>
+	<standaardopmerkingen_deens></standaardopmerkingen_deens>
+	<standaardopmerkingen_slowaaks></standaardopmerkingen_slowaaks>
+	<standaardopmerkingen_turks></standaardopmerkingen_turks>
+	<standaardopmerkingen_fins></standaardopmerkingen_fins>
+	<standaardopmerkingen_zweeds></standaardopmerkingen_zweeds>
+	<standaardopmerkingen_noors></standaardopmerkingen_noors>
+	<motorrijtuigen_belasting>
+		<maand_min>
+			<prijs nr="">
+				<bedrag>38</bedrag>
+				<munteenheid>EUR</munteenheid>
+				<btw/>
+				<btw_percentage/>
+				<bpm/>
+			</prijs>
+		</maand_min>
+		<maand_max>
+			<prijs nr="">
+				<bedrag>42</bedrag>
+				<munteenheid>EUR</munteenheid>
+				<btw/>
+				<btw_percentage/>
+				<bpm/>
+			</prijs>
+		</maand_max>
+		<kwartaal_min>
+			<prijs nr="">
+				<bedrag>114</bedrag>
+				<munteenheid>EUR</munteenheid>
+				<btw/>
+				<btw_percentage/>
+				<bpm/>
+			</prijs>
+		</kwartaal_min>
+		<kwartaal_max>
+			<prijs nr="">
+				<bedrag>125</bedrag>
+				<munteenheid>EUR</munteenheid>
+				<btw/>
+				<btw_percentage/>
+				<bpm/>
+			</prijs>
+		</kwartaal_max>
+		<jaar_min>
+			<prijs nr="">
+				<bedrag>456</bedrag>
+				<munteenheid>EUR</munteenheid>
+				<btw/>
+				<btw_percentage/>
+				<bpm/>
+			</prijs>
+		</jaar_min>
+		<jaar_max>
+			<prijs nr="">
+				<bedrag>500</bedrag>
+				<munteenheid>EUR</munteenheid>
+				<btw/>
+				<btw_percentage/>
+				<bpm/>
+			</prijs>
+		</jaar_max>
+	</motorrijtuigen_belasting>
+	<verkocht>n</verkocht>
+	<verwacht/>
+	<gereserveerd/>
+	<accessoires>
+		<accessoire>
+			<naam>Achterbank in delen neerklapbaar</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>1</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Airbag(s) hoofd achter</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>4</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Airbag(s) hoofd voor</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>5</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Airbag(s) side voor</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>6</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Airbag bestuurder</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>2</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Airbag passagier</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>3</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Airco</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>7</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Anti Blokkeer Systeem (ABS)</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>8</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Autotelefoonvoorbereiding met Bluetooth</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>9</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Bandenspanningscontrolesysteem</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>10</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Bestuurdersstoel in hoogte verstelbaar</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>11</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Boordcomputer</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>12</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Brake Assist System</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>13</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Buitenspiegels elektrisch inklapbaar</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>14</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Buitenspiegels elektrisch verstelbaar</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>15</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Buitenspiegels in carrosseriekleur</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>16</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Buitenspiegels verwarmbaar</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>17</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Centrale deurvergrendeling met afstandsbediening</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>18</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Dimlichten automatisch</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>19</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Electronic Brake Distribution (EBD)</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>20</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Electronic Stability Program (ESP)</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>21</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Elektrische ramen voor</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>22</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Hill hold-functie</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>23</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>ISO fix aansluiting</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>35</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>LED dagrijverlichting</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>24</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Multimedia-voorbereiding</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>25</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Parkeersensor achter</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>26</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Radio</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>27</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Rijstrooksensor met correctie</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>28</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Start/stop systeem</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>29</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Startblokkering</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>30</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Stuurbekrachtiging</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>32</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Stuur verstelbaar</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>31</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Stuurwiel multifunctioneel</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>33</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>Tractie Controle Systeem (TCS)</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>34</volgorde>
+			<prijs/>
+		</accessoire>
+		<accessoire>
+			<naam>USB aansluiting</naam>
+			<prioriteit>2</prioriteit>
+			<volgorde>36</volgorde>
+			<prijs/>
+		</accessoire>
+	</accessoires>
+	<accessoires_engels/>
+	<accessoires_duits/>
+	<accessoires_frans/>
+	<accessoires_spaans/>
+	<accessoires_portugees/>
+	<accessoires_italiaans/>
+	<accessoires_grieks/>
+	<accessoires_russisch/>
+	<accessoires_roemeens/>
+	<accessoires_hongaars/>
+	<accessoires_pools/>
+	<accessoires_tsjechisch/>
+	<accessoires_bulgaars/>
+	<accessoires_kroatisch/>
+	<accessoires_deens/>
+	<accessoires_slowaaks/>
+	<accessoires_turks/>
+	<accessoires_fins/>
+	<accessoires_zweeds/>
+	<accessoires_noors/>
+	<accessoiregroepen>
+		<accessoiregroep naam="Comfort &amp; Interieur">
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Achterbank in delen neerklapbaar</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Airco</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Autotelefoonvoorbereiding met Bluetooth</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Bandenspanningscontrolesysteem</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Bestuurdersstoel in hoogte verstelbaar</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Boordcomputer</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Elektrische ramen voor</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Multimedia-voorbereiding</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Radio</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Stuurbekrachtiging</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Stuur verstelbaar</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Stuurwiel multifunctioneel</description>
+			</accessoire>
+		</accessoiregroep>
+		<accessoiregroep naam="Exterieur">
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Buitenspiegels elektrisch inklapbaar</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Buitenspiegels elektrisch verstelbaar</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Buitenspiegels in carrosseriekleur</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Buitenspiegels verwarmbaar</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Centrale deurvergrendeling met afstandsbediening</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Dimlichten automatisch</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>LED dagrijverlichting</description>
+			</accessoire>
+		</accessoiregroep>
+		<accessoiregroep naam="Veiligheid">
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Airbag(s) hoofd achter</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Airbag(s) hoofd voor</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Airbag(s) side voor</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Airbag bestuurder</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Airbag passagier</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Anti Blokkeer Systeem (ABS)</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Brake Assist System</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Electronic Brake Distribution (EBD)</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Electronic Stability Program (ESP)</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Hill hold-functie</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Parkeersensor achter</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Rijstrooksensor met correctie</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Start/stop systeem</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Startblokkering</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>Tractie Controle Systeem (TCS)</description>
+			</accessoire>
+		</accessoiregroep>
+		<accessoiregroep naam="Overig">
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>ISO fix aansluiting</description>
+			</accessoire>
+			<accessoire>
+				<prioriteit>2</prioriteit>
+				<prijs/>
+				<description>USB aansluiting</description>
+			</accessoire>
+		</accessoiregroep>
+	</accessoiregroepen>
+	<accessoiregroepen_engels/>
+	<accessoiregroepen_duits/>
+	<accessoiregroepen_frans/>
+	<accessoiregroepen_spaans/>
+	<accessoiregroepen_portugees/>
+	<accessoiregroepen_italiaans/>
+	<accessoiregroepen_grieks/>
+	<accessoiregroepen_russisch/>
+	<accessoiregroepen_roemeens/>
+	<accessoiregroepen_hongaars/>
+	<accessoiregroepen_pools/>
+	<accessoiregroepen_tsjechisch/>
+	<accessoiregroepen_bulgaars/>
+	<accessoiregroepen_kroatisch/>
+	<accessoiregroepen_deens/>
+	<accessoiregroepen_slowaaks/>
+	<accessoiregroepen_turks/>
+	<accessoiregroepen_fins/>
+	<accessoiregroepen_zweeds/>
+	<accessoiregroepen_noors/>
+	<zoekaccessoires>
+		<accessoire>Achterbank in delen neerklapbaar</accessoire>
+		<accessoire>Airbag bestuurder</accessoire>
+		<accessoire>Airbag passagier</accessoire>
+		<accessoire>Airconditioning</accessoire>
+		<accessoire>Anti-slipregeling</accessoire>
+		<accessoire>Antiblokkeersysteem</accessoire>
+		<accessoire>Automatische dimlichten</accessoire>
+		<accessoire>Bandenspanningscontrole</accessoire>
+		<accessoire>Boordcomputer</accessoire>
+		<accessoire>Buitenspiegels in carrosseriekleur</accessoire>
+		<accessoire>Centrale deurvergrendeling afstandbediend</accessoire>
+		<accessoire>Elektrisch bedienbare ramen voor</accessoire>
+		<accessoire>Elektrisch inklapbare buitenspiegels</accessoire>
+		<accessoire>Elektrisch verstelbare buitenspiegels</accessoire>
+		<accessoire>Elektronische remkrachtverdeling</accessoire>
+		<accessoire>Hill-hold control</accessoire>
+		<accessoire>Hoofdairbags achter</accessoire>
+		<accessoire>Hoofdairbags voor</accessoire>
+		<accessoire>In hoogte verstelbare bestuurdersstoel</accessoire>
+		<accessoire>LED dagrijverlichting</accessoire>
+		<accessoire>Multifunctioneel stuurwiel</accessoire>
+		<accessoire>Multimedia-voorbereiding</accessoire>
+		<accessoire>Noodremassistentie</accessoire>
+		<accessoire>Parkeersensoren achter</accessoire>
+		<accessoire>Radio</accessoire>
+		<accessoire>Rijstrooksensor</accessoire>
+		<accessoire>Stabiliteitscontrole</accessoire>
+		<accessoire>Start/stopsysteem</accessoire>
+		<accessoire>Startonderbreker</accessoire>
+		<accessoire>Stuurbekrachtiging</accessoire>
+		<accessoire>Telefoonvoorbereiding met bluetooth</accessoire>
+		<accessoire>Verstelbaar stuurwiel</accessoire>
+		<accessoire>Verwarmde buitenspiegels</accessoire>
+		<accessoire>Zij-airbags voor</accessoire>
+	</zoekaccessoires>
+	<zoekaccessoires_engels>
+		<accessoire>Adjustable steering wheel</accessoire>
+		<accessoire>Air conditioning</accessoire>
+		<accessoire>Anti-lock braking system</accessoire>
+		<accessoire>Anti-slip regulation</accessoire>
+		<accessoire>Automatic dipped headlights</accessoire>
+		<accessoire>Door mirrors in colour of body</accessoire>
+		<accessoire>Driver's airbag</accessoire>
+		<accessoire>Electrically adjustable door mirrors</accessoire>
+		<accessoire>Electrically folding door mirrors</accessoire>
+		<accessoire>Electrically operated front windows</accessoire>
+		<accessoire>Electronic brakeforce distribution</accessoire>
+		<accessoire>Emergency braking assistance</accessoire>
+		<accessoire>Front head airbags</accessoire>
+		<accessoire>Front side airbags</accessoire>
+		<accessoire>Heated door mirrors</accessoire>
+		<accessoire>Height adjustable driver's seat</accessoire>
+		<accessoire>Hill-hold control</accessoire>
+		<accessoire>Immobiliser</accessoire>
+		<accessoire>Lane departure warning</accessoire>
+		<accessoire>LED daytime running lights</accessoire>
+		<accessoire>Multifunctional steering wheel</accessoire>
+		<accessoire>Multimedia enabled</accessoire>
+		<accessoire>Onboard computer</accessoire>
+		<accessoire>Passenger-side airbag</accessoire>
+		<accessoire>Power steering</accessoire>
+		<accessoire>Radio</accessoire>
+		<accessoire>Rear head airbags</accessoire>
+		<accessoire>Rear parking sensor</accessoire>
+		<accessoire>Rear seats foldable in parts</accessoire>
+		<accessoire>Remote central locking</accessoire>
+		<accessoire>Stability control</accessoire>
+		<accessoire>Start / stop system</accessoire>
+		<accessoire>Telephone enabled with Bluetooth</accessoire>
+		<accessoire>Tyre pressure control</accessoire>
+	</zoekaccessoires_engels>
+	<zoekaccessoires_duits>
+		<accessoire>Antiblockiersystem</accessoire>
+		<accessoire>Antriebsschlupfregelung</accessoire>
+		<accessoire>Automatisches Abblendlicht</accessoire>
+		<accessoire>Außenspiegel in Karosseriefarbe</accessoire>
+		<accessoire>Beheizte Außenspiegel</accessoire>
+		<accessoire>Beifahrerairbag</accessoire>
+		<accessoire>Bordcomputer</accessoire>
+		<accessoire>Elektrische Fensterheber vorn</accessoire>
+		<accessoire>Elektrisch einklappbare Außenspiegel</accessoire>
+		<accessoire>Elektrisch verstellbare Außenspiegel</accessoire>
+		<accessoire>Elektronische Bremskraftverteilung</accessoire>
+		<accessoire>Fahrerairbag</accessoire>
+		<accessoire>Fernbediente Zentralverriegelung</accessoire>
+		<accessoire>Geteilt umklappbare Rückbank</accessoire>
+		<accessoire>Hill-hold control</accessoire>
+		<accessoire>Höhenverstellbarer Fahrersitz</accessoire>
+		<accessoire>Klimaanlage</accessoire>
+		<accessoire>Kopfairbags hinten</accessoire>
+		<accessoire>Kopfairbags vorn</accessoire>
+		<accessoire>LED-Tagesfahrbeleuchtung</accessoire>
+		<accessoire>Multifunktionales Lenkrad</accessoire>
+		<accessoire>Multimediafähig</accessoire>
+		<accessoire>Notbremsassistent</accessoire>
+		<accessoire>Parksensoren hinten</accessoire>
+		<accessoire>Radio</accessoire>
+		<accessoire>Reifendruckkontrolle</accessoire>
+		<accessoire>Seitenairbags vorn</accessoire>
+		<accessoire>Servolenkung</accessoire>
+		<accessoire>Spurhalteassistent</accessoire>
+		<accessoire>Stabilitätskontrolle</accessoire>
+		<accessoire>Start/Stopp-System</accessoire>
+		<accessoire>Startunterbrecher</accessoire>
+		<accessoire>Telefon mit Bluetooth</accessoire>
+		<accessoire>Verstellbares Lenkrad</accessoire>
+	</zoekaccessoires_duits>
+	<zoekaccessoires_frans>
+		<accessoire>Airbag chauffeur</accessoire>
+		<accessoire>Airbag passager</accessoire>
+		<accessoire>Airbags de tête arrière</accessoire>
+		<accessoire>Airbags de tête avant</accessoire>
+		<accessoire>Airbags latéraux avant</accessoire>
+		<accessoire>Air conditionné</accessoire>
+		<accessoire>Assistance au freinage d'urgence</accessoire>
+		<accessoire>Banquette arrière rabattables en plusieurs parties</accessoire>
+		<accessoire>Capteurs de parking arrière</accessoire>
+		<accessoire>Contrôle d'immobilisation en côte</accessoire>
+		<accessoire>Contrôle de la stabilité</accessoire>
+		<accessoire>Contrôle de pression des pneus</accessoire>
+		<accessoire>Direction assistée</accessoire>
+		<accessoire>Détection de sortie de voie</accessoire>
+		<accessoire>Fenêtres électriques à l'avant</accessoire>
+		<accessoire>Feux de croisement automatiques</accessoire>
+		<accessoire>Multimédia activé</accessoire>
+		<accessoire>Ordinateur de bord</accessoire>
+		<accessoire>Radio</accessoire>
+		<accessoire>Réglage antidérapant</accessoire>
+		<accessoire>Répartition électronique de la force de freinage</accessoire>
+		<accessoire>Rétroviseurs extérieurs chauffants</accessoire>
+		<accessoire>Rétroviseurs extérieurs dans la couleur de la carrosserie</accessoire>
+		<accessoire>Rétroviseurs extérieurs à réglage électrique</accessoire>
+		<accessoire>Rétroviseurs électriques rabattables</accessoire>
+		<accessoire>Siège chauffeur réglable en hauteur</accessoire>
+		<accessoire>Starter</accessoire>
+		<accessoire>Système antiblocage</accessoire>
+		<accessoire>Système Start/stop</accessoire>
+		<accessoire>Téléphone activé avec Bluetooth</accessoire>
+		<accessoire>Verrouillage centralisé à distance</accessoire>
+		<accessoire>Volant multifonction</accessoire>
+		<accessoire>Volant réglable</accessoire>
+		<accessoire>Éclairage de jour LED</accessoire>
+	</zoekaccessoires_frans>
+	<zoekaccessoires_spaans>
+		<accessoire>Airbag conductor</accessoire>
+		<accessoire>Airbag pasajero</accessoire>
+		<accessoire>Airbags de cabeza delanteros</accessoire>
+		<accessoire>Airbags de cabeza traseros</accessoire>
+		<accessoire>Airbags laterales delanteros</accessoire>
+		<accessoire>Aire acondicionado</accessoire>
+		<accessoire>Asiento del conductor ajustable en altura</accessoire>
+		<accessoire>Asientos traseros abatibles por partes</accessoire>
+		<accessoire>Asistencia al frenado de urgencia</accessoire>
+		<accessoire>Aviso de salida de carril</accessoire>
+		<accessoire>Bloqueo centralizado a distancia</accessoire>
+		<accessoire>Control de ascenso de pendientes</accessoire>
+		<accessoire>Control de estabilidad</accessoire>
+		<accessoire>Control de presión de neumáticos</accessoire>
+		<accessoire>Dirección asistida</accessoire>
+		<accessoire>Distribución electrónica de la fuerza de frenada</accessoire>
+		<accessoire>Inmovilizador electrónico del motor</accessoire>
+		<accessoire>Luces de conducción diurna LED</accessoire>
+		<accessoire>Luces de cruce automáticas</accessoire>
+		<accessoire>Multimedia activado</accessoire>
+		<accessoire>Ordenador de a bordo</accessoire>
+		<accessoire>Radio</accessoire>
+		<accessoire>Retrovisores del color de la carrocería</accessoire>
+		<accessoire>Retrovisores exteriores de regulación eléctrica</accessoire>
+		<accessoire>Retrovisores exteriores eléctricos plegables</accessoire>
+		<accessoire>Retrovisores térmicos</accessoire>
+		<accessoire>Sensores de aparcamiento traseros</accessoire>
+		<accessoire>Sistema antibloqueo</accessoire>
+		<accessoire>Sistema antipatinaje</accessoire>
+		<accessoire>Sistema de start/stop</accessoire>
+		<accessoire>Teléfono habilitado con Bluetooth</accessoire>
+		<accessoire>Ventanillas eléctricas delanteras</accessoire>
+		<accessoire>Volante ajustable</accessoire>
+		<accessoire>Volante multifuncional</accessoire>
+	</zoekaccessoires_spaans>
+	<zoekaccessoires_portugees>
+		<accessoire>Airbag de passageiro</accessoire>
+		<accessoire>Airbag do condutor</accessoire>
+		<accessoire>Airbags laterais dianteiros</accessoire>
+		<accessoire>Airbags para a cabeça dianteiros</accessoire>
+		<accessoire>Airbags para a cabeça traseiros</accessoire>
+		<accessoire>Ar condicionado</accessoire>
+		<accessoire>ASR</accessoire>
+		<accessoire>Assistência à travagem de emergência</accessoire>
+		<accessoire>Aviso de saída de faixa</accessoire>
+		<accessoire>Banco do condutor ajustável em altura</accessoire>
+		<accessoire>Bancos traseiros rebatíveis em peças</accessoire>
+		<accessoire>Comando electrónico do retrovisor</accessoire>
+		<accessoire>Computador de bordo</accessoire>
+		<accessoire>Controlo da estabilidade</accessoire>
+		<accessoire>Controlo da pressão dos pneus</accessoire>
+		<accessoire>Controlo de assistência em subidas</accessoire>
+		<accessoire>Direcção assistida</accessoire>
+		<accessoire>Distribuição eletrónica da força de travagem</accessoire>
+		<accessoire>Espelhos c/ aquecimento</accessoire>
+		<accessoire>Fecho centralizado remoto</accessoire>
+		<accessoire>Luzes diurnas de presença LED</accessoire>
+		<accessoire>Médios automáticos</accessoire>
+		<accessoire>Preparado para multimédia</accessoire>
+		<accessoire>Preparado para telefone com Bluetooth</accessoire>
+		<accessoire>Retrovisores das portas com recolha elétrica</accessoire>
+		<accessoire>Retrovisores das portas na cor da carroçaria</accessoire>
+		<accessoire>Rádio</accessoire>
+		<accessoire>Sensor de estacionamento traseiro</accessoire>
+		<accessoire>Sistema de arranque/paragem</accessoire>
+		<accessoire>Sistema de travagem antibloqueio</accessoire>
+		<accessoire>Sistema imobilizador integrado</accessoire>
+		<accessoire>Vidros dianteiros elétricos</accessoire>
+		<accessoire>Volante ajustável</accessoire>
+		<accessoire>Volante multifunções</accessoire>
+	</zoekaccessoires_portugees>
+	<zoekaccessoires_italiaans>
+		<accessoire>Airbag conducente</accessoire>
+		<accessoire>Airbag laterali anteriori</accessoire>
+		<accessoire>Airbag passeggero</accessoire>
+		<accessoire>Airbag per la testa anteriori</accessoire>
+		<accessoire>Airbag per la testa posteriori</accessoire>
+		<accessoire>Alzacristalli elettrici anteriori</accessoire>
+		<accessoire>Aria condizionata</accessoire>
+		<accessoire>ASR</accessoire>
+		<accessoire>Ausilio alle frenate di emergenza</accessoire>
+		<accessoire>Autoradio</accessoire>
+		<accessoire>Bloccaggio centralizzato con telecomando</accessoire>
+		<accessoire>Computer di bordo</accessoire>
+		<accessoire>Controllo hill-hold</accessoire>
+		<accessoire>Controllo pressione pneumatici</accessoire>
+		<accessoire>Controllo stabilità</accessoire>
+		<accessoire>Fari anabbaglianti automatici</accessoire>
+		<accessoire>Immobiliser</accessoire>
+		<accessoire>Lane Departure Warning</accessoire>
+		<accessoire>Luci diurne a LED</accessoire>
+		<accessoire>Ripartitore elettronico di frenata</accessoire>
+		<accessoire>Sedile del conducente regolabile in altezza</accessoire>
+		<accessoire>Sedili posteriori ripiegabili in parti</accessoire>
+		<accessoire>Sensore di parcheggio posteriore</accessoire>
+		<accessoire>Servosterzo</accessoire>
+		<accessoire>Sistema di avvio/arresto</accessoire>
+		<accessoire>Sistema di frenata antibloccaggio</accessoire>
+		<accessoire>Specchi retrovisori a regolazione elettrica</accessoire>
+		<accessoire>Specchi retrovisori nel colore della carrozzeria</accessoire>
+		<accessoire>Specchi retrovisori portiere ripiegabili elettricamente</accessoire>
+		<accessoire>Specchi retrovisori riscaldati</accessoire>
+		<accessoire>Supporto multimediale attivato</accessoire>
+		<accessoire>Telefono abilitato con Bluetooth</accessoire>
+		<accessoire>Volante multifunzione</accessoire>
+		<accessoire>Volante regolabile</accessoire>
+	</zoekaccessoires_italiaans>
+	<zoekaccessoires_grieks>
+		<accessoire>Έλεγχος πίεσης ελαστικών</accessoire>
+		<accessoire>Έλεγχος συγκράτησης σε δρόμο με κλίση</accessoire>
+		<accessoire>Αερόσακος οδηγού</accessoire>
+		<accessoire>Αερόσακος συνοδηγού</accessoire>
+		<accessoire>Αυτόματη μεσαία σκάλα προβολέων</accessoire>
+		<accessoire>Ηλεκτρικά αναδιπλούμενοι καθρέφτες θυρών</accessoire>
+		<accessoire>Ηλεκτρικά μπροστινά παράθυρα</accessoire>
+		<accessoire>Ηλεκτρονική κατανομή δύναμης πέδησης</accessoire>
+		<accessoire>Θερμαινόμενοι καθρέφτες θυρών</accessoire>
+		<accessoire>Κάθισμα οδηγού ρυθμιζόμενου ύψους</accessoire>
+		<accessoire>Καθρέφτες στο χρώμα του αμαξώματος</accessoire>
+		<accessoire>Κεντρικό κλείδωμα με τηλεχειρισμό</accessoire>
+		<accessoire>Με δυνατότητα πολυμέσων</accessoire>
+		<accessoire>Με δυνατότητα τηλεφώνου μέσω Bluetooth</accessoire>
+		<accessoire>Μπροστινοί αερόσακοι κεφαλής</accessoire>
+		<accessoire>Μπροστινοί πλευρικοί αερόσακοι</accessoire>
+		<accessoire>Πίσω αερόσακοι κεφαλής</accessoire>
+		<accessoire>Πίσω αισθητήρας στάθμευσης</accessoire>
+		<accessoire>Πίσω καθίσματα αναδιπλούμενα σε μέρη</accessoire>
+		<accessoire>Πολυλειτουργικό τιμόνι</accessoire>
+		<accessoire>Προειδοποίηση αλλαγής λωρίδας</accessoire>
+		<accessoire>Ραδιόφωνο</accessoire>
+		<accessoire>Ρυθμιζόμενο τιμόνι</accessoire>
+		<accessoire>Σύστημα ακινητοποίησης οχήματος (immobiliser)</accessoire>
+		<accessoire>Σύστημα αντιμπλοκαρίσματος τροχών</accessoire>
+		<accessoire>Σύστημα αντιολίσθησης</accessoire>
+		<accessoire>Σύστημα εκκίνησης / διακοπής λειτουργίας</accessoire>
+		<accessoire>Σύστημα ελέγχου ευστάθειας</accessoire>
+		<accessoire>Σύστημα υποβοήθησης πέδησης έκτακτης ανάγκης</accessoire>
+		<accessoire>Υπολογιστής επί του οχήματος</accessoire>
+		<accessoire>Φώτα ημέρας LED</accessoire>
+		<accessoire>ηλεκτρονικό σύστημα ελέγχου καθρεπτών</accessoire>
+		<accessoire>σύστημα κλιματισμού</accessoire>
+		<accessoire>υδραυλικό τιμόνι</accessoire>
+	</zoekaccessoires_grieks>
+	<zoekaccessoires_russisch>
+		<accessoire>Автоматические фары ближнего света</accessoire>
+		<accessoire>Антиблокировочная тормозная система</accessoire>
+		<accessoire>Бортовой компьютер</accessoire>
+		<accessoire>Дверные зеркала заднего вида в цвет кузова</accessoire>
+		<accessoire>Дверные зеркала заднего вида с подогревом</accessoire>
+		<accessoire>Задние подушки безопасности для защиты головы</accessoire>
+		<accessoire>Задние сиденья, складывающиеся по частям</accessoire>
+		<accessoire>Задний датчик парковки</accessoire>
+		<accessoire>Иммобилайзер</accessoire>
+		<accessoire>Многофункциональное рулевое колесо</accessoire>
+		<accessoire>Мультимедийный центр включен</accessoire>
+		<accessoire>Передние боковые подушки безопасности</accessoire>
+		<accessoire>Передние подушки безопасности для защиты головы</accessoire>
+		<accessoire>Передние стеклоподъемники с электрическим приводом</accessoire>
+		<accessoire>Подушка безопасности водителя</accessoire>
+		<accessoire>Подушка безопасности пассажира</accessoire>
+		<accessoire>Пульт дистанционного управления центральным замком</accessoire>
+		<accessoire>Радиоприемник</accessoire>
+		<accessoire>Регулируемое по высоте сиденье водителя</accessoire>
+		<accessoire>Регулируемое рулевое колесо</accessoire>
+		<accessoire>Светодиодные дневные ходовые огни</accessoire>
+		<accessoire>Система запуска / остановки</accessoire>
+		<accessoire>Система кондиционирования воздуха</accessoire>
+		<accessoire>Система курсовой устойчивости</accessoire>
+		<accessoire>Система помощи при аварийном торможении</accessoire>
+		<accessoire>Система помощи при трогании в гору</accessoire>
+		<accessoire>Система предупреждения о покидании полосы движения</accessoire>
+		<accessoire>Система противоскольжения</accessoire>
+		<accessoire>Система электронного распределения тормозного усилия</accessoire>
+		<accessoire>Телефон с функцией Bluetooth включен</accessoire>
+		<accessoire>Управление давлением в шинах</accessoire>
+		<accessoire>Усилитель рулевого управления</accessoire>
+		<accessoire>Электрически регулируемые дверные зеркала заднего вида</accessoire>
+		<accessoire>Электрически складывающиеся дверные зеркала заднего вида</accessoire>
+	</zoekaccessoires_russisch>
+	<zoekaccessoires_roemeens>
+		<accessoire>Airbag pasager</accessoire>
+		<accessoire>Airbaguri laterale față</accessoire>
+		<accessoire>Airbaguri pentru cap față</accessoire>
+		<accessoire>Airbaguri pentru cap spate</accessoire>
+		<accessoire>Airbag șofer</accessoire>
+		<accessoire>Asistență la frânarea de urgență</accessoire>
+		<accessoire>ASR</accessoire>
+		<accessoire>Avertizare la părăsirea benzii</accessoire>
+		<accessoire>Computer de bord</accessoire>
+		<accessoire>Controlul presiunii în anvelope</accessoire>
+		<accessoire>Controlul stabilității</accessoire>
+		<accessoire>Distribuție electronică a forței de frânare</accessoire>
+		<accessoire>Geamuri față acționate electric</accessoire>
+		<accessoire>Imobilizator</accessoire>
+		<accessoire>Instalaţie de climatizare</accessoire>
+		<accessoire>Lumini de zi cu led</accessoire>
+		<accessoire>Lumini de întâlnire automate</accessoire>
+		<accessoire>Menținere a poziției în pantă</accessoire>
+		<accessoire>Oglinzi exterioare pliabile electric</accessoire>
+		<accessoire>Oglinzi exterioare reglabile electric</accessoire>
+		<accessoire>Oglinzi exterioare în culoarea caroseriei</accessoire>
+		<accessoire>Oglinzi exterioare încălzite</accessoire>
+		<accessoire>Pregătire multimedia</accessoire>
+		<accessoire>Pregătire telefon cu Bluetooth</accessoire>
+		<accessoire>Radio</accessoire>
+		<accessoire>Scaune spate pliabile fracționar</accessoire>
+		<accessoire>Scaun șofer reglabil pe înălțime</accessoire>
+		<accessoire>Senzor de parcare spate</accessoire>
+		<accessoire>Servodirecţie</accessoire>
+		<accessoire>Sistem antiblocare</accessoire>
+		<accessoire>Sistem start-stop</accessoire>
+		<accessoire>Volan multifuncțional</accessoire>
+		<accessoire>Volan reglabil</accessoire>
+		<accessoire>Închidere centralizată de la distanță</accessoire>
+	</zoekaccessoires_roemeens>
+	<zoekaccessoires_hongaars>
+		<accessoire>Abroncsnyomás-szabályozás</accessoire>
+		<accessoire>ASR</accessoire>
+		<accessoire>Automatikusan tompuló fényszórók</accessoire>
+		<accessoire>Blokkolásgátló fékrendszer</accessoire>
+		<accessoire>Bluetooth-képes telefon</accessoire>
+		<accessoire>Elektromosan behajtható ajtótükrök</accessoire>
+		<accessoire>Elektromosan állítható ajtótükrök</accessoire>
+		<accessoire>Elektromos vezérlésű első ablakok</accessoire>
+		<accessoire>Elektronikus fékerőelosztó</accessoire>
+		<accessoire>Első fejlégzsákok</accessoire>
+		<accessoire>Első oldalsó légzsákok</accessoire>
+		<accessoire>Emelkedőn való megtartás vezérlése</accessoire>
+		<accessoire>Fedélzeti számítógép</accessoire>
+		<accessoire>Fűtött ajtótükrök</accessoire>
+		<accessoire>Hátsó fejlégzsákok</accessoire>
+		<accessoire>Hátsó parkolóradar</accessoire>
+		<accessoire>Indításgátló</accessoire>
+		<accessoire>Indító-leállító rendszer</accessoire>
+		<accessoire>Járművezető légzsák</accessoire>
+		<accessoire>Karosszériával egyező színű ajtótükrök</accessoire>
+		<accessoire>LED-es nappali menetvilágítás</accessoire>
+		<accessoire>Légkondicionálás</accessoire>
+		<accessoire>Multimédiaképes</accessoire>
+		<accessoire>Rádió</accessoire>
+		<accessoire>Stabilitásvezérlés</accessoire>
+		<accessoire>Szervokormány</accessoire>
+		<accessoire>Sávelhagyás-figyelmeztetés</accessoire>
+		<accessoire>Távirányításos központi zár</accessoire>
+		<accessoire>Többfunkciós kormánykerék</accessoire>
+		<accessoire>Utaslégzsák</accessoire>
+		<accessoire>Vészfékezés-segítő</accessoire>
+		<accessoire>Állítható kormánykerék</accessoire>
+		<accessoire>Állítható magasságú vezetőülés</accessoire>
+		<accessoire>Összehajtható hátsó ülések</accessoire>
+	</zoekaccessoires_hongaars>
+	<zoekaccessoires_pools>
+		<accessoire>ABS</accessoire>
+		<accessoire>Automatyczne światła mijania</accessoire>
+		<accessoire>Boczne poduszki powietrzne przód</accessoire>
+		<accessoire>Dzielona rozkładana tylna kanapa</accessoire>
+		<accessoire>Elektrycznie opuszczane szyby z przodu</accessoire>
+		<accessoire>Elektrycznie regulowane lusterka zewnętrzne</accessoire>
+		<accessoire>Elektrycznie składane lusterka zewnętrzne</accessoire>
+		<accessoire>Immobiliser</accessoire>
+		<accessoire>Kierownica multifunkcjonalna</accessoire>
+		<accessoire>Klimatyzacja</accessoire>
+		<accessoire>Komputer pokładowy</accessoire>
+		<accessoire>Kontrola ciśnienia w ogumieniu</accessoire>
+		<accessoire>Kontrola stabilności</accessoire>
+		<accessoire>Lusterka zewnętrzne w kolorze karoserii</accessoire>
+		<accessoire>Multimedia włączone</accessoire>
+		<accessoire>Ogrzewane lusterka zewnętrzne</accessoire>
+		<accessoire>Ostrzeżenie o opuszczeniu pasa ruchu</accessoire>
+		<accessoire>Pilot do zamka centralnego</accessoire>
+		<accessoire>Poduszka powietrzna kierowcy</accessoire>
+		<accessoire>Poduszka powietrzna pasażera</accessoire>
+		<accessoire>Poduszki powietrzne chroniące głowę przód</accessoire>
+		<accessoire>Poduszki powietrzne chroniące głowę tył</accessoire>
+		<accessoire>Radio</accessoire>
+		<accessoire>Regulowana kierownica</accessoire>
+		<accessoire>Regulowany w pionie fotel kierowcy</accessoire>
+		<accessoire>Sensory parkowania tył</accessoire>
+		<accessoire>Sterowanie wspomaganiem ruszania na wzniesieniu</accessoire>
+		<accessoire>System antypoślizgowy</accessoire>
+		<accessoire>System start/stop</accessoire>
+		<accessoire>System wspomagania nagłego hamowania</accessoire>
+		<accessoire>Układ elektronicznego rozdziału siły hamowania</accessoire>
+		<accessoire>Uruchamianie telefonu za pomocą Bluetooth</accessoire>
+		<accessoire>Wspomaganie kierownicy</accessoire>
+		<accessoire>Światła dzienne LED</accessoire>
+	</zoekaccessoires_pools>
+	<zoekaccessoires_tsjechisch>
+		<accessoire>Airbag spolujezdce</accessoire>
+		<accessoire>Airbag řidiče</accessoire>
+		<accessoire>Asistent rozjezdu do kopce</accessoire>
+		<accessoire>Automaticky tlumené světlomety</accessoire>
+		<accessoire>Centrální zamykání s dálkovým ovládáním</accessoire>
+		<accessoire>Dveřní zrcátka s vyhříváním</accessoire>
+		<accessoire>Dveřní zrcátka v barvě karosérie</accessoire>
+		<accessoire>Elektricky nastavitelná dveřní zrcátka</accessoire>
+		<accessoire>Elektricky ovládaná přední okna</accessoire>
+		<accessoire>Elektricky skládací dveřní zrcátka</accessoire>
+		<accessoire>Elektronická distribuce brzdné síly</accessoire>
+		<accessoire>Imobilizér</accessoire>
+		<accessoire>Klimatizační zařízení</accessoire>
+		<accessoire>Multifunkční volant</accessoire>
+		<accessoire>Nastavitelný volant</accessoire>
+		<accessoire>Nouzové pomocné brzdění</accessoire>
+		<accessoire>Palubní počítač</accessoire>
+		<accessoire>Podpora telefonů pomocí Bluetooth</accessoire>
+		<accessoire>Posilovač řízení</accessoire>
+		<accessoire>Protiblokovací brzdový systém</accessoire>
+		<accessoire>Přední boční airbagy</accessoire>
+		<accessoire>Přední hlavové airbagy</accessoire>
+		<accessoire>Radiopřijímač</accessoire>
+		<accessoire>Regulace trakce</accessoire>
+		<accessoire>Světla LED pro denní svícení</accessoire>
+		<accessoire>Systém spuštění/zastavení</accessoire>
+		<accessoire>S podporou multimédií</accessoire>
+		<accessoire>Varování před opuštěním jízdního pruhu</accessoire>
+		<accessoire>Výškově nastavitelné sedadlo řidiče</accessoire>
+		<accessoire>Zadní hlavové airbagy</accessoire>
+		<accessoire>Zadní parkovací senzor</accessoire>
+		<accessoire>Částečně skládací zadní sedadla</accessoire>
+		<accessoire>Řízení stability</accessoire>
+		<accessoire>Řízení tlaku v pneumatikách</accessoire>
+	</zoekaccessoires_tsjechisch>
+	<zoekaccessoires_bulgaars>
+		<accessoire>LED дневни светлини за пътуване</accessoire>
+		<accessoire>Автоматични къси светлини</accessoire>
+		<accessoire>Антиблокираща система</accessoire>
+		<accessoire>Бордови компютър</accessoire>
+		<accessoire>Въздушна възглавница на водача</accessoire>
+		<accessoire>Въздушна възглавница на пътника</accessoire>
+		<accessoire>Датчик за паркиране на заден ход</accessoire>
+		<accessoire>Дистанционно централно заключване</accessoire>
+		<accessoire>Електрически сгъваеми огледала на вратите</accessoire>
+		<accessoire>Електронно разпределяне на силата на притискане</accessoire>
+		<accessoire>Задни въздушни възглавници за главата</accessoire>
+		<accessoire>Задните седалки се сгъват на части</accessoire>
+		<accessoire>Имобилайзер</accessoire>
+		<accessoire>Климатик</accessoire>
+		<accessoire>Контрол на налягането в гумите</accessoire>
+		<accessoire>Контрол на стабилността</accessoire>
+		<accessoire>Многофункционален волан</accessoire>
+		<accessoire>Мултимедията е активирана</accessoire>
+		<accessoire>Огледала на вратите с електронно регулиране</accessoire>
+		<accessoire>Огледала на вратите с цвят на каросерията</accessoire>
+		<accessoire>Орган за управление за задържане по наклон</accessoire>
+		<accessoire>Отопляеми огледала на вратите</accessoire>
+		<accessoire>Помощ за аварийно спиране</accessoire>
+		<accessoire>Предни въздушни възглавници за главата</accessoire>
+		<accessoire>Предни прозорци с електронно управление</accessoire>
+		<accessoire>Предни странични въздушни възглавници</accessoire>
+		<accessoire>Предупреждение за напускане на лентата за движение</accessoire>
+		<accessoire>Радио</accessoire>
+		<accessoire>Регулируема по височина седалка на водача</accessoire>
+		<accessoire>Регулируем волан</accessoire>
+		<accessoire>Система за стартиране/спиране</accessoire>
+		<accessoire>Система против хлъзгане</accessoire>
+		<accessoire>Телефонът е активиран с Bluetooth</accessoire>
+		<accessoire>Усилвател на волана</accessoire>
+	</zoekaccessoires_bulgaars>
+	<zoekaccessoires_kroatisch>
+		<accessoire>Automatski spuštanje farova</accessoire>
+		<accessoire>Blokada paljenja</accessoire>
+		<accessoire>Daljinsko središnje zaključavanje</accessoire>
+		<accessoire>Električni sklopivi retrovizori na vratima</accessoire>
+		<accessoire>Elektronička raspodjela kočne sile</accessoire>
+		<accessoire>Grijani retrovizori na vratima</accessoire>
+		<accessoire>Klima-uređaj</accessoire>
+		<accessoire>Kontrola stabilnosti</accessoire>
+		<accessoire>Kontrola tlaka u gumama</accessoire>
+		<accessoire>Kontrola za zadržavanje na uzbrdici</accessoire>
+		<accessoire>LED dnevna svjetla</accessoire>
+		<accessoire>Multimedija je omogućena</accessoire>
+		<accessoire>Podesiv upravljač</accessoire>
+		<accessoire>Pomoć pri kočenju u hitnom slučaju</accessoire>
+		<accessoire>Prednji bočni zračni jastuci</accessoire>
+		<accessoire>Prednji prozori na električno upravljanje</accessoire>
+		<accessoire>Prednji zračni jastuci za glavu</accessoire>
+		<accessoire>Putno računalo</accessoire>
+		<accessoire>Radio</accessoire>
+		<accessoire>Retrovizori na vratima s električnim podešavanjem</accessoire>
+		<accessoire>Retrovizori na vratima u boji karoserije vozila</accessoire>
+		<accessoire>Servo-upravljač</accessoire>
+		<accessoire>Sjedalo vozača podesivo po visini</accessoire>
+		<accessoire>Stražnja sjedala mogu se sklopiti u dijelovima</accessoire>
+		<accessoire>Stražnji senzor za parkiranje</accessoire>
+		<accessoire>Stražnji zračni jastuci za glavu</accessoire>
+		<accessoire>Sustav protiv blokiranja kotača</accessoire>
+		<accessoire>Sustav protiv klizanja</accessoire>
+		<accessoire>Sustav Start/Stop</accessoire>
+		<accessoire>Telefon je omogućen putem Bluetooth veze</accessoire>
+		<accessoire>Upozorenje na napuštanje prometne trake</accessoire>
+		<accessoire>Višenamjenski upravljač</accessoire>
+		<accessoire>Zračni jastuk vozača</accessoire>
+		<accessoire>Zračni jastuk za suputnika</accessoire>
+	</zoekaccessoires_kroatisch>
+	<zoekaccessoires_deens>
+		<accessoire>Advarsel ved vognbaneskift</accessoire>
+		<accessoire>Airbag i chaufførside</accessoire>
+		<accessoire>Airbag i medchaufførside</accessoire>
+		<accessoire>Aircondition</accessoire>
+		<accessoire>Antiblokeringssystem til bremsning</accessoire>
+		<accessoire>Automatisk nærlys</accessoire>
+		<accessoire>Computer ombord</accessoire>
+		<accessoire>Dæktryksovervågning</accessoire>
+		<accessoire>Elektronisk bremsekraftfordeling</accessoire>
+		<accessoire>Elindklappelige sidespejle</accessoire>
+		<accessoire>Eljusterbare sidespejle</accessoire>
+		<accessoire>Elopvarmede sidespejle</accessoire>
+		<accessoire>Elruder for</accessoire>
+		<accessoire>Fjernlåsning</accessoire>
+		<accessoire>Forberedt til multimedier</accessoire>
+		<accessoire>Hill Hold Control</accessoire>
+		<accessoire>Hovedairbags bag</accessoire>
+		<accessoire>Hovedairbags for</accessoire>
+		<accessoire>Højdejusterbart chaufførsæde</accessoire>
+		<accessoire>Justerbart rat</accessoire>
+		<accessoire>LED-dagkørelys</accessoire>
+		<accessoire>Multifunktionsrat</accessoire>
+		<accessoire>Nødbremseassistent</accessoire>
+		<accessoire>Opdelte bagsæder, der kan nedfældes</accessoire>
+		<accessoire>Parkeringssensor bag</accessoire>
+		<accessoire>Radio</accessoire>
+		<accessoire>Servostyring</accessoire>
+		<accessoire>Sideairbags for</accessoire>
+		<accessoire>Sidespejle i karosserifarve</accessoire>
+		<accessoire>Stabilitetskontrol</accessoire>
+		<accessoire>Start/stop-system</accessoire>
+		<accessoire>Startspærre</accessoire>
+		<accessoire>Telefon aktiveret med Bluetooth</accessoire>
+		<accessoire>Trækstyring</accessoire>
+	</zoekaccessoires_deens>
+	<zoekaccessoires_slowaaks>
+		<accessoire>Airbag spolujazdca</accessoire>
+		<accessoire>Airbag vodiča</accessoire>
+		<accessoire>Asistent jazdy do kopca</accessoire>
+		<accessoire>Asistent pri núdzovom brzdení</accessoire>
+		<accessoire>Automatické stretávacie svetlá</accessoire>
+		<accessoire>Bočné zrkadlá vo farbe karosérie</accessoire>
+		<accessoire>Denné prevádzkové svetlá LED</accessoire>
+		<accessoire>Diaľkové centrálne zamykanie</accessoire>
+		<accessoire>Elektricky nastaviteľné zrkadlá na dverách</accessoire>
+		<accessoire>Elektricky ovládané predné okná</accessoire>
+		<accessoire>Elektrické sklopné zrkadlá na dverách</accessoire>
+		<accessoire>Elektronické rozdelenie brzdnej sily</accessoire>
+		<accessoire>Imobilizér</accessoire>
+		<accessoire>Klimatizácia</accessoire>
+		<accessoire>Kontrola stability</accessoire>
+		<accessoire>Kontrola trakcie</accessoire>
+		<accessoire>Multifunkčný volant</accessoire>
+		<accessoire>Nastaviteľný volant</accessoire>
+		<accessoire>Palubný počítač</accessoire>
+		<accessoire>Podpora multimédií</accessoire>
+		<accessoire>Posilňovač riadenia</accessoire>
+		<accessoire>Predné bočné airbagy</accessoire>
+		<accessoire>Predné hlavové airbagy</accessoire>
+		<accessoire>Rádio</accessoire>
+		<accessoire>Sledovanie tlaku v pneumatikách</accessoire>
+		<accessoire>Systém ABS</accessoire>
+		<accessoire>Systém štart/stop</accessoire>
+		<accessoire>Telefón s podporou rozhrania Bluetooth</accessoire>
+		<accessoire>Upozornenie na vybočenie z jazdného pruhu</accessoire>
+		<accessoire>Vyhrievané bočné zrkadlá</accessoire>
+		<accessoire>Výškovo nastaviteľné sedadlo vodiča</accessoire>
+		<accessoire>Zadné hlavové airbagy</accessoire>
+		<accessoire>Zadné sedadlá sklápateľné po častiach</accessoire>
+		<accessoire>Zadný parkovací senzor</accessoire>
+	</zoekaccessoires_slowaaks>
+	<zoekaccessoires_turks>
+		<accessoire>Acil durum frenleme yardımı</accessoire>
+		<accessoire>Araç bilgisayarı</accessoire>
+		<accessoire>Arka baş hava yastıkları</accessoire>
+		<accessoire>Arka park sensörü</accessoire>
+		<accessoire>Ayarlanabilir direksiyon simidi</accessoire>
+		<accessoire>Elektrikle ayarlanabilen kapı aynaları</accessoire>
+		<accessoire>Elektrikle çalışan ön camlar</accessoire>
+		<accessoire>Elektrikli katlanır kapı aynaları</accessoire>
+		<accessoire>Elektronik fren kuvveti dağılımı</accessoire>
+		<accessoire>Gövde renginde kapı aynaları</accessoire>
+		<accessoire>Hidrolik direksiyon</accessoire>
+		<accessoire>Isıtmalı kapı aynaları</accessoire>
+		<accessoire>Kilitlenme Önleyici Fren Sistemi</accessoire>
+		<accessoire>Klima</accessoire>
+		<accessoire>Kısmen katlanır arka koltuklar</accessoire>
+		<accessoire>Lastik basıncı kontrolü</accessoire>
+		<accessoire>LED gündüz sürüş lambaları</accessoire>
+		<accessoire>Multimedya etkin</accessoire>
+		<accessoire>Otomatik kısa farlar</accessoire>
+		<accessoire>Radyo</accessoire>
+		<accessoire>Stabilite kontrolü</accessoire>
+		<accessoire>Sürücü hava yastığı</accessoire>
+		<accessoire>Telefon Bluetooth ile etkinleştirildi</accessoire>
+		<accessoire>Uzaktan merkezi kilitleme</accessoire>
+		<accessoire>Yokuş kalkış kontrolü</accessoire>
+		<accessoire>Yolcu hava yastığı</accessoire>
+		<accessoire>Yüksekliği ayarlanabilir sürücü koltuğu</accessoire>
+		<accessoire>Çalıştırma/durdurma sistemi</accessoire>
+		<accessoire>Çekiş kontrolü</accessoire>
+		<accessoire>Çok işlevli direksiyon simidi</accessoire>
+		<accessoire>Ön baş hava yastıkları</accessoire>
+		<accessoire>Ön yan hava yastıkları</accessoire>
+		<accessoire>İmmobilizer</accessoire>
+		<accessoire>Şerit takip uyarısı</accessoire>
+	</zoekaccessoires_turks>
+	<zoekaccessoires_fins>
+		<accessoire>Ajonestolaite</accessoire>
+		<accessoire>Ajonvakautusjärjestelmä</accessoire>
+		<accessoire>Ajotietokone</accessoire>
+		<accessoire>Automaattiset lähivalot</accessoire>
+		<accessoire>Elektroninen jarruvoiman jako</accessoire>
+		<accessoire>Etuturvatyynyt</accessoire>
+		<accessoire>Etäkeskuslukitus</accessoire>
+		<accessoire>Hätäjarrutusavustin</accessoire>
+		<accessoire>Ilmastointi</accessoire>
+		<accessoire>Kaistavahti</accessoire>
+		<accessoire>Korin väriset sivupeilit</accessoire>
+		<accessoire>Kuljettajan istuimen korkeuden säätö</accessoire>
+		<accessoire>Kuljettajan turvatyyny</accessoire>
+		<accessoire>Käynnistys-/pysäytysjärjestelmä</accessoire>
+		<accessoire>LED-päiväajovalot</accessoire>
+		<accessoire>Luistonestojärjestelmä</accessoire>
+		<accessoire>Lukkiutumaton jarrujärjestelmä</accessoire>
+		<accessoire>Lämmitettävät sivupeilit</accessoire>
+		<accessoire>Matkustajan turvatyyny</accessoire>
+		<accessoire>Monitoiminen ohjauspyörä</accessoire>
+		<accessoire>Multimedia käytössä</accessoire>
+		<accessoire>Mäkilähtöavustin</accessoire>
+		<accessoire>Ohjaustehostin</accessoire>
+		<accessoire>Osissa taitettavat takaistuimet</accessoire>
+		<accessoire>Puhelin käytössä Bluetoothin kanssa</accessoire>
+		<accessoire>Radio</accessoire>
+		<accessoire>Rengaspaineen valvonta</accessoire>
+		<accessoire>Sivuturvatyynyt edessä</accessoire>
+		<accessoire>Sähköisesti kääntyvät sivupeilit</accessoire>
+		<accessoire>Sähköisesti säädettävät sivupeilit</accessoire>
+		<accessoire>Sähkötoimiset etuikkunat</accessoire>
+		<accessoire>Säädettävä ohjauspyörä</accessoire>
+		<accessoire>Takapysäköintitutka</accessoire>
+		<accessoire>Takaturvatyynyt</accessoire>
+	</zoekaccessoires_fins>
+	<zoekaccessoires_zweeds>
+		<accessoire>Antiblockeringssystem</accessoire>
+		<accessoire>Assisterad nödbroms</accessoire>
+		<accessoire>Automatiskt halvljus</accessoire>
+		<accessoire>Avåkningsvarnare</accessoire>
+		<accessoire>Backstarthjälp</accessoire>
+		<accessoire>Bakre krockkuddar i huvudhöjd</accessoire>
+		<accessoire>Bakre parkeringssensor</accessoire>
+		<accessoire>Baksäten fällbara i delar</accessoire>
+		<accessoire>Centralt fjärrlås</accessoire>
+		<accessoire>Däcktryckreglering</accessoire>
+		<accessoire>Elektriskt justerbara yttre backspeglar</accessoire>
+		<accessoire>Elektriskt vikbara yttre backspeglar</accessoire>
+		<accessoire>Elektronisk fördelning av bromskraft</accessoire>
+		<accessoire>Elmanövrerade främre fönster</accessoire>
+		<accessoire>Främre krockkuddar i huvudhöjd</accessoire>
+		<accessoire>Främre sidomonterade krockkuddar</accessoire>
+		<accessoire>Förarens krockkudde</accessoire>
+		<accessoire>Förarsäte med justerbar höjd</accessoire>
+		<accessoire>Förberedd för multimedia</accessoire>
+		<accessoire>Förberedd för telefon med Bluetooth</accessoire>
+		<accessoire>Inbyggd dator</accessoire>
+		<accessoire>Justerbar ratt</accessoire>
+		<accessoire>LED-varselljus</accessoire>
+		<accessoire>Luftkonditionering</accessoire>
+		<accessoire>Låsningsfritt bromssystem</accessoire>
+		<accessoire>Passagerares krockkudde</accessoire>
+		<accessoire>Radio</accessoire>
+		<accessoire>Ratt med flera funktioner</accessoire>
+		<accessoire>Servostyrning</accessoire>
+		<accessoire>Stabilitetskontroll</accessoire>
+		<accessoire>Start/stopp-system</accessoire>
+		<accessoire>Startspärr</accessoire>
+		<accessoire>Uppvärmda yttre backspeglar</accessoire>
+		<accessoire>Yttre backspeglar i karossens färg</accessoire>
+	</zoekaccessoires_zweeds>
+	<zoekaccessoires_noors>
+		<accessoire>Antisklisystem</accessoire>
+		<accessoire>Automatisk nærlys</accessoire>
+		<accessoire>Bakkeholderkontroll</accessoire>
+		<accessoire>Bakseter som er delvis sammenleggbare</accessoire>
+		<accessoire>Blokkeringsfrie bremser</accessoire>
+		<accessoire>Dekktrykk-kontroll</accessoire>
+		<accessoire>Elektrisk betjente frontruter</accessoire>
+		<accessoire>Elektrisk innfellbare sidespeil</accessoire>
+		<accessoire>Elektrisk justerbare sidespeil</accessoire>
+		<accessoire>Elektronisk bremsekraftfordeling</accessoire>
+		<accessoire>Fjernstyrt sentrallås</accessoire>
+		<accessoire>Førersete som kan justeres i høyden</accessoire>
+		<accessoire>Justerbart ratt</accessoire>
+		<accessoire>Kjørecomputer</accessoire>
+		<accessoire>Kjørefeltvarsling</accessoire>
+		<accessoire>Klimaanlegg</accessoire>
+		<accessoire>Kollisjonspute på førersiden</accessoire>
+		<accessoire>Kollisjonspute på passasjersiden</accessoire>
+		<accessoire>Kollisjonsputer for hode bak</accessoire>
+		<accessoire>Kollisjonsputer for hode foran</accessoire>
+		<accessoire>Kollisjonsputer på siden foran</accessoire>
+		<accessoire>LED-kjørelys</accessoire>
+		<accessoire>Multifunksjonelt ratt</accessoire>
+		<accessoire>Multimedia er aktivert</accessoire>
+		<accessoire>Nødbremsassistanse</accessoire>
+		<accessoire>Oppvarmede sidespeil</accessoire>
+		<accessoire>Parkeringssensor bak</accessoire>
+		<accessoire>Radio</accessoire>
+		<accessoire>Servostyring</accessoire>
+		<accessoire>Sidespeil i samme farge som karosseriet</accessoire>
+		<accessoire>Stabilitetskontroll</accessoire>
+		<accessoire>Start/stopp-system</accessoire>
+		<accessoire>Startsperre</accessoire>
+		<accessoire>Telefon aktivert med Bluetooth</accessoire>
+	</zoekaccessoires_noors>
+	<schade>
+		<status/>
+		<opmerkingen_nederlands></opmerkingen_nederlands>
+		<opmerkingen_engels></opmerkingen_engels>
+		<opmerkingen_duits></opmerkingen_duits>
+		<opmerkingen_frans></opmerkingen_frans>
+		<opmerkingen_spaans></opmerkingen_spaans>
+		<opmerkingen_portugees></opmerkingen_portugees>
+		<opmerkingen_italiaans></opmerkingen_italiaans>
+		<opmerkingen_grieks></opmerkingen_grieks>
+		<opmerkingen_russisch></opmerkingen_russisch>
+		<opmerkingen_roemeens></opmerkingen_roemeens>
+		<opmerkingen_hongaars></opmerkingen_hongaars>
+		<opmerkingen_pools></opmerkingen_pools>
+		<opmerkingen_tsjechisch></opmerkingen_tsjechisch>
+		<opmerkingen_bulgaars></opmerkingen_bulgaars>
+		<opmerkingen_kroatisch></opmerkingen_kroatisch>
+		<opmerkingen_deens></opmerkingen_deens>
+		<opmerkingen_slowaaks></opmerkingen_slowaaks>
+		<opmerkingen_turks></opmerkingen_turks>
+		<opmerkingen_fins></opmerkingen_fins>
+		<opmerkingen_zweeds></opmerkingen_zweeds>
+		<opmerkingen_noors></opmerkingen_noors>
+		<beschadigingen_nederlands/>
+		<beschadigingen_engels/>
+		<beschadigingen_duits/>
+		<beschadigingen_frans/>
+		<beschadigingen_spaans/>
+		<beschadigingen_portugees/>
+		<beschadigingen_italiaans/>
+		<beschadigingen_grieks/>
+		<beschadigingen_russisch/>
+		<beschadigingen_roemeens/>
+		<beschadigingen_hongaars/>
+		<beschadigingen_pools/>
+		<beschadigingen_tsjechisch/>
+		<beschadigingen_bulgaars/>
+		<beschadigingen_kroatisch/>
+		<beschadigingen_deens/>
+		<beschadigingen_slowaaks/>
+		<beschadigingen_turks/>
+		<beschadigingen_fins/>
+		<beschadigingen_zweeds/>
+		<beschadigingen_noors/>
+		<defecte_onderdelen/>
+		<gerepareerde_schade/>
+		<verrijdbare_schade/>
+	</schade>
+	<vgs>
+		<optiesleutel/>
+		<merktypecode/>
+		<voertuigsoort/>
+		<merk/>
+		<model/>
+		<type/>
+		<uitvoering/>
+		<carrosserievorm/>
+		<brandstof/>
+	</vgs>
+	<autotelex>
+		<uitvoeringsnummer>177830</uitvoeringsnummer>
+		<voertuigsoort>geel</voertuigsoort>
+		<merk>Ford</merk>
+		<model>Fiesta</model>
+		<carvariant/>
+		<uitvoering>1.1 Trend</uitvoering>
+		<koetswerk>Hatchb.</koetswerk>
+		<brandstof>Benzine</brandstof>
+	</autotelex>
+	<afbeeldingen>
+		<afbeelding nr="1">
+			<url>https://media-eigenwebsiteincrementeel.export.dv.nl/18277243512/44916687-1.jpg</url>
+			<bestandsnaam>44916687-1.jpg</bestandsnaam>
+			<omschrijving/>
+		</afbeelding>
+		<afbeelding nr="2">
+			<url>https://media-eigenwebsiteincrementeel.export.dv.nl/18277243513/44916687-2.jpg</url>
+			<bestandsnaam>44916687-2.jpg</bestandsnaam>
+			<omschrijving/>
+		</afbeelding>
+		<afbeelding nr="3">
+			<url>https://media-eigenwebsiteincrementeel.export.dv.nl/18277243514/44916687-3.jpg</url>
+			<bestandsnaam>44916687-3.jpg</bestandsnaam>
+			<omschrijving/>
+		</afbeelding>
+		<afbeelding nr="4">
+			<url>https://media-eigenwebsiteincrementeel.export.dv.nl/18277243515/44916687-4.jpg</url>
+			<bestandsnaam>44916687-4.jpg</bestandsnaam>
+			<omschrijving/>
+		</afbeelding>
+		<afbeelding nr="5">
+			<url>https://media-eigenwebsiteincrementeel.export.dv.nl/18277243516/44916687-5.jpg</url>
+			<bestandsnaam>44916687-5.jpg</bestandsnaam>
+			<omschrijving/>
+		</afbeelding>
+		<afbeelding nr="6">
+			<url>https://media-eigenwebsiteincrementeel.export.dv.nl/18277243517/44916687-6.jpg</url>
+			<bestandsnaam>44916687-6.jpg</bestandsnaam>
+			<omschrijving/>
+		</afbeelding>
+		<afbeelding nr="7">
+			<url>https://media-eigenwebsiteincrementeel.export.dv.nl/18277243518/44916687-7.jpg</url>
+			<bestandsnaam>44916687-7.jpg</bestandsnaam>
+			<omschrijving/>
+		</afbeelding>
+		<afbeelding nr="8">
+			<url>https://media-eigenwebsiteincrementeel.export.dv.nl/18277243519/44916687-8.jpg</url>
+			<bestandsnaam>44916687-8.jpg</bestandsnaam>
+			<omschrijving/>
+		</afbeelding>
+		<afbeelding nr="9">
+			<url>https://media-eigenwebsiteincrementeel.export.dv.nl/18277243520/44916687-9.jpg</url>
+			<bestandsnaam>44916687-9.jpg</bestandsnaam>
+			<omschrijving/>
+		</afbeelding>
+		<afbeelding nr="10">
+			<url>https://media-eigenwebsiteincrementeel.export.dv.nl/18277243521/44916687-10.jpg</url>
+			<bestandsnaam>44916687-10.jpg</bestandsnaam>
+			<omschrijving/>
+		</afbeelding>
+		<afbeelding nr="11">
+			<url>https://media-eigenwebsiteincrementeel.export.dv.nl/18277243522/44916687-11.jpg</url>
+			<bestandsnaam>44916687-11.jpg</bestandsnaam>
+			<omschrijving/>
+		</afbeelding>
+		<afbeelding nr="12">
+			<url>https://media-eigenwebsiteincrementeel.export.dv.nl/18277243523/44916687-12.jpg</url>
+			<bestandsnaam>44916687-12.jpg</bestandsnaam>
+			<omschrijving/>
+		</afbeelding>
+		<afbeelding nr="13">
+			<url>https://media-eigenwebsiteincrementeel.export.dv.nl/18277243524/44916687-13.jpg</url>
+			<bestandsnaam>44916687-13.jpg</bestandsnaam>
+			<omschrijving/>
+		</afbeelding>
+		<afbeelding nr="14">
+			<url>https://media-eigenwebsiteincrementeel.export.dv.nl/18277243525/44916687-14.jpg</url>
+			<bestandsnaam>44916687-14.jpg</bestandsnaam>
+			<omschrijving/>
+		</afbeelding>
+		<afbeelding nr="15">
+			<url>https://media-eigenwebsiteincrementeel.export.dv.nl/18277243526/44916687-15.jpg</url>
+			<bestandsnaam>44916687-15.jpg</bestandsnaam>
+			<omschrijving/>
+		</afbeelding>
+		<afbeelding nr="16">
+			<url>https://media-eigenwebsiteincrementeel.export.dv.nl/18277243527/44916687-16.jpg</url>
+			<bestandsnaam>44916687-16.jpg</bestandsnaam>
+			<omschrijving/>
+		</afbeelding>
+		<afbeelding nr="17">
+			<url>https://media-eigenwebsiteincrementeel.export.dv.nl/18277243528/44916687-17.jpg</url>
+			<bestandsnaam>44916687-17.jpg</bestandsnaam>
+			<omschrijving/>
+		</afbeelding>
+		<afbeelding nr="18">
+			<url>https://media-eigenwebsiteincrementeel.export.dv.nl/18277243529/44916687-18.jpg</url>
+			<bestandsnaam>44916687-18.jpg</bestandsnaam>
+			<omschrijving/>
+		</afbeelding>
+		<afbeelding nr="19">
+			<url>https://media-eigenwebsiteincrementeel.export.dv.nl/18277243530/44916687-19.jpg</url>
+			<bestandsnaam>44916687-19.jpg</bestandsnaam>
+			<omschrijving/>
+		</afbeelding>
+		<afbeelding nr="20">
+			<url>https://media-eigenwebsiteincrementeel.export.dv.nl/18277243531/44916687-20.jpg</url>
+			<bestandsnaam>44916687-20.jpg</bestandsnaam>
+			<omschrijving/>
+		</afbeelding>
+		<afbeelding nr="21">
+			<url>https://media-eigenwebsiteincrementeel.export.dv.nl/18277243532/44916687-21.jpg</url>
+			<bestandsnaam>44916687-21.jpg</bestandsnaam>
+			<omschrijving/>
+		</afbeelding>
+		<afbeelding nr="22">
+			<url>https://media-eigenwebsiteincrementeel.export.dv.nl/18277243533/44916687-22.jpg</url>
+			<bestandsnaam>44916687-22.jpg</bestandsnaam>
+			<omschrijving/>
+		</afbeelding>
+		<afbeelding nr="23">
+			<url>https://media-eigenwebsiteincrementeel.export.dv.nl/18277243534/44916687-23.jpg</url>
+			<bestandsnaam>44916687-23.jpg</bestandsnaam>
+			<omschrijving/>
+		</afbeelding>
+		<afbeelding nr="24">
+			<url>https://media-eigenwebsiteincrementeel.export.dv.nl/18277243535/44916687-24.jpg</url>
+			<bestandsnaam>44916687-24.jpg</bestandsnaam>
+			<omschrijving/>
+		</afbeelding>
+	</afbeeldingen>
+	<panoramas/>
+	<videos/>
+	<documenten/>
+	<call-to-actions/>
+	<call-to-actions_engels/>
+	<call-to-actions_duits/>
+	<call-to-actions_frans/>
+	<call-to-actions_spaans/>
+	<call-to-actions_portugees/>
+	<call-to-actions_italiaans/>
+	<call-to-actions_grieks/>
+	<call-to-actions_russisch/>
+	<call-to-actions_roemeens/>
+	<call-to-actions_hongaars/>
+	<call-to-actions_pools/>
+	<call-to-actions_tsjechisch/>
+	<call-to-actions_bulgaars/>
+	<call-to-actions_kroatisch/>
+	<call-to-actions_deens/>
+	<call-to-actions_slowaaks/>
+	<call-to-actions_turks/>
+	<call-to-actions_fins/>
+	<call-to-actions_zweeds/>
+	<call-to-actions_noors/>
+	<unsupportedProperties/>
+	<unsupportedProperties_engels/>
+	<unsupportedProperties_duits/>
+	<unsupportedProperties_frans/>
+	<unsupportedProperties_spaans/>
+	<unsupportedProperties_portugees/>
+	<unsupportedProperties_italiaans/>
+	<unsupportedProperties_grieks/>
+	<unsupportedProperties_russisch/>
+	<unsupportedProperties_roemeens/>
+	<unsupportedProperties_hongaars/>
+	<unsupportedProperties_pools/>
+	<unsupportedProperties_tsjechisch/>
+	<unsupportedProperties_bulgaars/>
+	<unsupportedProperties_kroatisch/>
+	<unsupportedProperties_deens/>
+	<unsupportedProperties_slowaaks/>
+	<unsupportedProperties_turks/>
+	<unsupportedProperties_fins/>
+	<unsupportedProperties_zweeds/>
+	<unsupportedProperties_noors/>
+	<aanwezige_cabine/>
+	<bandensoorten/>
+	<non-markingbanden/>
+	<aantal_europallets/>
+	<min_koppelschotelhoogte/>
+	<max_koppelschotelhoogte/>
+	<bekledingcode/>
+	<types_heftruck_acculader/>
+	<productienummer/>
+	<fabrikant>
+		<naam/>
+		<straat/>
+		<huisnummer/>
+		<huisnummer_extensie/>
+		<postcode/>
+		<provincie/>
+		<plaats/>
+		<land/>
+		<telefoon/>
+		<website/>
+		<email/>
+	</fabrikant>
+	<eu-verantwoordelijke>
+		<naam/>
+		<straat/>
+		<huisnummer/>
+		<huisnummer_extensie/>
+		<postcode/>
+		<provincie/>
+		<plaats/>
+		<land/>
+		<telefoon/>
+		<website/>
+		<email/>
+	</eu-verantwoordelijke>
+</voertuig>

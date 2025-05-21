@@ -98,142 +98,151 @@ body {
 
 /* Filters Panel */
 .filters-panel {
-    background: white;
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm);
-    overflow: hidden;
-    height: fit-content;
-}
-
-.filters-header {
+    background: #fff;
+    border-radius: 16px;
     padding: 20px;
-    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: sticky;
+    top: 20px;
+    width: fit-content;
+    min-width: 200px;
+    max-width: 280px;
+    align-self: flex-start;
 }
 
+/* Header */
 .filters-header h2 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--text-primary);
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 15px;
+    padding: 0 5px;
 }
 
-.filters-body {
-    padding: 20px;
-}
-
+/* Elke filtergroep */
 .filter-group {
-    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0 5px;
+    margin-bottom: 15px;
 }
 
+/* Label styling */
 .filter-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
-    color: var(--text-secondary);
+    color: #444;
+    margin-bottom: 4px;
 }
 
+/* Select dropdowns */
 .custom-select {
-    position: relative;
+    margin-bottom: 5px;
 }
 
 .custom-select select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    background: white;
-    font-size: 14px;
-    color: var(--text-primary);
     appearance: none;
-    cursor: pointer;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23666' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-color: #f4f4f4;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: #333;
+    transition: all 0.3s ease;
+    background-image: url("data:image/svg+xml,%3Csvg fill='gray' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 8px center;
+    background-position: right 12px center;
+    background-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
+.custom-select select:focus {
+    border-color: #000;
+    background-color: #fff;
+    outline: none;
+}
+
+/* Checkbox stijl */
 .checkbox-group {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    padding: 5px 0;
+    margin-bottom: 10px;
 }
 
 .custom-checkbox {
     display: flex;
     align-items: center;
+    gap: 10px;
     cursor: pointer;
-    user-select: none;
+    font-size: 14px;
+    color: #333;
+    padding: 2px 0;
 }
 
 .custom-checkbox input {
-    display: none;
-}
-
-.checkmark {
+    appearance: none;
     width: 18px;
     height: 18px;
-    border: 2px solid var(--border-color);
-    border-radius: 3px;
-    margin-right: 8px;
+    border: 2px solid #999;
+    border-radius: 4px;
     position: relative;
-    transition: var(--transition);
+    transition: 0.2s ease;
 }
 
-.custom-checkbox input:checked + .checkmark {
-    background: var(--primary-color);
-    border-color: var(--primary-color);
+.custom-checkbox input:checked {
+    background-color: #000;
+    border-color: #000;
 }
 
-.custom-checkbox input:checked + .checkmark:after {
-    content: "";
-    position: absolute;
-    left: 6px;
-    top: 2px;
-    width: 4px;
-    height: 8px;
-    border: solid white;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-}
-
-.range-filter {
-    width: 100%;
-}
-
+/* Range inputs (bijv. prijs) */
 .range-inputs {
     display: flex;
+    gap: 10px;
     align-items: center;
-    gap: 8px;
+    margin-bottom: 10px;
 }
 
 .range-inputs input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
     font-size: 14px;
+    background-color: #f4f4f4;
+    transition: border 0.3s ease;
 }
 
-.range-inputs span {
-    color: var(--text-secondary);
+.range-inputs input:focus {
+    border-color: #000;
+    background-color: #fff;
+    outline: none;
 }
 
+/* Reset knop */
 .filters-reset {
-    width: 100%;
     padding: 12px;
-    background: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-weight: 600;
+    width: 100%;
     font-size: 14px;
+    font-weight: 600;
+    border-radius: 12px;
+    border: none;
+    background-color: #000;
+    color: #fff;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease;
     cursor: pointer;
-    transition: var(--transition);
-    margin-top: 10px;
+    box-sizing: border-box;
 }
 
 .filters-reset:hover {
-    background: #000000; /* Black */
+    background-color: #222;
 }
 
 /* Cars Grid */
@@ -1555,3 +1564,4 @@ body {
         gap: 0.5rem;
     }
 }
+
