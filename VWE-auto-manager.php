@@ -1050,7 +1050,6 @@ function display_car_card($car) {
             <h3 class="car-title">' . $detailed_title . '</h3>
             <div class="car-price">€ ' . number_format((float)$car['prijs'], 0, ',', '.') . '</div>
             <div class="car-specs">
-                <span>€ ' . number_format(2.065, 3, ',', '.') . ' p/m</span>
                 <span>' . $car['kilometerstand'] . '</span>
                 <span>' . $car['vermogen'] . '</span>
             </div>
