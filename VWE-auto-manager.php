@@ -235,26 +235,7 @@ function display_car_listing() {
 
     echo '<div class="page-wrapper">';
 
-    // Add top controls
-    echo '<div class="top-controls">
-        <div class="results-count">
-            <span id="resultsText">Viewing <span id="currentResults">1-' . min(9, $total_items) . '</span> of <span id="totalResults">' . $total_items . '</span> TOTAL CARS</span>
-            <span id="filteredResults" style="display: none;">(<span id="filteredCount">0</span> match your filters)</span>
-        </div>
-        <div class="view-controls">
-            <div class="sort-dropdown">
-                <select id="sortSelect">
-                    <option value="default">Sort By Default</option>
-                    <option value="price-asc">Price: Low to High</option>
-                    <option value="price-desc">Price: High to Low</option>
-                    <option value="year-desc">Year: Newest First</option>
-                    <option value="year-asc">Year: Oldest First</option>
-                    <option value="km-asc">Kilometers: Low to High</option>
-                    <option value="km-desc">Kilometers: High to Low</option>
-                </select>
-            </div>
-        </div>
-    </div>';
+
 
     echo '<div class="main-content">';
 
