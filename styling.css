@@ -30,8 +30,6 @@ body {
     padding: 20px;
 }
 
-
-
 .results-count {
     font-size: 14px;
     font-weight: 600;
@@ -58,6 +56,7 @@ body {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23666' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 8px center;
+background-color: #FCFCFC;
 }
 
 .view-toggle {
@@ -80,9 +79,8 @@ body {
 /* Main Content Layout */
 .main-content {
     display: grid;
-    grid-template-columns: 300px 1fr;
+    grid-template-columns: minmax(250px, 350px) 1fr;
     gap: 30px;
-    max-width: 1400px;
     margin: 0 auto;
 }
 
@@ -92,22 +90,23 @@ body {
     border-radius: 16px;
     padding: 20px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
-    display: flex;
     flex-direction: column;
     gap: 20px;
     position: sticky;
     top: 20px;
-    width: 55;
+    width: 100%;
     align-self: flex-start;
+    border: 2px solid #E0E0E0;
 }
 
 /* Header */
-.filters-header h2 {
+.filters-header h2, .filters-header label {
     font-size: 20px;
     font-weight: 700;
     color: #1a1a1a;
     margin-bottom: 15px;
     padding: 0 5px;
+    text-align: left;
 }
 
 /* Elke filtergroep */
@@ -115,8 +114,31 @@ body {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    padding: 0 5px;
+    padding: 0 12px; /* Equal left and right padding */
     margin-bottom: 15px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.filter-group label,
+.custom-select,
+.checkbox-group,
+.range-inputs {
+    padding: 0; /* Remove extra padding, let .filter-group handle it */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.custom-select select,
+.range-inputs input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.custom-checkbox {
+    padding: 0; /* Remove extra padding */
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* Label styling */
@@ -124,35 +146,28 @@ body {
     font-size: 14px;
     font-weight: 600;
     color: #444;
-    margin-bottom: 4px;
-}
-
-/* Select dropdowns */
-.custom-select {
-    margin-bottom: 5px;
-}
-
-.custom-select select {
-    appearance: none;
-    background-color: #FCFCFC;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 6px 8px;
-    font-size: 13px;
-    color: #333;
-    transition: all 0.3s ease;
-    background-image: url("data:image/svg+xml,%3Csvg fill='gray' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 8px center;
-    background-size: 14px;
+    margin-bottom: 0 !important;
+    padding: 0 5px;
     width: 100%;
     box-sizing: border-box;
 }
 
-.custom-select select:focus {
-    border-color: #000;
-    background-color: #FCFCFC;
-    outline: none;
+/* Select dropdowns */
+.custom-select {
+    margin-top: 0 !important;
+    margin-bottom: 5px;
+    padding: 0 5px;  /* Added padding on both sides */
+    width: 100%;
+    box-sizing: border-box;
+background-color: #FCFCFC;
+
+}
+
+.custom-select select {
+    margin-top: 0 !important;
+    border-radius: 8px;
+    width: 100%;  /* Make select full width */
+    box-sizing: border-box;
 }
 
 /* Checkbox stijl */
@@ -160,8 +175,10 @@ body {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    padding: 5px 0;
+    padding: 5px;  /* Equal padding all around */
     margin-bottom: 10px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .custom-checkbox {
@@ -171,7 +188,9 @@ body {
     cursor: pointer;
     font-size: 13px;
     color: #333;
-    padding: 1px 0;
+    padding: 1px 5px;  /* Added horizontal padding */
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .custom-checkbox input {
@@ -195,6 +214,9 @@ body {
     gap: 10px;
     align-items: center;
     margin-bottom: 10px;
+    padding: 0 5px;  /* Added padding on both sides */
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .range-inputs input {
@@ -205,6 +227,8 @@ body {
     font-size: 13px;
     background-color: #FCFCFC;
     transition: border 0.3s ease;
+    width: 100%;  /* Make inputs full width */
+    box-sizing: border-box;
 }
 
 .range-inputs input:focus {
@@ -216,7 +240,8 @@ body {
 /* Reset knop */
 .filters-reset {
     padding: 12px;
-    width: 100%;
+    width: calc(100% - 40px);  /* Account for parent padding */
+    margin: 0 20px;  /* Center the button */
     font-size: 14px;
     font-weight: 600;
     border-radius: 2px;
@@ -1513,7 +1538,6 @@ body {
 .pagination-next:disabled {
     border-color: #ccc;
     color: #ccc;
-    cursor: not-allowed;
 }
 
 .pagination-info {

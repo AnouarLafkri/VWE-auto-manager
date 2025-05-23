@@ -241,11 +241,9 @@ function display_car_listing() {
 
     // Filters panel
     echo '<aside class="filters-panel">
-        <div class="filters-header">
-            <h2>FILTERS & SORTS</h2>
-        </div>
         <div class="filters-body">
             <div class="filter-group">
+            <h2><label>FILTERS & SORTS</label></h2>
                 <label>MERK</label>
                 <div class="custom-select">
                     <select id="brandFilter">
@@ -367,7 +365,7 @@ function display_car_listing() {
                 <label>AANTAL DEUREN</label>
                 <div class="custom-select">
                     <select id="doorsFilter">
-                        <option value="">Alle</option>
+                        <option value="">Aantal deuren</option>
                         <option value="2">2 deuren</option>
                         <option value="3">3 deuren</option>
                         <option value="4">4 deuren</option>
@@ -379,7 +377,7 @@ function display_car_listing() {
                 <label>AANTAL ZITPLAATSEN</label>
                 <div class="custom-select">
                     <select id="seatsFilter">
-                        <option value="">Alle</option>
+                        <option value="">Aantal zitplaatsen</option>
                         <option value="2">2 zitplaatsen</option>
                         <option value="3">3 zitplaatsen</option>
                         <option value="4">4 zitplaatsen</option>
