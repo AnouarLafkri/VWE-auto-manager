@@ -91,17 +91,17 @@ background-color: #FCFCFC;
     padding: 20px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
     flex-direction: column;
-    gap: 20px;
     position: sticky;
     top: 20px;
     width: 100%;
     align-self: flex-start;
     border: 2px solid #E0E0E0;
+gap: 10px;
 }
 
 /* Header */
 .filters-header h2, .filters-header label {
-    font-size: 20px;
+    font-size: 28px;
     font-weight: 700;
     color: #1a1a1a;
     margin-bottom: 15px;
@@ -113,11 +113,10 @@ background-color: #FCFCFC;
 .filter-group {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    padding: 0 12px; /* Equal left and right padding */
-    margin-bottom: 15px;
+    margin-bottom: 5px;
     width: 100%;
     box-sizing: border-box;
+gap: 4px;
 }
 
 .filter-group label,
@@ -239,11 +238,10 @@ background-color: #FCFCFC;
 
 /* Reset knop */
 .filters-reset {
-    padding: 12px;
-    width: calc(100% - 40px);  /* Account for parent padding */
-    margin: 0 20px;  /* Center the button */
+    width: 296px;
+    height: 45px;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 800;
     border-radius: 2px;
     border: none;
     background-color: #63C3DB;
@@ -253,7 +251,9 @@ background-color: #FCFCFC;
     cursor: pointer;
     box-sizing: border-box;
     text-align: center;
+
 }
+
 
 .filters-reset:hover {
     background-color: #63C3DB;
@@ -1576,4 +1576,13 @@ background-color: #FCFCFC;
         flex-direction: column;
         gap: 0.5rem;
     }
+}
+
+.filters-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: #000000;
+    margin-bottom: 15px;
+    padding: 0 5px;
+    text-align: left;
 }

@@ -243,7 +243,7 @@ function display_car_listing() {
     echo '<aside class="filters-panel">
         <div class="filters-body">
             <div class="filter-group">
-            <h2><label>FILTERS & SORTS</label></h2>
+           <div class="filters-title">FILTERS & SORTS</div>
                 <label>MERK</label>
                 <div class="custom-select">
                     <select id="brandFilter">
