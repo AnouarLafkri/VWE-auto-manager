@@ -84,20 +84,24 @@ background-color: #FCFCFC;
     margin: 0 auto;
 }
 
-/* Filters Panel */
 .filters-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     background: #FFFFFF;
     border-radius: 16px;
     padding: 20px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
-    flex-direction: column;
     position: sticky;
     top: 20px;
     width: 100%;
+    max-width: 400px; /* voeg max-breedte toe voor centrering */
+    margin: 0 auto;    /* horizontaal centreren */
     align-self: flex-start;
+align-item: center;
     border: 2px solid #E0E0E0;
-gap: 10px;
 }
+
 
 /* Header */
 .filters-header h2, .filters-header label {
@@ -173,7 +177,6 @@ background-color: #FCFCFC;
 .checkbox-group {
     display: flex;
     flex-direction: column;
-    gap: 10px;
     padding: 5px;  /* Equal padding all around */
     margin-bottom: 10px;
     width: 100%;
@@ -238,8 +241,10 @@ background-color: #FCFCFC;
 
 /* Reset knop */
 .filters-reset {
-    width: 296px;
-    height: 45px;
+    width: 100%;
+    padding: 12px 0;
+    margin: 0 auto;
+    box-sizing: border-box;
     font-size: 14px;
     font-weight: 800;
     border-radius: 2px;
@@ -249,9 +254,7 @@ background-color: #FCFCFC;
     text-transform: uppercase;
     transition: background-color 0.3s ease;
     cursor: pointer;
-    box-sizing: border-box;
     text-align: center;
-
 }
 
 
