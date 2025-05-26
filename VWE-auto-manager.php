@@ -234,16 +234,13 @@ function display_car_listing() {
     output_image_preload($cars);
 
     echo '<div class="page-wrapper">';
-
-
-
     echo '<div class="main-content">';
 
     // Filters panel
     echo '<aside class="filters-panel">
         <div class="filters-body">
             <div class="filter-group">
-           <div class="filters-title">FILTERS & SORTS</div>
+                <div class="filters-title">FILTERS & SORTS</div>
                 <label>MERK</label>
                 <div class="custom-select">
                     <select id="brandFilter">
@@ -447,9 +444,15 @@ function display_car_listing() {
     if ($total_pages > 1) {
         echo '<div class="pagination-controls">
             <button class="pagination-prev" onclick="changePage(-1)" disabled>Previous</button>
-            <div class="pagination-info">
-                <span id="currentPage">1</span> of <span id="totalPages">' . $total_pages . '</span>
-            </div>
+            <div class="pagination-numbers">';
+
+        // Show all page numbers
+        for ($i = 1; $i <= $total_pages; $i++) {
+            $active_class = $i === 1 ? ' active' : ''; // Mark first page as active initially
+            echo '<button class="pagination-number' . $active_class . '" onclick="goToPage(' . $i . ')" data-page="' . $i . '">' . $i . '</button>';
+        }
+
+        echo '</div>
             <button class="pagination-next" onclick="changePage(1)">Next</button>
         </div>';
     }
@@ -520,6 +523,10 @@ function renderCars() {
     const start = (currentPage - 1) * carsPerPage;
     const end = start + carsPerPage;
     const carsToShow = filteredCars.slice(start, end);
+
+    // Log the number of cars being rendered
+    console.log(`Rendering ${carsToShow.length} cars (${start + 1} to ${end} of ${filteredCars.length})`);
+
     carsToShow.forEach(car => {
         const card = document.createElement("div");
         card.className = "car-card";
@@ -549,14 +556,26 @@ function renderCars() {
 
 function updatePagination() {
     const totalPages = Math.ceil(filteredCars.length / carsPerPage);
-    document.getElementById("currentPage").textContent = currentPage;
-    document.getElementById("totalPages").textContent = totalPages;
+
+    // Update Previous/Next buttons
     document.querySelector(".pagination-prev").disabled = currentPage === 1;
     document.querySelector(".pagination-next").disabled = currentPage === totalPages || totalPages === 0;
+
+    // Update page number buttons
+    const pageButtons = document.querySelectorAll('.pagination-number');
+    pageButtons.forEach(button => {
+        const pageNum = parseInt(button.dataset.page);
+        button.classList.toggle('active', pageNum === currentPage);
+        button.disabled = pageNum === currentPage;
+    });
 }
 
-function updateResultsCount() {
-    // Optionally update a results count display if you have one
+function goToPage(page) {
+    if (page < 1 || page > Math.ceil(filteredCars.length / carsPerPage)) return;
+    currentPage = page;
+    renderCars();
+    updatePagination();
+    document.getElementById("carsGrid").scrollIntoView({ behavior: "smooth" });
 }
 
 function applyFilters() {
@@ -564,7 +583,7 @@ function applyFilters() {
     currentPage = 1;
     renderCars();
     updatePagination();
-    updateResultsCount();
+    console.log(`Total cars after filtering: ${filteredCars.length}`);
 }
 
 function changePage(direction) {
@@ -574,7 +593,6 @@ function changePage(direction) {
     currentPage = newPage;
     renderCars();
     updatePagination();
-    updateResultsCount();
     document.getElementById("carsGrid").scrollIntoView({ behavior: "smooth" });
 }
 
@@ -606,6 +624,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const nextBtn = document.querySelector(".pagination-next");
     if (prevBtn) prevBtn.addEventListener("click", () => changePage(-1));
     if (nextBtn) nextBtn.addEventListener("click", () => changePage(1));
+
+    // Initial render
+    console.log(`Total cars loaded: ${allCars.length}`);
     applyFilters();
 });
 
@@ -635,7 +656,7 @@ function openModal(carData) {
             carouselSlides.appendChild(slide);
             const dot = document.createElement("div");
             dot.className = "carousel-dot" + (index === 0 ? " active" : "");
-            dot.onclick = () => goToSlide(index);
+            dot.onclick = () => goToPage(index + 1);
             carouselDots.appendChild(dot);
         });
         totalSlides = carData.afbeeldingen.length;
@@ -698,13 +719,6 @@ function updateCarousel() {
     dots.forEach((dot, index) => {
         dot.classList.toggle("active", index === currentSlide);
     });
-}
-
-function goToSlide(index) {
-    if (index >= 0 && index < totalSlides) {
-        currentSlide = index;
-        updateCarousel();
-    }
 }
 
 function closeModal() {

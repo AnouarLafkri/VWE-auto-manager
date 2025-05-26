@@ -1511,12 +1511,65 @@ background-color: #FCFCFC;
 .pagination-next:disabled {
     border-color: #ccc;
     color: #ccc;
+    cursor: not-allowed;
 }
 
-.pagination-info {
-    font-size: 1.1rem;
-    font-weight: 500;
+.pagination-numbers {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.pagination-number {
+    padding: 0.5rem 1rem;
+    border: 2px solid #333;
+    background: white;
     color: #333;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+    min-width: 40px;
+    text-align: center;
+}
+
+.pagination-number:hover:not(:disabled) {
+    background: #333;
+    color: white;
+}
+
+.pagination-number.active {
+    background: #333;
+    color: white;
+    cursor: default;
+    transform: scale(1.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    border-color: #000;
+}
+
+.pagination-number:disabled {
+    border-color: #ccc;
+    color: #ccc;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .pagination-controls {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .pagination-numbers {
+        order: 2;
+        width: 100%;
+        justify-content: center;
+        margin: 0.5rem 0;
+    }
+
+    .pagination-prev,
+    .pagination-next {
+        order: 1;
+    }
 }
 
 /* Cars Container */
