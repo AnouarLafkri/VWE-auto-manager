@@ -616,6 +616,50 @@ document.addEventListener("DOMContentLoaded", function() {
             element.addEventListener("input", applyFilters);
         }
     });
+
+    // Add event listener for brand filter to update model options
+    const brandFilter = document.getElementById("brandFilter");
+    const modelFilter = document.getElementById("modelFilter");
+
+    if (brandFilter && modelFilter) {
+        brandFilter.addEventListener("change", function() {
+            const selectedBrand = this.value;
+            const models = new Set();
+
+            // Clear current model options except the first one
+            modelFilter.innerHTML = '<option value="">Alle Modellen</option>';
+
+            if (selectedBrand) {
+                // Get all models for the selected brand
+                allCars.forEach(car => {
+                    if (car.merk === selectedBrand) {
+                        models.add(car.model);
+                    }
+                });
+
+                // Sort models alphabetically
+                const sortedModels = Array.from(models).sort();
+
+                // Add model options
+                sortedModels.forEach(model => {
+                    const option = document.createElement("option");
+                    option.value = model;
+                    option.textContent = model;
+                    modelFilter.appendChild(option);
+                });
+            }
+
+            // Reset model filter and apply filters
+            modelFilter.value = "";
+            applyFilters();
+        });
+
+        // Trigger change event on brand filter to populate models initially
+        if (brandFilter.value) {
+            brandFilter.dispatchEvent(new Event('change'));
+        }
+    }
+
     document.querySelectorAll("input[name='year']").forEach(cb => { cb.addEventListener("change", applyFilters); });
     document.querySelectorAll("input[name='status']").forEach(cb => { cb.addEventListener("change", applyFilters); });
     const resetButton = document.getElementById("resetFilters");
