@@ -537,8 +537,8 @@ function renderCars() {
                 <h3 class="car-title">${car.merk} ${car.model}${car.cilinder_inhoud ? ' / ' + car.cilinder_inhoud : ''}${car.transmissie ? ' / ' + car.transmissie : ''}${car.brandstof ? ' / ' + car.brandstof : ''}${car.deuren ? ' / ' + car.deuren + ' Deurs' : ''} / NL Auto</h3>
                 <div class="car-price">€ ${Number((car.prijs||'').toString().replace(/[^0-9.]/g, '')).toLocaleString("nl-NL")}</div>
                 <div class="car-specs">
-                    <span>${car.kilometerstand}</span>
-                    <span>${car.vermogen}</span>
+                    <span><img src="https://raw.githubusercontent.com/anouarlafkri/SVG/main/Tank.svg" alt="Kilometerstand" width="18" style="vertical-align:middle;margin-right:4px;">${car.kilometerstand || '0 km'}</span>
+                    <span><img src="https://raw.githubusercontent.com/anouarlafkri/SVG/main/pK.svg" alt="Vermogen" width="18" style="vertical-align:middle;margin-right:4px;">${car.vermogen || '0 pk'}</span>
                 </div>
                 <button type="button" class="view-button" onclick="showCarDetails(this)">BEKIJKEN <span class="arrow">→</span></button>
             </div>
@@ -951,10 +951,14 @@ function extract_car_data($car, $image_url_base) {
     // Format values with units
     if (is_numeric($data['kilometerstand'])) {
         $data['kilometerstand'] = number_format($data['kilometerstand'], 0, ',', '.') . ' km';
+    } else {
+        $data['kilometerstand'] = '0 km';
     }
 
-    if (is_numeric($data['vermogen'])) {
-        $data['vermogen'] = $data['vermogen'] . ' kW (' . $data['vermogen_pk'] . ' pk)';
+    if (is_numeric($data['vermogen_pk'])) {
+        $data['vermogen'] = $data['vermogen_pk'] . ' pk';
+    } else {
+        $data['vermogen'] = '0 pk';
     }
 
     if (is_numeric($data['gewicht'])) {
@@ -1062,8 +1066,8 @@ function display_car_card($car) {
             <h3 class="car-title">' . $detailed_title . '</h3>
             <div class="car-price">€ ' . number_format((float)$car['prijs'], 0, ',', '.') . '</div>
             <div class="car-specs">
-                <span>' . $car['kilometerstand'] . '</span>
-                <span>' . $car['vermogen'] . '</span>
+                <span><img src="https://raw.githubusercontent.com/anouarlafkri/SVG/main/Tank.svg" alt="Kilometerstand" width="18" style="vertical-align:middle;margin-right:4px;">' . $car['kilometerstand'] . '</span>
+                <span><img src="https://raw.githubusercontent.com/anouarlafkri/SVG/main/pK.svg" alt="Vermogen" width="18" style="vertical-align:middle;margin-right:4px;">' . $car['vermogen'] . '</span>
             </div>
             <button type="button" class="view-button" onclick="showCarDetails(this)">
                 BEKIJKEN <span class="arrow">→</span>
