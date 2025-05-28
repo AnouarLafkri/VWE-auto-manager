@@ -325,7 +325,7 @@ background-color: #FCFCFC;
 }
 
 .car-card:hover {
-    border-color: var(--primary-color);
+    /* border-color: var(--primary-color); */
 }
 
 /* Status Badge */
@@ -377,11 +377,11 @@ background-color: #FCFCFC;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: border-color 0.3s ease;
+    transition: filter 0.4s ease, border-color 0.3s ease;
 }
 
-.car-image img:hover {
-    border-color: var(--primary-color);
+.car-image:hover img {
+    filter: brightness(63%);
 }
 
 .car-info {
@@ -408,7 +408,7 @@ background-color: #FCFCFC;
     margin: 0;
     color: var(--text-primary);
     line-height: 1.4;
-    min-height: 50px;
+    min-height: 48px;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -432,8 +432,7 @@ background-color: #FCFCFC;
     font-size: 14px;
     color: var(--text-secondary);
     border-top: 1px solid #e0e0e0;
-    border-bottom: 1px solid #e0e0e0;
-    padding: 7px 20px;
+    padding: 7px 20px 0;
 }
 
 .car-specs span {
@@ -441,9 +440,12 @@ background-color: #FCFCFC;
     align-items: center;
     gap: 8px;
     line-height: 1.4;
-    padding: 5px;
+    padding: 3px 5px 0px;
     border-radius: 4px;
     font-weight: 500;
+}
+.car-specs span:last-child{
+    color: #9e9e9e;
 }
 
 .car-specs span:hover {
@@ -452,12 +454,12 @@ background-color: #FCFCFC;
 .view-button {
     display: inline-flex;
     align-items: center;
-    padding: 10px 20px;
+    padding: 16px 20px;
     width: calc(100% - 40px);
     background: transparent;
     color: var(--primary-color);
     text-decoration: none;
-    border-radius: 8px;
+    /* border-radius: 8px; */
     font-weight: 700;
     font-size: 14px;
     transition: all 0.3s ease;
@@ -465,11 +467,13 @@ background-color: #FCFCFC;
     cursor: pointer;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: 10px;
+    justify-content: end;
+    width: 100%;
+    background: #f7f7f7;
+    border-top: 1px solid #e0e0e0;
 }
 
-.view-button:hover {
-}
+.view-button:hover {color: #616161;}
 
 .view-button .arrow {
     margin-left: 8px;

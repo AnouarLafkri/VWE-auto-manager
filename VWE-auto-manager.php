@@ -543,7 +543,7 @@ function renderCars() {
         card.dataset.car = JSON.stringify(car);
         card.innerHTML = `
             <div class="car-image">
-                <img src="${car.eersteAfbeelding}" alt="${car.merk} ${car.model}" class="car-image" loading="lazy" decoding="async">
+                <img src="${car.eersteAfbeelding}" alt="${car.merk} ${car.model}" class="car-image" loading="lazy" decoding="async" onclick="showCarDetails(this.closest('.car-card').querySelector('.view-button'))" style="cursor: pointer;">
                 <div class="car-badges">
                     <span class="status-badge ${car.status}">${car.status === "beschikbaar" ? "AVAILABLE" : (car.status === "verkocht" ? "VERKOCHT" : "GERESERVEERD")}</span>
                     <span class="year-badge">${car.bouwjaar}</span>
@@ -551,7 +551,7 @@ function renderCars() {
             </div>
             <div class="car-info">
                 <div class="car-brand">${car.merk.toUpperCase()}</div>
-                <h3 class="car-title">${car.merk} ${car.model}${car.cilinder_inhoud ? ' / ' + car.cilinder_inhoud : ''}${car.transmissie ? ' / ' + car.transmissie : ''}${car.brandstof ? ' / ' + car.brandstof : ''}${car.deuren ? ' / ' + car.deuren + ' Deurs' : ''} / NL Auto</h3>
+                <h3 class="car-title">${car.titel || `${car.merk} ${car.model}${car.cilinder_inhoud ? ' / ' + car.cilinder_inhoud : ''}${car.transmissie ? ' / ' + car.transmissie : ''}${car.brandstof ? ' / ' + car.brandstof : ''}${car.deuren ? ' / ' + car.deuren + ' Deurs' : ''} / NL Auto`}</h3>
                 <div class="car-price">€ ${Number((car.prijs||'').toString().replace(/[^0-9.]/g, '')).toLocaleString("nl-NL")}</div>
                 <div class="car-specs">
                     <span><img src="https://raw.githubusercontent.com/anouarlafkri/SVG/main/Tank.svg" alt="Kilometerstand" width="18" style="vertical-align:middle;margin-right:4px;">${car.kilometerstand || '0 km'}</span>
@@ -1214,7 +1214,7 @@ function display_car_card($car) {
                    ($car['status'] === "verkocht" ? "VERKOCHT" : "GERESERVEERD"));
     $status_class = $car['status'];
 
-    // Use the titel field for the car card title
+    // Use the titel field from XML for the car card title
     $detailed_title = $car['titel'];
 
     echo '<div class="car-card" data-car=\'' . $jsonData . '\'>
@@ -1503,6 +1503,84 @@ function ensure_all_images_exist() {
 }
 
 /**
+ * Create a new XML file with the correct structure
+ */
+function create_new_xml_file($data) {
+    // Create the XML structure
+    $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><voertuigen></voertuigen>');
+
+    // Add each vehicle to the XML
+    foreach ($data as $vehicle) {
+        $voertuig = $xml->addChild('voertuig');
+
+        // Add basic vehicle information
+        $voertuig->addChild('merk', htmlspecialchars($vehicle['merk']));
+        $voertuig->addChild('model', htmlspecialchars($vehicle['model']));
+        $voertuig->addChild('titel', htmlspecialchars($vehicle['titel']));
+        $voertuig->addChild('bouwjaar', htmlspecialchars($vehicle['bouwjaar']));
+        $voertuig->addChild('verkoopprijs_particulier', htmlspecialchars($vehicle['prijs']));
+        $voertuig->addChild('tellerstand', htmlspecialchars($vehicle['kilometerstand']));
+        $voertuig->addChild('brandstof', htmlspecialchars($vehicle['brandstof']));
+        $voertuig->addChild('transmissie', htmlspecialchars($vehicle['transmissie']));
+        $voertuig->addChild('carrosserie', htmlspecialchars($vehicle['carrosserie']));
+        $voertuig->addChild('aantal_deuren', htmlspecialchars($vehicle['deuren']));
+        $voertuig->addChild('cilinder_inhoud', htmlspecialchars($vehicle['cilinder_inhoud']));
+        $voertuig->addChild('vermogen_motor_pk', htmlspecialchars($vehicle['vermogen_pk']));
+        $voertuig->addChild('kenteken', htmlspecialchars($vehicle['kenteken']));
+        $voertuig->addChild('massa', htmlspecialchars($vehicle['gewicht']));
+        $voertuig->addChild('aantal_zitplaatsen', htmlspecialchars($vehicle['aantal_zitplaatsen']));
+        $voertuig->addChild('interieurkleur', htmlspecialchars($vehicle['interieurkleur']));
+        $voertuig->addChild('bekleding', htmlspecialchars($vehicle['bekleding']));
+        $voertuig->addChild('opmerkingen', htmlspecialchars($vehicle['opmerkingen']));
+
+        // Add status information
+        $voertuig->addChild('verkocht', $vehicle['status'] === 'verkocht' ? 'j' : 'n');
+        $voertuig->addChild('gereserveerd', $vehicle['status'] === 'gereserveerd' ? 'j' : 'n');
+
+        // Add images
+        if (!empty($vehicle['afbeeldingen'])) {
+            $afbeeldingen = $voertuig->addChild('afbeeldingen');
+            foreach ($vehicle['afbeeldingen'] as $image) {
+                $afbeelding = $afbeeldingen->addChild('afbeelding');
+                $afbeelding->addChild('bestandsnaam', basename($image));
+            }
+        }
+
+        // Add packages if available
+        if (!empty($vehicle['afleverpakketten'])) {
+            $pakketten = $voertuig->addChild('afleverpakketten');
+            foreach ($vehicle['afleverpakketten'] as $pakket) {
+                $afleverpakket = $pakketten->addChild('afleverpakket');
+                $afleverpakket->addChild('naam', htmlspecialchars($pakket['naam']));
+                $afleverpakket->addChild('omschrijving', htmlspecialchars($pakket['omschrijving']));
+                $afleverpakket->addChild('prijs_in', htmlspecialchars($pakket['prijs']));
+            }
+        }
+    }
+
+    // Format the XML with proper indentation
+    $dom = new DOMDocument('1.0');
+    $dom->preserveWhiteSpace = false;
+    $dom->formatOutput = true;
+    $dom->loadXML($xml->asXML());
+
+    // Save the XML file
+    $xml_content = $dom->saveXML();
+    $temp_file = LOCAL_XML_PATH . '.new';
+
+    if (file_put_contents($temp_file, $xml_content)) {
+        // If successful, replace the old file with the new one
+        if (file_exists(LOCAL_XML_PATH)) {
+            unlink(LOCAL_XML_PATH);
+        }
+        rename($temp_file, LOCAL_XML_PATH);
+        return true;
+    }
+
+    return false;
+}
+
+/**
  * Update all data (XML and images)
  */
 function update_all_data() {
@@ -1514,6 +1592,25 @@ function update_all_data() {
         // Download and update XML file
         if (!download_xml_from_ftp()) {
             error_log('Failed to update XML file');
+            return false;
+        }
+
+        // Get the current XML data
+        $xml = get_xml_data();
+        if (!$xml) {
+            error_log('Failed to get XML data');
+            return false;
+        }
+
+        // Convert XML to array format
+        $cars_data = [];
+        foreach ($xml->voertuig as $car) {
+            $cars_data[] = extract_car_data($car, get_image_base_url());
+        }
+
+        // Create new XML file with the data
+        if (!create_new_xml_file($cars_data)) {
+            error_log('Failed to create new XML file');
             return false;
         }
 

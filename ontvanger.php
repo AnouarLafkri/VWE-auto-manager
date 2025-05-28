@@ -503,68 +503,21 @@ function removeIncompleteVehicles($xml) {
 */
 
 function saveXmlFile($xml, $filePath) {
-    // Create backup before saving
-    $backupPath = $filePath . '.backup.' . date('Y-m-d-H-i-s');
-    if (file_exists($filePath)) {
-        if (!copy($filePath, $backupPath)) {
-            logMessage("WARNING: Failed to create backup before saving");
-        } else {
-            logMessage("Created backup: " . $backupPath);
-        }
-    }
+    try {
+        // Format the XML with proper indentation
+        $dom = new DOMDocument('1.0');
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+        $dom->loadXML($xml->asXML());
 
-    // Convert SimpleXML to DOMDocument for better formatting
-    $dom = new DOMDocument('1.0', 'UTF-8');
-    $dom->preserveWhiteSpace = true;
-    $dom->formatOutput = true;
-
-    // Import the SimpleXML object
-    $dom->loadXML($xml->asXML());
-
-    // Verify XML content before saving
-    $vehicleCount = 0;
-    foreach ($dom->getElementsByTagName('voertuig') as $vehicle) {
-        $vehicleCount++;
-    }
-    foreach ($dom->getElementsByTagName('autotelex') as $vehicle) {
-        $vehicleCount++;
-    }
-
-    if ($vehicleCount === 0) {
-        logMessage("ERROR: Attempting to save empty XML file! Aborting save operation.");
-        return false;
-    }
-
-    // Save the XML
-    if (file_put_contents($filePath, $dom->saveXML())) {
-        chmod($filePath, 0666);
-
-        // Verify the saved file
-        $savedContent = file_get_contents($filePath);
-        if (empty($savedContent)) {
-            logMessage("ERROR: Saved file is empty! Restoring from backup.");
-            if (file_exists($backupPath)) {
-                copy($backupPath, $filePath);
-                chmod($filePath, 0666);
-            }
-            return false;
+        // Save the formatted XML directly
+        if ($dom->save($filePath) === false) {
+            throw new Exception("Failed to save XML file");
         }
 
-        // Verify XML structure after saving
-        $testXml = simplexml_load_string($savedContent);
-        if ($testXml === false) {
-            logMessage("ERROR: Saved file contains invalid XML! Restoring from backup.");
-            if (file_exists($backupPath)) {
-                copy($backupPath, $filePath);
-                chmod($filePath, 0666);
-            }
-            return false;
-        }
-
-        logMessage("Successfully saved XML file with $vehicleCount vehicles");
         return true;
-    } else {
-        logMessage("ERROR: Failed to save XML file");
+    } catch (Exception $e) {
+        error_log("Error saving XML file: " . $e->getMessage());
         return false;
     }
 }
