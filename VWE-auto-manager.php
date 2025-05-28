@@ -234,6 +234,7 @@ function display_car_listing() {
     output_image_preload($cars);
 
     echo '<div class="page-wrapper">';
+
     echo '<div class="main-content" style="display:flex; flex-direction:row; align-items:flex-start; gap:30px;">';
 
     // Filters panel links
@@ -760,62 +761,151 @@ function openModal(carData) {
     const modal = document.getElementById("carModal");
     const carouselSlides = modal.querySelector(".carousel-slides");
     const carouselDots = modal.querySelector(".carousel-dots");
+    const carouselCounter = modal.querySelector(".carousel-counter");
     const details = modal.querySelector(".modal-details");
+
+    // Generate URL-friendly title
+    const carTitle = carData.titel || `${carData.merk} ${carData.model}${carData.cilinder_inhoud ? ' ' + carData.cilinder_inhoud : ''}${carData.transmissie ? ' ' + carData.transmissie : ''}${carData.brandstof ? ' ' + carData.brandstof : ''}${carData.deuren ? ' ' + carData.deuren + ' Deurs' : ''}`;
+    const carId = carTitle.toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+        .replace(/\s+/g, '-') // Replace spaces with hyphens
+        .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+        .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+
+    const carUrl = window.location.origin + window.location.pathname + '?car=' + carId;
+
+    // Update browser URL without reloading the page
+    window.history.pushState({car: carData}, '', carUrl);
+
+    // Reset carousel
     carouselSlides.innerHTML = "";
     carouselDots.innerHTML = "";
+
     if (carData.afbeeldingen && carData.afbeeldingen.length > 0) {
         carData.afbeeldingen.forEach((image, index) => {
             const slide = document.createElement("div");
             slide.className = "carousel-slide";
-            slide.innerHTML = `<img src="${image}" alt="${carData.merk} ${carData.model} - Image ${index + 1}">`;
+            slide.innerHTML = `
+                <img src="${image}"
+                     alt="${carData.merk} ${carData.model} - Image ${index + 1}"
+                     loading="lazy"
+                     decoding="async"
+                     onclick="openLightbox(this.src)">
+            `;
             carouselSlides.appendChild(slide);
+
             const dot = document.createElement("div");
             dot.className = "carousel-dot" + (index === 0 ? " active" : "");
-            dot.onclick = () => goToPage(index + 1);
+            dot.onclick = () => goToSlide(index);
             carouselDots.appendChild(dot);
         });
-        totalSlides = carData.afbeeldingen.length;
-        currentSlide = 0;
+
+        window.totalSlides = carData.afbeeldingen.length;
+        window.currentSlide = 0;
         updateCarousel();
+        updateCarouselCounter();
     }
+
+    // Update carousel counter
+    function updateCarouselCounter() {
+        carouselCounter.textContent = `${window.currentSlide + 1} / ${window.totalSlides}`;
+    }
+
+    // Add keyboard navigation
+    document.addEventListener("keydown", function(e) {
+        if (modal.style.display === "block") {
+            if (e.key === "ArrowLeft") prevSlide();
+            if (e.key === "ArrowRight") nextSlide();
+        }
+    });
+
     details.innerHTML = `
         <div class="modal-sections">
-            <div class="modal-section">
-                <h3>${carData.merk} ${carData.model}</h3>
+            <div class="modal-section title-section" data-car='${JSON.stringify(carData)}'>
+                <div class="title-content">
+                    <h3>${carData.titel || (carData.merk + ' ' + carData.model)}</h3>
+                    <div class="car-status ${carData.status}">${carData.status.toUpperCase()}</div>
+                </div>
                 <div class="price-tag">€ ${Number(carData.prijs).toLocaleString("nl-NL")}</div>
             </div>
+
             <div class="modal-section">
-                <h4>Belangrijke Specificaties</h4>
+                <h4><i class="fas fa-info-circle"></i> Belangrijke Specificaties</h4>
                 <div class="specs-grid">
-                    <div class="spec-item"><span class="spec-label">Bouwjaar</span><span class="spec-value">${carData.bouwjaar || "N/A"}</span></div>
-                    <div class="spec-item"><span class="spec-label">Kilometerstand</span><span class="spec-value">${carData.kilometerstand || "N/A"}</span></div>
-                    <div class="spec-item"><span class="spec-label">Brandstof</span><span class="spec-value">${carData.brandstof || "N/A"}</span></div>
-                    <div class="spec-item"><span class="spec-label">Transmissie</span><span class="spec-value">${carData.transmissie || "N/A"}</span></div>
+                    <div class="spec-item">
+                        <span class="spec-label"><i class="fas fa-calendar"></i> Bouwjaar</span>
+                        <span class="spec-value">${carData.bouwjaar || "N/A"}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label"><i class="fas fa-tachometer-alt"></i> Kilometerstand</span>
+                        <span class="spec-value">${carData.kilometerstand || "N/A"}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label"><i class="fas fa-gas-pump"></i> Brandstof</span>
+                        <span class="spec-value">${carData.brandstof || "N/A"}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label"><i class="fas fa-cog"></i> Transmissie</span>
+                        <span class="spec-value">${carData.transmissie || "N/A"}</span>
+                    </div>
                 </div>
             </div>
+
             <div class="modal-section">
-                <h4>Technische Details</h4>
+                <h4><i class="fas fa-tools"></i> Technische Details</h4>
                 <div class="specs-grid">
-                    <div class="spec-item"><span class="spec-label">Vermogen</span><span class="spec-value">${carData.vermogen || "N/A"}</span></div>
-                    <div class="spec-item"><span class="spec-label">Cilinder Inhoud</span><span class="spec-value">${carData.cilinder_inhoud || "N/A"}</span></div>
-                    <div class="spec-item"><span class="spec-label">Aantal Cilinders</span><span class="spec-value">${carData.cilinders || "N/A"}</span></div>
-                    <div class="spec-item"><span class="spec-label">Gewicht</span><span class="spec-value">${carData.gewicht || "N/A"}</span></div>
+                    <div class="spec-item">
+                        <span class="spec-label"><i class="fas fa-bolt"></i> Vermogen</span>
+                        <span class="spec-value">${carData.vermogen || "N/A"}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label"><i class="fas fa-compress-arrows-alt"></i> Cilinder Inhoud</span>
+                        <span class="spec-value">${carData.cilinder_inhoud || "N/A"}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label"><i class="fas fa-cogs"></i> Aantal Cilinders</span>
+                        <span class="spec-value">${carData.cilinders || "N/A"}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label"><i class="fas fa-weight"></i> Gewicht</span>
+                        <span class="spec-value">${carData.gewicht || "N/A"}</span>
+                    </div>
                 </div>
             </div>
+
             <div class="modal-section">
-                <h4>Voertuig Kenmerken</h4>
+                <h4><i class="fas fa-car"></i> Voertuig Kenmerken</h4>
                 <div class="specs-grid">
-                    <div class="spec-item"><span class="spec-label">Carrosserie</span><span class="spec-value">${carData.carrosserie || "N/A"}</span></div>
-                    <div class="spec-item"><span class="spec-label">Aantal Deuren</span><span class="spec-value">${carData.deuren || "N/A"}</span></div>
-                    <div class="spec-item"><span class="spec-label">Aantal Zitplaatsen</span><span class="spec-value">${carData.aantal_zitplaatsen || "N/A"}</span></div>
-                    <div class="spec-item"><span class="spec-label">Kleur</span><span class="spec-value">${carData.kleur || "N/A"}</span></div>
-                    <div class="spec-item"><span class="spec-label">Interieur Kleur</span><span class="spec-value">${carData.interieurkleur || "N/A"}</span></div>
-                    <div class="spec-item"><span class="spec-label">Bekleding</span><span class="spec-value">${carData.bekleding || "N/A"}</span></div>
+                    <div class="spec-item">
+                        <span class="spec-label"><i class="fas fa-car-side"></i> Carrosserie</span>
+                        <span class="spec-value">${carData.carrosserie || "N/A"}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label"><i class="fas fa-door-open"></i> Aantal Deuren</span>
+                        <span class="spec-value">${carData.deuren || "N/A"}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label"><i class="fas fa-chair"></i> Aantal Zitplaatsen</span>
+                        <span class="spec-value">${carData.aantal_zitplaatsen || "N/A"}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label"><i class="fas fa-palette"></i> Kleur</span>
+                        <span class="spec-value">${carData.kleur || "N/A"}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label"><i class="fas fa-paint-brush"></i> Interieur Kleur</span>
+                        <span class="spec-value">${carData.interieurkleur || "N/A"}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label"><i class="fas fa-couch"></i> Bekleding</span>
+                        <span class="spec-value">${carData.bekleding || "N/A"}</span>
+                    </div>
                 </div>
             </div>
+
             ${carData.opmerkingen ? `
                 <div class="modal-section">
-                    <h4>Beschrijving</h4>
+                    <h4><i class="fas fa-align-left"></i> Beschrijving</h4>
                     <div class="description-content">
                         ${carData.opmerkingen}
                     </div>
@@ -823,62 +913,131 @@ function openModal(carData) {
             ` : ""}
         </div>
     `;
-    modal.style.display = "block";
-}
 
-function updateCarousel() {
-    const slides = document.querySelector(".carousel-slides");
-    if (!slides || totalSlides === 0) return;
-    slides.style.transform = "translateX(-" + (currentSlide * 100) + "%)";
-    const dots = document.querySelectorAll(".carousel-dot");
-    dots.forEach((dot, index) => {
-        dot.classList.toggle("active", index === currentSlide);
-    });
+    modal.style.display = "block";
+    document.body.style.overflow = "hidden"; // Prevent background scrolling
 }
 
 function closeModal() {
     const modal = document.getElementById("carModal");
     modal.style.display = "none";
+    document.body.style.overflow = ""; // Restore scrolling
+    // Reset URL when closing modal
+    window.history.pushState({}, '', window.location.pathname);
 }
 
-window.showCarDetails = showCarDetails;
-window.openModal = openModal;
-window.closeModal = closeModal;
-window.nextSlide = nextSlide;
-window.prevSlide = prevSlide;
-window.goToSlide = goToSlide;
-window.addEventListener("click", function(event) {
-    const modal = document.getElementById("carModal");
-    if (event.target === modal) {
-        closeModal();
-    }
-});
-window.addEventListener("keydown", function(event) {
-    if (event.key === "Escape") {
-        closeModal();
-    }
-});
-
-// Helper om waarde uit topbar of sidebar te halen
-function getFilterValue(barId, sideId) {
-    const bar = document.getElementById(barId);
-    const side = document.getElementById(sideId);
-    return (bar && bar.value) ? bar.value : (side && side.value ? side.value : "");
+function updateCarousel() {
+    const slides = document.querySelector(".carousel-slides");
+    if (!slides || !window.totalSlides) return;
+    slides.style.transform = "translateX(-" + (window.currentSlide * 100) + "%)";
+    const dots = document.querySelectorAll(".carousel-dot");
+    dots.forEach((dot, index) => {
+        dot.classList.toggle("active", index === window.currentSlide);
+    });
 }
 
-// Synchroniseer topbar en sidebar (optioneel, voor UX)
-function syncFilters(barId, sideId) {
-    const bar = document.getElementById(barId);
-    const side = document.getElementById(sideId);
-    if (bar && side) {
-        bar.addEventListener("change", () => { side.value = bar.value; filterCars(); });
-        side.addEventListener("change", () => { bar.value = side.value; filterCars(); });
+function nextSlide() {
+    if (!window.totalSlides) return;
+    window.currentSlide = (window.currentSlide + 1) % window.totalSlides;
+    updateCarousel();
+    updateCarouselCounter();
+}
+
+function prevSlide() {
+    if (!window.totalSlides) return;
+    window.currentSlide = (window.currentSlide - 1 + window.totalSlides) % window.totalSlides;
+    updateCarousel();
+    updateCarouselCounter();
+}
+
+function goToSlide(index) {
+    if (!window.totalSlides) return;
+    window.currentSlide = index;
+    updateCarousel();
+    updateCarouselCounter();
+}
+
+function updateCarouselCounter() {
+    const counter = document.querySelector(".carousel-counter");
+    if (counter && window.totalSlides) {
+        counter.textContent = `${window.currentSlide + 1} / ${window.totalSlides}`;
     }
 }
-syncFilters("brandFilterBar", "brandFilter");
-syncFilters("modelFilterBar", "modelFilter");
-syncFilters("fuelFilterBar", "fuelFilter");
-syncFilters("transmissionFilterBar", "transmissionFilter");
+
+function openLightbox(imageSrc) {
+    const lightbox = document.createElement("div");
+    lightbox.className = "lightbox";
+    lightbox.innerHTML = `
+        <img src="${imageSrc}" alt="Full size image">
+        <button class="lightbox-close" onclick="this.parentElement.remove()">&times;</button>
+    `;
+    document.body.appendChild(lightbox);
+}
+
+function shareCar() {
+    const carData = JSON.parse(document.querySelector(".modal-section.title-section").dataset.car);
+
+    // Generate URL-friendly title
+    const carTitle = carData.titel || `${carData.merk} ${carData.model}${carData.cilinder_inhoud ? ' ' + carData.cilinder_inhoud : ''}${carData.transmissie ? ' ' + carData.transmissie : ''}${carData.brandstof ? ' ' + carData.brandstof : ''}${carData.deuren ? ' ' + carData.deuren + ' Deurs' : ''}`;
+    const carId = carTitle.toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+        .replace(/\s+/g, '-') // Replace spaces with hyphens
+        .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+        .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+
+    const shareUrl = window.location.origin + window.location.pathname + '?car=' + carId;
+
+    const shareData = {
+        title: carTitle,
+        text: `Bekijk deze ${carTitle} op onze website!`,
+        url: shareUrl
+    };
+
+    if (navigator.share) {
+        navigator.share(shareData)
+            .then(() => {
+                showNotification('Succesvol gedeeld!');
+            })
+            .catch((error) => {
+                console.error('Error sharing:', error);
+                fallbackShare(shareUrl);
+            });
+    } else {
+        fallbackShare(shareUrl);
+    }
+}
+
+function fallbackShare(url) {
+    const dummy = document.createElement("input");
+    document.body.appendChild(dummy);
+    dummy.value = url;
+    dummy.select();
+    document.execCommand("copy");
+    document.body.removeChild(dummy);
+    showNotification('Link gekopieerd naar klembord!');
+}
+
+function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 100);
+
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
+}
+
+function printCarDetails() {
+    window.print();
+}
 
 // Voeg event listeners toe voor topbar filters
 ["brandFilterBar", "modelFilterBar", "fuelFilterBar", "transmissionFilterBar"].forEach(id => {
@@ -933,6 +1092,71 @@ JS;
 
     // Render modals at the end of the page
     render_modals();
+
+    // Add JavaScript for favorites functionality
+    $js = <<<'JS'
+<script>
+// ... existing JavaScript code ...
+
+// Function to update favorites display
+function updateFavoritesDisplay() {
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+    const favoritesGrid = document.querySelector('.favorites-grid');
+    const favoritesCount = document.querySelector('.favorites-count');
+
+    // Update count
+    favoritesCount.textContent = `${favorites.length} auto${favorites.length !== 1 ? "'s" : ""} in favorieten`;
+
+    // Clear current display
+    favoritesGrid.innerHTML = '';
+
+    if (favorites.length === 0) {
+        favoritesGrid.innerHTML = '<div class="no-favorites">Nog geen favorieten toegevoegd</div>';
+        return;
+    }
+
+    // Display each favorite
+    favorites.forEach(car => {
+        const card = document.createElement("div");
+        card.className = "car-card";
+        card.dataset.car = JSON.stringify(car);
+        card.innerHTML = `
+            <div class="car-image">
+                <img src="${car.eersteAfbeelding}" alt="${car.merk} ${car.model}" class="car-image" loading="lazy" decoding="async" onclick="showCarDetails(this.closest('.car-card').querySelector('.view-button'))" style="cursor: pointer;">
+                <div class="car-badges">
+                    <span class="status-badge ${car.status}">${car.status === "beschikbaar" ? "AVAILABLE" : (car.status === "verkocht" ? "VERKOCHT" : "GERESERVEERD")}</span>
+                    <span class="year-badge">${car.bouwjaar}</span>
+                </div>
+            </div>
+            <div class="car-info">
+                <div class="car-brand">${car.merk.toUpperCase()}</div>
+                <h3 class="car-title">${car.titel || `${car.merk} ${car.model}${car.cilinder_inhoud ? ' / ' + car.cilinder_inhoud : ''}${car.transmissie ? ' / ' + car.transmissie : ''}${car.brandstof ? ' / ' + car.brandstof : ''}${car.deuren ? ' / ' + car.deuren + ' Deurs' : ''} / NL Auto`}</h3>
+                <div class="car-price">€ ${Number((car.prijs||'').toString().replace(/[^0-9.]/g, '')).toLocaleString("nl-NL")}</div>
+                <div class="car-specs">
+                    <span><img src="https://raw.githubusercontent.com/anouarlafkri/SVG/main/Tank.svg" alt="Kilometerstand" width="18" style="vertical-align:middle;margin-right:4px;">${car.kilometerstand || '0 km'}</span>
+                    <span><img src="https://raw.githubusercontent.com/anouarlafkri/SVG/main/pK.svg" alt="Vermogen" width="18" style="vertical-align:middle;margin-right:4px;">${car.vermogen || '0 pk'}</span>
+                </div>
+                <button type="button" class="view-button" onclick="showCarDetails(this)">BEKIJKEN <span class="arrow">→</span></button>
+            </div>
+        `;
+        favoritesGrid.appendChild(card);
+    });
+}
+
+// Update toggleFavorite function to also update the favorites display
+const originalToggleFavorite = toggleFavorite;
+toggleFavorite = function() {
+    originalToggleFavorite();
+    updateFavoritesDisplay();
+};
+
+// Initialize favorites display
+document.addEventListener('DOMContentLoaded', function() {
+    updateFavoritesDisplay();
+});
+</script>
+JS;
+    echo $js;
 }
 
 function generate_options($items) {
@@ -1121,7 +1345,6 @@ function extract_car_data($car, $image_url_base) {
         'bekleding' => $get_xml_value($car, 'bekleding', 'Onbekend'),
         'opmerkingen' => $get_xml_value($car, 'opmerkingen', 'Geen aanvullende opmerkingen beschikbaar.'),
         'afbeeldingen' => [],
-        'afleverpakketten' => [],
         'carrosserie' => $get_xml_value($car, 'carrosserie', 'Onbekend')
     ];
 
@@ -1187,19 +1410,6 @@ function extract_car_data($car, $image_url_base) {
     $data['eersteAfbeelding'] = empty($data['afbeeldingen']) ?
         $image_url_base . 'placeholder.jpg' : $data['afbeeldingen'][0];
 
-    // Collect packages
-    if (isset($car->afleverpakketten) && isset($car->afleverpakketten->afleverpakket)) {
-        foreach ($car->afleverpakketten->afleverpakket as $pakket) {
-            if (isset($pakket->naam) && isset($pakket->omschrijving) && isset($pakket->prijs_in)) {
-            $data['afleverpakketten'][] = [
-                'naam' => (string)$pakket->naam,
-                'omschrijving' => strip_tags((string)$pakket->omschrijving),
-                'prijs' => (string)$pakket->prijs_in
-            ];
-            }
-        }
-    }
-
     return $data;
 }
 
@@ -1207,6 +1417,9 @@ function extract_car_data($car, $image_url_base) {
  * Display a single car card
  */
 function display_car_card($car) {
+    // Generate a unique identifier for the car
+    $car_id = strtolower(str_replace(' ', '-', $car['merk'] . '-' . $car['model'] . '-' . $car['kenteken']));
+
     // Ensure proper JSON encoding of the car data
     $jsonData = htmlspecialchars(json_encode($car, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP), ENT_QUOTES);
 
@@ -1217,7 +1430,7 @@ function display_car_card($car) {
     // Use the titel field from XML for the car card title
     $detailed_title = $car['titel'];
 
-    echo '<div class="car-card" data-car=\'' . $jsonData . '\'>
+    echo '<div class="car-card" data-car=\'' . $jsonData . '\' data-car-id="' . $car_id . '">
         <div class="car-image">';
 
     // Use the new optimized image function
@@ -1263,18 +1476,24 @@ function render_modals() {
     echo '
         <div id="carModal" class="modal">
             <div class="modal-content">
-            <button class="modal-close" onclick="closeModal()">&times;</button>
-            <div class="modal-carousel">
-                <div class="carousel-container">
-                    <div class="carousel-slides"></div>
-                    <button class="carousel-prev" onclick="prevSlide()">❮</button>
-                    <button class="carousel-next" onclick="nextSlide()">❯</button>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+                <div class="modal-carousel">
+                    <div class="carousel-container">
+                        <div class="carousel-slides"></div>
+                        <button class="carousel-prev" onclick="prevSlide()">❮</button>
+                        <button class="carousel-next" onclick="nextSlide()">❯</button>
+                        <div class="carousel-counter"></div>
+                    </div>
+                    <div class="carousel-dots"></div>
                 </div>
-                <div class="carousel-dots"></div>
+                <div class="modal-details"></div>
+                <div class="modal-actions">
+                    <button class="modal-action-btn share-btn" onclick="shareCar()">
+                        <i class="fas fa-share-alt"></i> Delen
+                    </button>
+                </div>
             </div>
-            <div class="modal-details"></div>
-            </div>
-    </div>';
+        </div>';
 }
 
 /**
@@ -1545,17 +1764,6 @@ function create_new_xml_file($data) {
                 $afbeelding->addChild('bestandsnaam', basename($image));
             }
         }
-
-        // Add packages if available
-        if (!empty($vehicle['afleverpakketten'])) {
-            $pakketten = $voertuig->addChild('afleverpakketten');
-            foreach ($vehicle['afleverpakketten'] as $pakket) {
-                $afleverpakket = $pakketten->addChild('afleverpakket');
-                $afleverpakket->addChild('naam', htmlspecialchars($pakket['naam']));
-                $afleverpakket->addChild('omschrijving', htmlspecialchars($pakket['omschrijving']));
-                $afleverpakket->addChild('prijs_in', htmlspecialchars($pakket['prijs']));
-            }
-        }
     }
 
     // Format the XML with proper indentation
@@ -1743,3 +1951,43 @@ function check_last_update() {
         error_log("No last update found - update needed");
     }
 }
+
+// Add this at the end of the file, before the closing PHP tag
+function handle_direct_links() {
+    if (isset($_GET['car'])) {
+        $car_id = $_GET['car'];
+        $xml = get_xml_data();
+        if ($xml) {
+            foreach ($xml->voertuig as $car) {
+                // Generate the same URL-friendly title as in JavaScript
+                $car_title = (string)$car->titel ?:
+                    (string)$car->merk . ' ' .
+                    (string)$car->model .
+                    ((string)$car->cilinder_inhoud ? ' ' . (string)$car->cilinder_inhoud : '') .
+                    ((string)$car->transmissie ? ' ' . (string)$car->transmissie : '') .
+                    ((string)$car->brandstof ? ' ' . (string)$car->brandstof : '') .
+                    ((string)$car->aantal_deuren ? ' ' . (string)$car->aantal_deuren . ' Deurs' : '');
+
+                $current_car_id = strtolower($car_title);
+                $current_car_id = preg_replace('/[^a-z0-9\s-]/', '', $current_car_id);
+                $current_car_id = preg_replace('/\s+/', '-', $current_car_id);
+                $current_car_id = preg_replace('/-+/', '-', $current_car_id);
+                $current_car_id = trim($current_car_id, '-');
+
+                if ($current_car_id === $car_id) {
+                    $car_data = extract_car_data($car, get_image_base_url());
+                    echo '<script>
+                        document.addEventListener("DOMContentLoaded", function() {
+                            const carData = ' . json_encode($car_data) . ';
+                            openModal(carData);
+                        });
+                    </script>';
+                    break;
+                }
+            }
+        }
+    }
+}
+
+// Add this line after the shortcode registration
+add_action('wp_footer', 'handle_direct_links');
