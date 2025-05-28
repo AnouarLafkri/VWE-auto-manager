@@ -78,29 +78,72 @@ background-color: #FCFCFC;
 
 /* Main Content Layout */
 .main-content {
-    display: grid;
-    grid-template-columns: minmax(250px, 350px) 1fr;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
     gap: 30px;
-    margin: 0 auto;
 }
 
 .filters-panel {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: #FFFFFF;
-    border-radius: 10px;
-    padding: 20px;
-    position: sticky;
-    top: 20px;
+    min-width: 280px;
+    max-width: 340px;
     width: 100%;
-    max-width: 400px; /* voeg max-breedte toe voor centrering */
-    margin: 0 auto;    /* horizontaal centreren */
-    align-self: flex-start;
-    align-item: center;
-    border: 2px solid #E0E0E0;
+    flex-shrink: 0;
+    border: 1px solid #E0E0E0;
+    padding: 20px;
+    border-radius: 8px;
+    background: #fff;
 }
 
+.content-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 0;
+    margin-top: 0;
+    width: 100%;
+}
+
+.result-count {
+    color: #b0b7c3;
+    text-transform: uppercase;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-right: 24px;
+    min-width: 180px;
+    white-space: nowrap;
+}
+
+.filter-bar .dropdown-group {
+    display: flex;
+    gap: 12px;
+    margin-left: auto;
+}
+
+.filter-dropdown {
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    font-size: 14px;
+    background: #fff;
+    color: #222;
+    min-width: 120px;
+    max-width: 150px;
+    box-shadow: none;
+    outline: none;
+    transition: border 0.2s;
+}
+.filter-dropdown:focus, .filter-dropdown:hover {
+    border: 1.5px solid #22b3ff;
+}
 
 /* Header */
 .filters-header h2, .filters-header label {
@@ -376,7 +419,7 @@ background-color: #FCFCFC;
 .car-price {
     font-size: 20px;
     font-weight: 700;
-    color: #89744d;
+    color: #26BAE0;
     margin: 0;
     padding: 0 20px 6px;
 }
@@ -713,64 +756,29 @@ background-color: #FCFCFC;
 
 @media (max-width: 1024px) {
     .main-content {
-        grid-template-columns: 1fr;
-    }
-
-    .description-content {
-        padding: 30px;
-    }
-}
-
-@media (max-width: 768px) {
-    .page-wrapper {
-        padding: 10px;
-    }
-
-    .top-controls {
         flex-direction: column;
-        gap: 15px;
+        gap: 20px;
     }
-
-    .main-content {
-        grid-template-columns: 1fr;
+    .filters-panel {
+        max-width: 100%;
+        min-width: 0;
+        width: 100%;
     }
-
-    .cars-grid {
-        grid-template-columns: 1fr;
+    .content-right {
+        width: 100%;
     }
-
-    .modal-content {
-        width: 95%;
-        padding: 20px;
-        margin: 2% auto;
+    .filter-bar {
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
     }
-
-    .details-grid {
-        grid-template-columns: 1fr;
+    .result-count {
+        margin-right: 0;
+        margin-bottom: 6px;
     }
-
-    .carousel-container {
-        height: 400px;
-    }
-
-    .specs-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .price-tag {
-        font-size: 28px;
-    }
-
-    .description-content {
-        padding: 20px;
-    }
-
-    .description-content h4 {
-        font-size: 24px;
-    }
-
-    .description-content p {
-        font-size: 16px;
+    .filter-bar .dropdown-group {
+        margin-left: 0;
+        justify-content: flex-start;
     }
 }
 

@@ -234,12 +234,12 @@ function display_car_listing() {
     output_image_preload($cars);
 
     echo '<div class="page-wrapper">';
-    echo '<div class="main-content">';
+    echo '<div class="main-content" style="display:flex; flex-direction:row; align-items:flex-start; gap:30px;">';
 
-    // Filters panel
-    echo '<aside class="filters-panel">
-        <div class="filters-body">
-            <div class="filter-group">
+    // Filters panel links
+    echo '<aside class="filters-panel">';
+    echo '<div class="filters-body">';
+    echo '<div class="filter-group">
                 <div class="filters-title">FILTERS & SORTS</div>
                 <label>MERK</label>
                 <div class="custom-select">
@@ -420,12 +420,22 @@ function display_car_listing() {
                 </div>
             </div>
             <button class="filters-reset" id="resetFilters">FILTERS WISSEN</button>
-        </div>
-    </aside>';
+        </div></aside>';
 
-    // Cars grid with pagination
-    echo '<div class="cars-container">
-        <div class="cars-grid" id="carsGrid">';
+    // Content rechts: filter-bar + cards
+    echo '<div class="content-right" style="flex:1; display:flex; flex-direction:column; gap:24px;">';
+    // Filter bar boven de cards
+    echo '<div class="filter-bar">';
+    echo '<div class="result-count" id="resultCount">0 results found</div>';
+    echo '<div class="dropdown-group">';
+    echo '<select id="sortSelect" class="filter-dropdown"><option value="">Sort By Default</option><option value="prijs-asc">Price (Low-High)</option><option value="prijs-desc">Price (High-Low)</option><option value="km-asc">Mileage (Low-High)</option><option value="km-desc">Mileage (High-Low)</option><option value="jaar-desc">Newest First</option><option value="jaar-asc">Oldest First</option></select>';
+    echo '<select id="showSelect" class="filter-dropdown"><option value="12">Show 12</option><option value="24">Show 24</option><option value="50">Show 50</option><option value="100">Show 100</option></select>';
+    echo '</div>';
+    echo '</div>';
+
+    // Cards grid
+    echo '<div class="cars-container">';
+    echo '<div class="cars-grid" id="carsGrid">';
 
     // Debug information
     if (DEBUG_MODE) {
@@ -465,7 +475,7 @@ function display_car_listing() {
     $js = <<<'JS'
 <script>
 let currentPage = 1;
-const carsPerPage = 9;
+let carsPerPage = 9; // Default value, will be updated by showSelect
 let allCars = __ALL_CARS_JSON__;
 let filteredCars = allCars.slice();
 const totalItems = allCars.length;
@@ -580,10 +590,51 @@ function goToPage(page) {
 
 function applyFilters() {
     filteredCars = allCars.filter(checkFilters);
+    sortCars(); // Apply current sorting after filtering
     currentPage = 1;
     renderCars();
     updatePagination();
+    updateResultsCount();
     console.log(`Total cars after filtering: ${filteredCars.length}`);
+}
+
+function sortCars() {
+    const sortValue = document.getElementById("sortSelect").value;
+    if (!sortValue) return;
+
+    const [sortBy, sortOrder] = sortValue.split("-");
+
+    filteredCars.sort((a, b) => {
+        let valA, valB;
+
+        if (sortBy === "prijs") {
+            valA = parseFloat((a.prijs || '').toString().replace(/[^0-9.]/g, ''));
+            valB = parseFloat((b.prijs || '').toString().replace(/[^0-9.]/g, ''));
+        } else if (sortBy === "km") {
+            valA = parseFloat((a.kilometerstand || '').toString().replace(/[^0-9]/g, ""));
+            valB = parseFloat((b.kilometerstand || '').toString().replace(/[^0-9]/g, ""));
+        } else if (sortBy === "jaar") {
+            valA = parseInt(a.bouwjaar);
+            valB = parseInt(b.bouwjaar);
+        } else {
+            return 0; // No specific sort, maintain current order
+        }
+
+        if (isNaN(valA)) valA = sortOrder === 'asc' ? Infinity : -Infinity;
+        if (isNaN(valB)) valB = sortOrder === 'asc' ? Infinity : -Infinity;
+
+        if (valA < valB) return sortOrder === "asc" ? -1 : 1;
+        if (valA > valB) return sortOrder === "asc" ? 1 : -1;
+        return 0;
+    });
+}
+
+function updateResultsCount() {
+    const resultCountElement = document.getElementById("resultCount");
+    if (resultCountElement) {
+        const count = filteredCars.length;
+        resultCountElement.textContent = count + (count === 1 ? " result found" : " results found");
+    }
 }
 
 function changePage(direction) {
@@ -672,6 +723,26 @@ document.addEventListener("DOMContentLoaded", function() {
     // Initial render
     console.log(`Total cars loaded: ${allCars.length}`);
     applyFilters();
+
+    const sortSelect = document.getElementById("sortSelect");
+    if (sortSelect) {
+        sortSelect.addEventListener("change", function() {
+            sortCars();
+            currentPage = 1; // Reset to first page after sorting
+            renderCars();
+            updatePagination();
+        });
+    }
+
+    const showSelect = document.getElementById("showSelect");
+    if (showSelect) {
+        showSelect.addEventListener("change", function() {
+            carsPerPage = parseInt(this.value) || 9; // Update carsPerPage
+            currentPage = 1; // Reset to first page
+            renderCars();
+            updatePagination();
+        });
+    }
 });
 
 function showCarDetails(button) {
@@ -787,6 +858,75 @@ window.addEventListener("keydown", function(event) {
         closeModal();
     }
 });
+
+// Helper om waarde uit topbar of sidebar te halen
+function getFilterValue(barId, sideId) {
+    const bar = document.getElementById(barId);
+    const side = document.getElementById(sideId);
+    return (bar && bar.value) ? bar.value : (side && side.value ? side.value : "");
+}
+
+// Synchroniseer topbar en sidebar (optioneel, voor UX)
+function syncFilters(barId, sideId) {
+    const bar = document.getElementById(barId);
+    const side = document.getElementById(sideId);
+    if (bar && side) {
+        bar.addEventListener("change", () => { side.value = bar.value; filterCars(); });
+        side.addEventListener("change", () => { bar.value = side.value; filterCars(); });
+    }
+}
+syncFilters("brandFilterBar", "brandFilter");
+syncFilters("modelFilterBar", "modelFilter");
+syncFilters("fuelFilterBar", "fuelFilter");
+syncFilters("transmissionFilterBar", "transmissionFilter");
+
+// Voeg event listeners toe voor topbar filters
+["brandFilterBar", "modelFilterBar", "fuelFilterBar", "transmissionFilterBar"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("change", filterCars);
+});
+
+// Pas filterCars aan om getFilterValue te gebruiken
+function filterCars() {
+    carCards.forEach(card => {
+        try {
+            const carData = JSON.parse(card.dataset.car);
+            const criteria = {
+                brandMatch: !getFilterValue("brandFilterBar", "brandFilter") || carData.merk === getFilterValue("brandFilterBar", "brandFilter"),
+                modelMatch: !getFilterValue("modelFilterBar", "modelFilter") || carData.model === getFilterValue("modelFilterBar", "modelFilter"),
+                fuelMatch: !getFilterValue("fuelFilterBar", "fuelFilter") || carData.brandstof === getFilterValue("fuelFilterBar", "fuelFilter"),
+                transmissionMatch: !getFilterValue("transmissionFilterBar", "transmissionFilter") || carData.transmissie === getFilterValue("transmissionFilterBar", "transmissionFilter"),
+                bodyMatch: !bodyFilter.value || carData.carrosserie === bodyFilter.value,
+                doorsMatch: !doorsFilter.value || carData.deuren === doorsFilter.value,
+                seatsMatch: !seatsFilter.value || carData.aantal_zitplaatsen === seatsFilter.value,
+                priceMatch: (isInRange(parseFloat(carData.prijs), priceMin.value, priceMax.value)),
+                kmMatch: (isInRange(parseFloat(carData.kilometerstand), kmMin.value, kmMax.value)),
+                powerMatch: (isInRange(parseFloat(carData.vermogen_pk), powerMin.value, powerMax.value)),
+                yearMatch: getYearMatch(carData.bouwjaar),
+                statusMatch: getStatusMatch(carData.status)
+            };
+            const shouldShow = Object.values(criteria).every(match => match);
+            card.style.display = shouldShow ? "block" : "none";
+        } catch (e) {
+            card.style.display = "none";
+        }
+    });
+    updateResultsCount();
+}
+
+// Reset beide bars in resetAllFilters
+function resetAllFilters() {
+    ["brandFilter", "modelFilter", "fuelFilter", "transmissionFilter", "brandFilterBar", "modelFilterBar", "fuelFilterBar", "transmissionFilterBar"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = "";
+    });
+    document.querySelectorAll("input[name='year'], input[name='status']").forEach(cb => cb.checked = cb.value === "all");
+    sortSelect.value = "default";
+    showSelect.value = "all";
+    filterCars();
+}
+
+// updateResultsCount blijft hetzelfde
 </script>
 JS;
     echo str_replace('__ALL_CARS_JSON__', $allCarsJson, $js);
@@ -884,7 +1024,7 @@ function optimize_downloaded_image($local_file) {
             );
 
             // Use ImageMagick if available
-            if (extension_loaded('imagick')) {
+            if (extension_loaded('imagick') && class_exists('Imagick')) {
                 $imagick = new Imagick($local_file);
                 $imagick->resizeImage($size, $size, Imagick::FILTER_LANCZOS, 1);
                 $imagick->setImageCompressionQuality(85);
@@ -962,6 +1102,7 @@ function extract_car_data($car, $image_url_base) {
     $data = [
         'merk' => $get_xml_value($car, 'merk', 'Onbekend merk'),
         'model' => $get_xml_value($car, 'model', 'Onbekend model'),
+        'titel' => $get_xml_value($car, 'titel', 'Onbekende titel'),
         'bouwjaar' => $get_xml_value($car, 'bouwjaar', 'Onbekend bouwjaar'),
         'prijs' => $get_xml_value($car, 'verkoopprijs_particulier', 'Prijs op aanvraag'),
         'kilometerstand' => $get_xml_value($car, 'tellerstand', '0'),
@@ -1073,35 +1214,8 @@ function display_car_card($car) {
                    ($car['status'] === "verkocht" ? "VERKOCHT" : "GERESERVEERD"));
     $status_class = $car['status'];
 
-    // Create a detailed title with specifications
-    $title_parts = [];
-    $title_parts[] = $car['merk'] . ' ' . $car['model'];
-
-    // Add engine info if available
-    if (!empty($car['cilinder_inhoud'])) {
-        $title_parts[] = $car['cilinder_inhoud'];
-    }
-
-    // Add transmission if available
-    if (!empty($car['transmissie'])) {
-        $title_parts[] = $car['transmissie'];
-    }
-
-    // Add fuel type if available
-    if (!empty($car['brandstof'])) {
-        $title_parts[] = $car['brandstof'];
-    }
-
-    // Add doors if available
-    if (!empty($car['deuren'])) {
-        $title_parts[] = $car['deuren'] . ' Deurs';
-    }
-
-    // Add NL Auto if it's a Dutch car
-    $title_parts[] = 'NL Auto';
-
-    // Join all parts with spaces
-    $detailed_title = implode(' / ', $title_parts);
+    // Use the titel field for the car card title
+    $detailed_title = $car['titel'];
 
     echo '<div class="car-card" data-car=\'' . $jsonData . '\'>
         <div class="car-image">';
@@ -1121,8 +1235,8 @@ function display_car_card($car) {
 
     echo '<div class="car-info">
             <div class="car-brand">' . strtoupper($car['merk']) . '</div>
-            <h3 class="car-title">' . $detailed_title . '</h3>
-            <div class="car-price">€ ' . number_format((float)$car['prijs'], 0, ',', '.') . '</div>
+            <h3 class="car-title">' . htmlspecialchars($detailed_title) . '</h3>
+            <div class="car-price">€ ' . number_format((float)str_replace(',', '.', preg_replace('/[^0-9,]/i', '', $car['prijs'])), 0, ',', '.') . '</div>
             <div class="car-specs">
                 <span><img src="https://raw.githubusercontent.com/anouarlafkri/SVG/main/Tank.svg" alt="Kilometerstand" width="18" style="vertical-align:middle;margin-right:4px;">' . $car['kilometerstand'] . '</span>
                 <span><img src="https://raw.githubusercontent.com/anouarlafkri/SVG/main/pK.svg" alt="Vermogen" width="18" style="vertical-align:middle;margin-right:4px;">' . $car['vermogen'] . '</span>

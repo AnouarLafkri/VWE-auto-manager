@@ -56,12 +56,14 @@ if ($isCli) {
     // Read from local_file.xml when running from command line
     $xmlData = file_get_contents('local_file.xml');
     if ($xmlData === false) {
+        logMessage("ERROR: Could not read local_file.xml");
         die("Error: Could not read local_file.xml\n");
     }
 } else {
     // Get XML data from POST request
     $xmlData = file_get_contents('php://input');
     if (empty($xmlData)) {
+        logMessage("ERROR: No XML data received in POST request");
         header('HTTP/1.1 400 Bad Request');
         echo "No XML data received";
         exit;
@@ -72,37 +74,101 @@ if ($isCli) {
 logMessage("Data length: " . strlen($xmlData) . " bytes");
 logMessage("First 100 chars: " . substr($xmlData, 0, 100));
 
-// Parse incoming XML
+// Fix XML entities in incoming data before parsing
+$xmlData = fixXmlEntities($xmlData);
+logMessage("First 200 chars after entity fix: " . substr($xmlData, 0, 200));
+
+// Parse incoming XML with detailed error handling
 libxml_use_internal_errors(true);
-$incomingXml = simplexml_load_string($xmlData);
+$libxml_options = LIBXML_NOWARNING | LIBXML_NOERROR;
+if (defined('LIBXML_RECOVER')) {
+    $libxml_options |= LIBXML_RECOVER;
+}
+$incomingXml = simplexml_load_string($xmlData, 'SimpleXMLElement', $libxml_options);
 if ($incomingXml === false) {
     $errors = libxml_get_errors();
-    $errorMessage = "XML parsing failed:\n";
+    $criticalErrors = [];
+
     foreach ($errors as $error) {
-        $errorMessage .= "Line {$error->line}: {$error->message}\n";
+        if ($error->level === LIBXML_ERR_FATAL) {
+            $criticalErrors[] = $error;
+            logMessage("XML Critical Error: Line {$error->line}: {$error->message}");
+        } else {
+            logMessage("XML Warning: Line {$error->line}: {$error->message}");
+        }
     }
-    logMessage("ERROR: " . $errorMessage);
     libxml_clear_errors();
-    http_response_code(400);
-    echo "0";
-    exit;
+
+    // Only fail if there are critical errors
+    if (!empty($criticalErrors)) {
+        // Log the problematic XML for debugging
+        logMessage("Problematic XML content (first 500 chars):");
+        logMessage(substr($xmlData, 0, 500));
+
+        // Try to fix the XML structure and re-parse
+        logMessage("Attempting to fix XML structure and re-parse...");
+        $fixedXml = fixXmlStructure($xmlData);
+        if ($fixedXml) {
+            $incomingXml = simplexml_load_string($fixedXml, 'SimpleXMLElement', $libxml_options);
+            if ($incomingXml !== false) {
+                logMessage("Successfully fixed and loaded XML after initial parse failure.");
+            } else {
+                logMessage("Failed to fix and load XML after initial parse failure.");
+                http_response_code(400);
+                echo "Error loading XML data. Please check the error logs for more information.";
+                exit;
+            }
+        } else {
+            logMessage("Failed to fix XML structure after initial parse failure.");
+            http_response_code(400);
+            echo "Error loading XML data. Please check the error logs for more information.";
+            exit;
+        }
+    } else {
+        logMessage("XML loaded with warnings but no critical errors");
+    }
 }
-logMessage("Successfully parsed incoming XML");
+
+// Validate XML structure (but don't fail if it's just entity warnings)
+if (!validateXmlStructure($xmlData)) {
+    logMessage("WARNING: XML structure validation failed, but attempting to continue");
+
+    // Try to load with SimpleXML as a fallback test
+    $libxml_options = LIBXML_NOWARNING | LIBXML_NOERROR;
+    if (defined('LIBXML_RECOVER')) {
+        $libxml_options |= LIBXML_RECOVER;
+    }
+    $testXml = simplexml_load_string($xmlData, 'SimpleXMLElement', $libxml_options);
+    if ($testXml === false) {
+        logMessage("ERROR: XML is completely invalid and cannot be loaded");
+        http_response_code(400);
+        echo "Invalid XML structure. Please check the error logs for more information.";
+        exit;
+    } else {
+        logMessage("XML can be loaded despite validation warnings - continuing");
+    }
+}
 
 // Handle both single vehicle and multiple vehicles XML structure
 $vehiclesToProcess = [];
-if ($incomingXml->getName() === 'voertuig' || $incomingXml->getName() === 'autotelex') {
-    // Single vehicle XML
-    $vehiclesToProcess[] = $incomingXml;
-    logMessage("Processing single vehicle XML (" . $incomingXml->getName() . ")");
-} else if ($incomingXml->getName() === 'voorraad') {
-    // Multiple vehicles XML
-    foreach ($incomingXml->children() as $vehicle) {
-        if ($vehicle->getName() === 'voertuig' || $vehicle->getName() === 'autotelex') {
-            $vehiclesToProcess[] = $vehicle;
+if ($incomingXml !== false && $incomingXml instanceof SimpleXMLElement) {
+    if ($incomingXml->getName() === 'voertuig' || $incomingXml->getName() === 'autotelex') {
+        // Single vehicle XML
+        $vehiclesToProcess[] = $incomingXml;
+        logMessage("Processing single vehicle XML (" . $incomingXml->getName() . ")");
+    } else if ($incomingXml->getName() === 'voorraad') {
+        // Multiple vehicles XML
+        foreach ($incomingXml->children() as $vehicle) {
+            if ($vehicle->getName() === 'voertuig' || $vehicle->getName() === 'autotelex') {
+                $vehiclesToProcess[] = $vehicle;
+            }
         }
+        logMessage("Processing multiple vehicles XML");
+    } else {
+        logMessage("WARNING: Unknown XML root element: " . $incomingXml->getName());
     }
-    logMessage("Processing multiple vehicles XML");
+} else {
+    logMessage("ERROR: Invalid incoming XML - cannot process vehicles");
 }
 
 logMessage("Number of vehicles to process: " . count($vehiclesToProcess));
@@ -127,22 +193,35 @@ if (file_exists($localPath)) {
             throw new Exception("Failed to read file contents");
         }
 
+        // Fix common XML entity issues before validation
+        $xmlContent = fixXmlEntities($xmlContent);
+        logMessage("First 200 chars of local XML after entity fix: " . substr($xmlContent, 0, 200));
+
         // Validate the XML structure
         $validation = validateXmlStructure($xmlContent);
-        if (!$validation['valid']) {
-            logMessage("XML validation failed: " . $validation['message']);
+        if (!$validation) {
+            logMessage("XML validation failed - attempting to fix structure");
 
             // Try to fix the structure
             $fixedXml = fixXmlStructure($xmlContent);
             if ($fixedXml) {
                 logMessage("Successfully fixed XML structure");
                 $xmlContent = $fixedXml;
+
+                // Re-validate after fixing
+                if (!validateXmlStructure($xmlContent)) {
+                    logMessage("XML still invalid after fixing - creating new structure");
+                    $dom = createNewXmlStructure();
+                    $xmlContent = $dom->saveXML();
+                }
             } else {
                 // Create new XML structure if fixing fails
                 logMessage("Creating new XML structure after failed fix");
                 $dom = createNewXmlStructure();
                 $xmlContent = $dom->saveXML();
             }
+        } else {
+            logMessage("XML validation passed successfully");
         }
 
         // Create SimpleXMLElement from the validated/fixed XML
@@ -351,12 +430,23 @@ function restoreBackup($backupPath, $filePath) {
 
 // Functie om te controleren of een voertuig volledig is
 function isVehicleComplete($vehicle) {
+    // First check for verkoopprijs_particulier before other checks
+    if (!isset($vehicle->verkoopprijs_particulier) ||
+        !isset($vehicle->verkoopprijs_particulier->prijzen) ||
+        !isset($vehicle->verkoopprijs_particulier->prijzen->prijs) ||
+        !isset($vehicle->verkoopprijs_particulier->prijzen->prijs->bedrag) ||
+        trim((string)$vehicle->verkoopprijs_particulier->prijzen->prijs->bedrag) === '') {
+        logMessage("Missing required field 'verkoopprijs_particulier' for vehicle: " .
+                  ((string)$vehicle->merk ?: 'Unknown') . " " .
+                  ((string)$vehicle->model ?: 'Unknown'));
+        return false;
+    }
+
     // Essentiële velden voor een auto advertentie
     $requiredFields = [
         'merk',
         'model',
         'bouwjaar',
-        'verkoopprijs_particulier',
         'tellerstand',
         'brandstof',
         'transmissie',
@@ -401,57 +491,196 @@ function isVehicleComplete($vehicle) {
     return true;
 }
 
-// Functie om onvolledige voertuigen te verwijderen
+// REMOVED: Function to remove incomplete vehicles - no longer needed
+// All vehicles are now added regardless of missing fields, only duplicates are prevented
+/*
 function removeIncompleteVehicles($xml) {
-    $removedCount = 0;
-    $vehicles = $xml->children();
-    $requiredFields = [
-        'merk',
-        'model',
-        'bouwjaar',
-        'verkoopprijs_particulier',
-        'tellerstand',
-        'brandstof',
-        'transmissie',
-        'carrosserie'
-    ];
+    // This function has been disabled to allow all vehicles to be added
+    // regardless of missing fields. Only duplicate vehicles are prevented.
+    logMessage("removeIncompleteVehicles function disabled - all vehicles will be added");
+    return 0;
+}
+*/
 
-    foreach ($vehicles as $vehicle) {
-        if ($vehicle->getName() === 'voertuig' || $vehicle->getName() === 'autotelex') {
-            if (!isVehicleComplete($vehicle)) {
-                $id = (string)$vehicle->kenteken ?:
-                      ((string)$vehicle->chassisnummer ?:
-                      ((string)$vehicle->voertuignr ?:
-                      (string)$vehicle->voertuignr_hexon));
+function saveXmlFile($xml, $filePath) {
+    // Create backup before saving
+    $backupPath = $filePath . '.backup.' . date('Y-m-d-H-i-s');
+    if (file_exists($filePath)) {
+        if (!copy($filePath, $backupPath)) {
+            logMessage("WARNING: Failed to create backup before saving");
+        } else {
+            logMessage("Created backup: " . $backupPath);
+        }
+    }
 
-                $merk = (string)$vehicle->merk;
-                $model = (string)$vehicle->model;
+    // Convert SimpleXML to DOMDocument for better formatting
+    $dom = new DOMDocument('1.0', 'UTF-8');
+    $dom->preserveWhiteSpace = true;
+    $dom->formatOutput = true;
 
-                logMessage("Removing incomplete vehicle: " . ($id ?: "No ID") . " ($merk $model)");
+    // Import the SimpleXML object
+    $dom->loadXML($xml->asXML());
 
-                // Log welke velden ontbreken
-                $missingFields = array_filter($requiredFields, function($field) use ($vehicle) {
-                    return !isset($vehicle->$field) || trim((string)$vehicle->$field) === '';
-                });
+    // Verify XML content before saving
+    $vehicleCount = 0;
+    foreach ($dom->getElementsByTagName('voertuig') as $vehicle) {
+        $vehicleCount++;
+    }
+    foreach ($dom->getElementsByTagName('autotelex') as $vehicle) {
+        $vehicleCount++;
+    }
 
-                if (!empty($missingFields)) {
-                    logMessage("Missing fields: " . implode(", ", $missingFields));
+    if ($vehicleCount === 0) {
+        logMessage("ERROR: Attempting to save empty XML file! Aborting save operation.");
+        return false;
+    }
+
+    // Save the XML
+    if (file_put_contents($filePath, $dom->saveXML())) {
+        chmod($filePath, 0666);
+
+        // Verify the saved file
+        $savedContent = file_get_contents($filePath);
+        if (empty($savedContent)) {
+            logMessage("ERROR: Saved file is empty! Restoring from backup.");
+            if (file_exists($backupPath)) {
+                copy($backupPath, $filePath);
+                chmod($filePath, 0666);
+            }
+            return false;
+        }
+
+        // Verify XML structure after saving
+        $testXml = simplexml_load_string($savedContent);
+        if ($testXml === false) {
+            logMessage("ERROR: Saved file contains invalid XML! Restoring from backup.");
+            if (file_exists($backupPath)) {
+                copy($backupPath, $filePath);
+                chmod($filePath, 0666);
+            }
+            return false;
+        }
+
+        logMessage("Successfully saved XML file with $vehicleCount vehicles");
+        return true;
+    } else {
+        logMessage("ERROR: Failed to save XML file");
+        return false;
+    }
+}
+
+// Add this function to check file integrity
+function restoreFromKnownGoodBackup($filePath) {
+    $knownGoodBackup = __DIR__ . "/local_file.xml.known_good";
+
+    // If we have a known good backup, use it
+    if (file_exists($knownGoodBackup)) {
+        if (copy($knownGoodBackup, $filePath)) {
+            chmod($filePath, 0666);
+            logMessage("Successfully restored from known good backup");
+            return true;
+        }
+    }
+
+    // If no known good backup exists, create one from the current file if it's valid
+    if (file_exists($filePath)) {
+        $content = file_get_contents($filePath);
+        if (!empty($content)) {
+            $xml = simplexml_load_string($content);
+            if ($xml !== false) {
+                $vehicleCount = 0;
+                foreach ($xml->children() as $vehicle) {
+                    if ($vehicle->getName() === 'voertuig' || $vehicle->getName() === 'autotelex') {
+                        $vehicleCount++;
+                    }
                 }
-
-                // Verwijder het voertuig uit de XML
-                $dom = dom_import_simplexml($vehicle);
-                $dom->parentNode->removeChild($dom);
-
-                $removedCount++;
+                if ($vehicleCount > 0) {
+                    if (copy($filePath, $knownGoodBackup)) {
+                        chmod($knownGoodBackup, 0666);
+                        logMessage("Created new known good backup with $vehicleCount vehicles");
+                        return true;
+                    }
+                }
             }
         }
     }
 
-    if ($removedCount > 0) {
-        logMessage("Total removed incomplete vehicles: " . $removedCount);
+    return false;
+}
+
+// Modify the checkFileIntegrity function to use the known good backup
+function checkFileIntegrity($filePath) {
+    if (!file_exists($filePath)) {
+        logMessage("ERROR: File does not exist: $filePath");
+        return restoreFromKnownGoodBackup($filePath);
     }
 
-    return $removedCount;
+    $content = file_get_contents($filePath);
+    if (empty($content)) {
+        logMessage("ERROR: File is empty: $filePath");
+        return restoreFromKnownGoodBackup($filePath);
+    }
+
+    // Check if content is valid XML
+    $xml = simplexml_load_string($content);
+    if ($xml === false) {
+        logMessage("ERROR: File contains invalid XML: $filePath");
+        return restoreFromKnownGoodBackup($filePath);
+    }
+
+    // Count vehicles
+    $vehicleCount = 0;
+    foreach ($xml->children() as $vehicle) {
+        if ($vehicle->getName() === 'voertuig' || $vehicle->getName() === 'autotelex') {
+            $vehicleCount++;
+        }
+    }
+
+    if ($vehicleCount === 0) {
+        logMessage("ERROR: No vehicles found in XML file: $filePath");
+        return restoreFromKnownGoodBackup($filePath);
+    }
+
+    logMessage("File integrity check passed: $vehicleCount vehicles found");
+    return true;
+}
+
+// Add this function to restore from latest backup
+function restoreFromLatestBackup($filePath) {
+    $backups = glob($filePath . '.backup.*');
+    if (empty($backups)) {
+        logMessage("ERROR: No backups found for: $filePath");
+        return false;
+    }
+
+    // Sort backups by date (newest first)
+    usort($backups, function($a, $b) {
+        return filemtime($b) - filemtime($a);
+    });
+
+    $latestBackup = $backups[0];
+    if (copy($latestBackup, $filePath)) {
+        chmod($filePath, 0666);
+        logMessage("Successfully restored from backup: $latestBackup");
+        return true;
+    }
+
+    logMessage("ERROR: Failed to restore from backup: $latestBackup");
+    return false;
+}
+
+// Add this check before processing vehicles
+$localPath = __DIR__ . "/local_file.xml";
+if (file_exists($localPath)) {
+    if (!checkFileIntegrity($localPath)) {
+        logMessage("WARNING: File integrity check failed, attempting to restore from known good backup");
+        if (!restoreFromKnownGoodBackup($localPath)) {
+            logMessage("ERROR: Failed to restore from known good backup, creating new XML structure");
+            $dom = createNewXmlStructure();
+            $xmlContent = $dom->saveXML();
+            $existingXml = simplexml_load_string($xmlContent);
+        }
+    }
 }
 
 foreach ($vehiclesToProcess as $newCar) {
@@ -467,14 +696,17 @@ foreach ($vehiclesToProcess as $newCar) {
     $vehicleType = $newCar->getName();
 
     if (empty($uniqueId)) {
-        logMessage("SKIP: Geen uniek ID (kenteken/chassisnummer/voertuignr) voor voertuig $newCount ($newMerk $newModel)");
+        logMessage("SKIP: Geen uniek ID (kenteken/chassisnummer/voertuignr) voor voertuig $newCount ($newMerk $newModel) - Cannot add vehicle without unique identifier");
         $skippedCount++;
         continue;
     }
 
     logMessage("Processing $vehicleType $newCount met uniek ID: $uniqueId ($newMerk $newModel)");
 
-    // Check of voertuig bestaat
+    // NO VALIDATION - ADD ALL VEHICLES REGARDLESS OF MISSING FIELDS
+    // Only skip if no unique ID is available (already checked above)
+
+    // Check if vehicle already exists (prevent duplicates)
     if (isset($existingCars[$uniqueId])) {
         try {
             foreach ($existingXml->children() as $existingCar) {
@@ -488,8 +720,13 @@ foreach ($vehiclesToProcess as $newCar) {
                     // Update timestamp voor bestaande auto
                     if (!isset($existingCar->timestamp)) {
                         $existingCar->addChild('timestamp', time());
+                    } else {
+                        $existingCar->timestamp = time();
                     }
-                    logMessage("Updated existing vehicle: $uniqueId");
+                    logMessage("DUPLICATE FOUND: Updated existing vehicle instead of adding duplicate: $uniqueId ($newMerk $newModel)");
+
+                    // Save after each update
+                    saveXmlFile($existingXml, __DIR__ . "/local_file.xml");
                     break;
                 }
             }
@@ -526,7 +763,10 @@ foreach ($vehiclesToProcess as $newCar) {
                 }
             }
             $addedCount++;
-            logMessage("Successfully added new $vehicleType: $uniqueId");
+            logMessage("Successfully added new $vehicleType: $uniqueId ($newMerk $newModel) - Added regardless of missing fields");
+
+            // Save after each addition
+            saveXmlFile($existingXml, __DIR__ . "/local_file.xml");
         } catch (Exception $e) {
             logMessage("ERROR adding vehicle $uniqueId: " . $e->getMessage());
             $skippedCount++;
@@ -534,21 +774,14 @@ foreach ($vehiclesToProcess as $newCar) {
     }
 }
 
-// Voeg deze code toe na het laden van de bestaande XML
-if ($existingXml) {
-    $removedCount = removeIncompleteVehicles($existingXml);
-    if ($removedCount > 0) {
-        logMessage("Removed $removedCount incomplete vehicles from existing XML");
-    }
-}
-
 // Log final results
 logMessage("=== Final Results ===");
 logMessage("Total vehicles processed: " . $newCount);
 logMessage("New vehicles added: " . $addedCount);
-logMessage("Existing vehicles skipped: " . $skippedCount);
+logMessage("Vehicles skipped (no unique ID or duplicates): " . $skippedCount);
+logMessage("NOTE: All vehicles are now added regardless of missing fields - only duplicates and vehicles without unique IDs are skipped");
 
-// Sort vehicles by timestamp (newest first)
+// Sort vehicles by timestamp (newest first) - only if there are vehicles
 $vehicles = [];
 foreach ($existingXml->children() as $vehicle) {
     if ($vehicle->getName() === 'voertuig' || $vehicle->getName() === 'autotelex') {
@@ -556,39 +789,43 @@ foreach ($existingXml->children() as $vehicle) {
     }
 }
 
-// Sort vehicles by timestamp
-usort($vehicles, function($a, $b) {
-    $timestampA = isset($a->timestamp) ? (int)$a->timestamp : 0;
-    $timestampB = isset($b->timestamp) ? (int)$b->timestamp : 0;
-    return $timestampB - $timestampA; // Sort descending (newest first)
-});
+if (count($vehicles) > 0) {
+    // Sort vehicles by timestamp
+    usort($vehicles, function($a, $b) {
+        $timestampA = isset($a->timestamp) ? (int)$a->timestamp : 0;
+        $timestampB = isset($b->timestamp) ? (int)$b->timestamp : 0;
+        return $timestampB - $timestampA; // Sort descending (newest first)
+    });
 
-// Create new XML with sorted vehicles
-$dom = new DOMDocument('1.0', 'UTF-8');
-$dom->preserveWhiteSpace = true;
-$dom->formatOutput = true;
+    // Create new XML with sorted vehicles
+    $dom = new DOMDocument('1.0', 'UTF-8');
+    $dom->preserveWhiteSpace = true;
+    $dom->formatOutput = true;
 
-$root = $dom->createElement('voorraad');
-$root->setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
-$root->setAttribute('xsi:noNamespaceSchemaLocation', 'voertuigen.xsd');
-$root->setAttribute('versie', '2.23');
-$root->setAttribute('datum', date('Y-m-d'));
-$root->setAttribute('tijd', date('H:i:s'));
-$dom->appendChild($root);
+    $root = $dom->createElement('voorraad');
+    $root->setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
+    $root->setAttribute('xsi:noNamespaceSchemaLocation', 'voertuigen.xsd');
+    $root->setAttribute('versie', '2.23');
+    $root->setAttribute('datum', date('Y-m-d'));
+    $root->setAttribute('tijd', date('H:i:s'));
+    $dom->appendChild($root);
 
-// Add sorted vehicles to new XML
-foreach ($vehicles as $vehicle) {
-    $vehicleNode = $dom->importNode(dom_import_simplexml($vehicle), true);
-    $root->appendChild($vehicleNode);
-}
+    // Add sorted vehicles to new XML
+    foreach ($vehicles as $vehicle) {
+        $vehicleNode = $dom->importNode(dom_import_simplexml($vehicle), true);
+        $root->appendChild($vehicleNode);
+    }
 
-// Save the sorted XML
-$xmlString = $dom->saveXML();
-if (file_put_contents($localPath, $xmlString)) {
-    chmod($localPath, 0666);
-    logMessage("Successfully saved sorted XML file");
+    // Save the sorted XML
+    $xmlString = $dom->saveXML();
+    if (file_put_contents($localPath, $xmlString)) {
+        chmod($localPath, 0666);
+        logMessage("Successfully saved sorted XML file with " . count($vehicles) . " vehicles");
+    } else {
+        logMessage("ERROR: Failed to save sorted XML file");
+    }
 } else {
-    logMessage("ERROR: Failed to save sorted XML file");
+    logMessage("No vehicles to sort - skipping sorting step");
 }
 
 // Function to compare vehicles between files
@@ -726,6 +963,7 @@ function extract_car_data($car, $image_url_base) {
     $data = [
         'merk' => $get_xml_value($car, 'merk', 'Onbekend merk'),
         'model' => $get_xml_value($car, 'model', 'Onbekend model'),
+        'titel' => $get_xml_value($car, 'titel', ''),
         'bouwjaar' => $get_xml_value($car, 'bouwjaar', 'Onbekend bouwjaar'),
         'prijs' => $get_xml_value($car, 'verkoopprijs_particulier', 'Prijs op aanvraag'),
         'kilometerstand' => $get_xml_value($car, 'tellerstand', '0'),
@@ -922,6 +1160,62 @@ function createNewXmlStructure() {
     return $dom;
 }
 
+// Function to fix XML entities
+function fixXmlEntities($xmlContent) {
+    $entityReplacements = [
+        '&euro;' => '€',
+        '&pound;' => '£',
+        '&dollar;' => '$',
+        '&yen;' => '¥',
+        '&cent;' => '¢',
+        '&copy;' => '©',
+        '&reg;' => '®',
+        '&trade;' => '™',
+        '&nbsp;' => ' ',
+        '&ndash;' => '–',
+        '&mdash;' => '—',
+        '&lsquo;' => "'",
+        '&rsquo;' => "'",
+        '&ldquo;' => '"',
+        '&rdquo;' => '"',
+        '&hellip;' => '…',
+        '&euml;' => 'ë',
+        '&uuml;' => 'ü',
+        '&ouml;' => 'ö',
+        '&auml;' => 'ä',
+        '&iuml;' => 'ï',
+        '&Euml;' => 'Ë',
+        '&Uuml;' => 'Ü',
+        '&Ouml;' => 'Ö',
+        '&Auml;' => 'Ä',
+        '&Iuml;' => 'Ï',
+        '&aacute;' => 'á',
+        '&eacute;' => 'é',
+        '&iacute;' => 'í',
+        '&oacute;' => 'ó',
+        '&uacute;' => 'ú',
+        '&agrave;' => 'à',
+        '&egrave;' => 'è',
+        '&igrave;' => 'ì',
+        '&ograve;' => 'ò',
+        '&ugrave;' => 'ù',
+        '&acirc;' => 'â',
+        '&ecirc;' => 'ê',
+        '&icirc;' => 'î',
+        '&ocirc;' => 'ô',
+        '&ucirc;' => 'û',
+        '&ccedil;' => 'ç',
+        '&ntilde;' => 'ñ',
+        '&szlig;' => 'ß'
+    ];
+
+    foreach ($entityReplacements as $entity => $replacement) {
+        $xmlContent = str_replace($entity, $replacement, $xmlContent);
+    }
+
+    return $xmlContent;
+}
+
 // Function to validate XML structure
 function validateXmlStructure($xmlContent) {
     // Enable error handling
@@ -932,24 +1226,62 @@ function validateXmlStructure($xmlContent) {
     $dom->preserveWhiteSpace = true;
     $dom->formatOutput = true;
 
-    // Try to load the XML
-    if (!$dom->loadXML($xmlContent, LIBXML_NOWARNING | LIBXML_NOERROR)) {
+    // Try to load the XML with more lenient settings
+    $libxml_options = LIBXML_NOWARNING | LIBXML_NOERROR;
+    if (defined('LIBXML_RECOVER')) {
+        $libxml_options |= LIBXML_RECOVER;
+    }
+    if (!$dom->loadXML($xmlContent, $libxml_options)) {
         $errors = libxml_get_errors();
-        $errorMessage = "XML validation failed:\n";
+        $criticalErrors = [];
+
+        // Only log critical errors, ignore entity warnings
         foreach ($errors as $error) {
-            $errorMessage .= "Line {$error->line}: {$error->message}\n";
+            if ($error->level === LIBXML_ERR_FATAL) {
+                $criticalErrors[] = $error;
+                logMessage("XML Critical Error: Line {$error->line}: {$error->message}");
+            } else {
+                // Log non-critical errors as warnings only
+                logMessage("XML Warning: Line {$error->line}: {$error->message}");
+            }
         }
+
         libxml_clear_errors();
-        return ['valid' => false, 'message' => $errorMessage];
+
+        // Only fail if there are critical errors
+        if (!empty($criticalErrors)) {
+            return false;
+        }
     }
 
     // Check for root element
     $root = $dom->documentElement;
-    if (!$root || $root->nodeName !== 'voorraad') {
-        return ['valid' => false, 'message' => 'Invalid root element. Expected "voorraad"'];
+    if (!$root) {
+        logMessage("ERROR: No root element found in XML");
+        return false;
     }
 
-    return ['valid' => true, 'message' => 'XML structure is valid'];
+    // Check if root element is 'voertuig', 'autotelex', or 'voorraad'
+    $validRoots = ['voertuig', 'autotelex', 'voorraad'];
+    if (!in_array($root->nodeName, $validRoots)) {
+        logMessage("ERROR: Invalid root element: " . $root->nodeName);
+        return false;
+    }
+
+    // For voorraad elements, check for required attributes (but don't fail if missing)
+    if ($root->nodeName === 'voorraad') {
+        $requiredAttrs = ['versie', 'datum', 'tijd'];
+        foreach ($requiredAttrs as $attr) {
+            if (!$root->hasAttribute($attr)) {
+                logMessage("WARNING: Missing recommended attribute '$attr' in voorraad element");
+                // Don't fail validation for missing attributes
+            }
+        }
+    }
+
+    // Don't require vehicles to exist - allow empty voorraad
+    logMessage("XML structure validation passed");
+    return true;
 }
 
 // Function to fix XML structure
@@ -959,6 +1291,9 @@ function fixXmlStructure($xmlContent) {
     $dom->preserveWhiteSpace = true;
     $dom->formatOutput = true;
 
+        // Fix common XML entity issues
+    $xmlContent = fixXmlEntities($xmlContent);
+
     // Add XML declaration if missing
     if (strpos($xmlContent, '<?xml') === false) {
         $xmlContent = '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . $xmlContent;
@@ -967,15 +1302,17 @@ function fixXmlStructure($xmlContent) {
     // Add root element if missing
     if (strpos($xmlContent, '<voorraad') === false) {
         $xmlContent = str_replace('<?xml version="1.0" encoding="UTF-8"?>',
-            '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . '<voorraad xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="voertuigen.xsd">',
+            '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . '<voorraad xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="voertuigen.xsd" versie="2.23" datum="' . date('Y-m-d') . '" tijd="' . date('H:i:s') . '">',
             $xmlContent);
         $xmlContent .= "\n</voorraad>";
     }
 
     // Load the XML
     if (!$dom->loadXML($xmlContent, LIBXML_NOWARNING | LIBXML_NOERROR)) {
+        logMessage("ERROR: Failed to load XML after fixing structure");
         return false;
     }
 
     return $dom->saveXML();
 }
+
