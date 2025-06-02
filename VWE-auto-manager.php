@@ -1826,6 +1826,7 @@ function update_all_data() {
         fetch_images_from_ftp();
         ensure_all_images_exist();
         cleanup_unused_images();
+        vwe_create_occasion_posts(); // Add this line
         update_timestamp();
 
         if (DEBUG_MODE) {
@@ -1838,7 +1839,10 @@ function update_all_data() {
 // Update the get_xml_data function to use the new update mechanism
 function get_xml_data() {
     // Check if we need to update and perform update if needed
-    update_all_data();
+    if (needs_update()) {
+        error_log('Update needed, running update_all_data()');
+        update_all_data();
+    }
 
     if (!file_exists(LOCAL_XML_PATH)) {
         error_log('XML file not found: ' . LOCAL_XML_PATH);
@@ -1868,6 +1872,10 @@ function get_xml_data() {
         error_log('Error parsing XML content from: ' . LOCAL_XML_PATH);
         return false;
     }
+
+    // Log the number of vehicles found in XML
+    $vehicle_count = count($xml->voertuig);
+    error_log('Found ' . $vehicle_count . ' vehicles in XML data');
 
     return $xml;
 }
@@ -1928,6 +1936,237 @@ function vwe_init() {
 function vwe_enqueue_scripts() {
     wp_enqueue_style('vwe-styles', VWE_PLUGIN_URL . 'styling.css', array(), filemtime(VWE_PLUGIN_DIR . 'styling.css'));
     wp_enqueue_script('vwe-scripts', VWE_PLUGIN_URL . 'scripts.js', array('jquery'), filemtime(VWE_PLUGIN_DIR . 'scripts.js'), true);
+
+    // Add optimized CSS
+    wp_add_inline_style('vwe-styles', '
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .modal-content {
+            position: relative;
+            background: #fff;
+            margin: 20px auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 1200px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-carousel {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .carousel-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 4px;
+            background: #f5f5f5;
+        }
+
+        .carousel-slides {
+            display: flex;
+            transition: transform 0.3s ease-out;
+            will-change: transform;
+        }
+
+        .carousel-slide {
+            flex: 0 0 100%;
+            position: relative;
+        }
+
+        .carousel-slide img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+            aspect-ratio: 16/9;
+        }
+
+        .carousel-prev,
+        .carousel-next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 18px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .carousel-prev { left: 10px; }
+        .carousel-next { right: 10px; }
+
+        .carousel-prev:hover,
+        .carousel-next:hover {
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .carousel-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ccc;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .carousel-dot.active {
+            background: #333;
+        }
+
+        .modal-details {
+            padding: 20px 0;
+        }
+
+        .modal-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+
+        .title-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .title-content h3 {
+            margin: 0;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .car-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .car-status.beschikbaar { background: #e6f4ea; color: #1e7e34; }
+        .car-status.verkocht { background: #fbe9e7; color: #d32f2f; }
+        .car-status.reserve { background: #fff3e0; color: #f57c00; }
+
+        .price-tag {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .spec-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .spec-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .spec-value {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .description-content {
+            line-height: 1.6;
+            color: #444;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .modal-action-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .share-btn {
+            background: #2196f3;
+            color: white;
+        }
+
+        .share-btn:hover {
+            background: #1976d2;
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 95%;
+                margin: 10px auto;
+                padding: 15px;
+            }
+
+            .title-section {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .specs-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .carousel-prev,
+            .carousel-next {
+                padding: 8px 12px;
+                font-size: 16px;
+            }
+        }
+    ');
 }
 
 /**
@@ -1954,40 +2193,328 @@ function check_last_update() {
 
 // Add this at the end of the file, before the closing PHP tag
 function handle_direct_links() {
-    if (isset($_GET['car'])) {
-        $car_id = $_GET['car'];
-        $xml = get_xml_data();
-        if ($xml) {
-            foreach ($xml->voertuig as $car) {
-                // Generate the same URL-friendly title as in JavaScript
-                $car_title = (string)$car->titel ?:
-                    (string)$car->merk . ' ' .
-                    (string)$car->model .
-                    ((string)$car->cilinder_inhoud ? ' ' . (string)$car->cilinder_inhoud : '') .
-                    ((string)$car->transmissie ? ' ' . (string)$car->transmissie : '') .
-                    ((string)$car->brandstof ? ' ' . (string)$car->brandstof : '') .
-                    ((string)$car->aantal_deuren ? ' ' . (string)$car->aantal_deuren . ' Deurs' : '');
+    if (!isset($_GET['car'])) {
+        return;
+    }
 
-                $current_car_id = strtolower($car_title);
-                $current_car_id = preg_replace('/[^a-z0-9\s-]/', '', $current_car_id);
-                $current_car_id = preg_replace('/\s+/', '-', $current_car_id);
-                $current_car_id = preg_replace('/-+/', '-', $current_car_id);
-                $current_car_id = trim($current_car_id, '-');
+    $car_id = sanitize_text_field($_GET['car']);
+    error_log('Processing direct link for car ID: ' . $car_id);
 
-                if ($current_car_id === $car_id) {
-                    $car_data = extract_car_data($car, get_image_base_url());
-                    echo '<script>
-                        document.addEventListener("DOMContentLoaded", function() {
-                            const carData = ' . json_encode($car_data) . ';
-                            openModal(carData);
-                        });
-                    </script>';
-                    break;
-                }
-            }
+    // Get XML data with error handling
+    $xml = get_xml_data();
+    if (!$xml) {
+        error_log('Failed to load XML data for car details');
+        return;
+    }
+
+    // Find the matching car
+    $car_data = null;
+    foreach ($xml->voertuig as $car) {
+        $title = (string)$car->merk . ' ' . (string)$car->model;
+        if ((string)$car->cilinder_inhoud) $title .= ' ' . (string)$car->cilinder_inhoud;
+        if ((string)$car->transmissie) $title .= ' ' . (string)$car->transmissie;
+        if ((string)$car->brandstof) $title .= ' ' . (string)$car->brandstof;
+        if ((string)$car->aantal_deuren) $title .= ' ' . (string)$car->aantal_deuren . ' Deurs';
+        $title .= ' NL Auto';
+
+        $current_id = sanitize_title($title);
+        if ($current_id === $car_id) {
+            $car_data = extract_car_data($car, get_image_base_url());
+            break;
         }
     }
+
+    if (!$car_data) {
+        error_log('Car not found: ' . $car_id);
+        return;
+    }
+
+    // Output minimal HTML and JavaScript
+    ?>
+    <div id="carModal" class="modal" style="display: block;">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div class="modal-carousel">
+                <div class="carousel-container">
+                    <div class="carousel-slides">
+                        <?php foreach ($car_data['afbeeldingen'] as $index => $image): ?>
+                            <div class="carousel-slide">
+                                <img src="<?php echo esc_url($image); ?>"
+                                     alt="<?php echo esc_attr($car_data['merk'] . ' ' . $car_data['model']); ?> - Image <?php echo $index + 1; ?>"
+                                     loading="lazy"
+                                     decoding="async">
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <button class="carousel-prev" onclick="prevSlide()">❮</button>
+                    <button class="carousel-next" onclick="nextSlide()">❯</button>
+                    <div class="carousel-counter">1 / <?php echo count($car_data['afbeeldingen']); ?></div>
+                </div>
+                <div class="carousel-dots">
+                    <?php foreach ($car_data['afbeeldingen'] as $index => $image): ?>
+                        <div class="carousel-dot<?php echo $index === 0 ? ' active' : ''; ?>"
+                             onclick="goToSlide(<?php echo $index; ?>)"></div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <div class="modal-details">
+                <div class="modal-sections">
+                    <div class="modal-section title-section">
+                        <div class="title-content">
+                            <h3><?php echo esc_html($car_data['titel'] ?: ($car_data['merk'] . ' ' . $car_data['model'])); ?></h3>
+                            <div class="car-status <?php echo esc_attr($car_data['status']); ?>">
+                                <?php echo strtoupper(esc_html($car_data['status'])); ?>
+                            </div>
+                        </div>
+                        <div class="price-tag">
+                            € <?php echo number_format((float)str_replace(',', '.', preg_replace('/[^0-9,]/i', '', $car_data['prijs'])), 0, ',', '.'); ?>
+                        </div>
+                    </div>
+
+                    <div class="modal-section">
+                        <h4><i class="fas fa-info-circle"></i> Belangrijke Specificaties</h4>
+                        <div class="specs-grid">
+                            <div class="spec-item">
+                                <span class="spec-label"><i class="fas fa-calendar"></i> Bouwjaar</span>
+                                <span class="spec-value"><?php echo esc_html($car_data['bouwjaar']); ?></span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label"><i class="fas fa-tachometer-alt"></i> Kilometerstand</span>
+                                <span class="spec-value"><?php echo esc_html($car_data['kilometerstand']); ?></span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label"><i class="fas fa-gas-pump"></i> Brandstof</span>
+                                <span class="spec-value"><?php echo esc_html($car_data['brandstof']); ?></span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label"><i class="fas fa-cog"></i> Transmissie</span>
+                                <span class="spec-value"><?php echo esc_html($car_data['transmissie']); ?></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <?php if (!empty($car_data['opmerkingen'])): ?>
+                        <div class="modal-section">
+                            <h4><i class="fas fa-align-left"></i> Beschrijving</h4>
+                            <div class="description-content">
+                                <?php echo wp_kses_post($car_data['opmerkingen']); ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-action-btn share-btn" onclick="shareCar()">
+                    <i class="fas fa-share-alt"></i> Delen
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        window.currentSlide = 0;
+        window.totalSlides = <?php echo count($car_data['afbeeldingen']); ?>;
+        document.body.style.overflow = 'hidden';
+    });
+    </script>
+    <?php
 }
 
-// Add this line after the shortcode registration
-add_action('wp_footer', 'handle_direct_links');
+// ... existing code ...
+
+// Add rewrite rules for occasion detail pages
+function vwe_add_rewrite_rules() {
+    add_rewrite_rule(
+        'occasions/([^/]+)/?$',
+        'index.php?occasion=$matches[1]',
+        'top'
+    );
+    add_rewrite_tag('%occasion%', '([^/]+)');
+}
+add_action('init', 'vwe_add_rewrite_rules');
+
+// Register query vars
+function vwe_query_vars($vars) {
+    $vars[] = 'occasion';
+    return $vars;
+}
+add_filter('query_vars', 'vwe_query_vars');
+
+// ... existing code ...
+
+/**
+ * Create or update WordPress posts for each occasion
+ */
+function vwe_create_occasion_posts() {
+    $xml = get_xml_data();
+    if (!$xml) {
+        error_log('Failed to get XML data for creating occasion posts');
+        return false;
+    }
+
+    foreach ($xml->voertuig as $car) {
+        $title = (string)$car->merk . ' ' . (string)$car->model;
+        if ((string)$car->cilinder_inhoud) $title .= ' ' . (string)$car->cilinder_inhoud;
+        if ((string)$car->transmissie) $title .= ' ' . (string)$car->transmissie;
+        if ((string)$car->brandstof) $title .= ' ' . (string)$car->brandstof;
+        if ((string)$car->aantal_deuren) $title .= ' ' . (string)$car->aantal_deuren . ' Deurs';
+        $title .= ' NL Auto';
+
+        $post_name = sanitize_title($title);
+
+        // Check if post already exists
+        $existing_post = get_page_by_path($post_name, OBJECT, 'occasion');
+
+        if ($existing_post) {
+            // Update existing post
+            $post_id = $existing_post->ID;
+            wp_update_post(array(
+                'ID' => $post_id,
+                'post_title' => $title,
+                'post_content' => (string)$car->opmerkingen,
+                'post_status' => 'publish'
+            ));
+        } else {
+            // Create new post
+            $post_id = wp_insert_post(array(
+                'post_title' => $title,
+                'post_name' => $post_name,
+                'post_content' => (string)$car->opmerkingen,
+                'post_status' => 'publish',
+                'post_type' => 'occasion'
+            ));
+        }
+
+        if ($post_id) {
+            // Update post meta
+            update_post_meta($post_id, '_occasion_price', (string)$car->prijs);
+            update_post_meta($post_id, '_occasion_year', (string)$car->bouwjaar);
+            update_post_meta($post_id, '_occasion_mileage', (string)$car->kilometerstand);
+            update_post_meta($post_id, '_occasion_fuel', (string)$car->brandstof);
+            update_post_meta($post_id, '_occasion_transmission', (string)$car->transmissie);
+            update_post_meta($post_id, '_occasion_power', (string)$car->vermogen);
+            update_post_meta($post_id, '_occasion_doors', (string)$car->aantal_deuren);
+            update_post_meta($post_id, '_occasion_color', (string)$car->kleur);
+            update_post_meta($post_id, '_occasion_status', (string)$car->status);
+
+            // Update gallery
+            $gallery = array();
+            if (isset($car->afbeeldingen) && isset($car->afbeeldingen->afbeelding)) {
+                foreach ($car->afbeeldingen->afbeelding as $image) {
+                    $gallery[] = get_image_base_url() . (string)$image;
+                }
+            }
+            update_post_meta($post_id, '_occasion_gallery', $gallery);
+        }
+    }
+
+    return true;
+}
+
+// ... existing code ...
+
+/**
+ * Register custom post type for occasions
+ */
+function vwe_register_post_types() {
+    register_post_type('occasion', array(
+        'labels' => array(
+            'name' => 'Occasions',
+            'singular_name' => 'Occasion',
+            'add_new' => 'Add New',
+            'add_new_item' => 'Add New Occasion',
+            'edit_item' => 'Edit Occasion',
+            'new_item' => 'New Occasion',
+            'view_item' => 'View Occasion',
+            'search_items' => 'Search Occasions',
+            'not_found' => 'No occasions found',
+            'not_found_in_trash' => 'No occasions found in Trash',
+            'all_items' => 'All Occasions',
+            'archives' => 'Occasion Archives',
+            'insert_into_item' => 'Insert into occasion',
+            'uploaded_to_this_item' => 'Uploaded to this occasion',
+            'featured_image' => 'Featured Image',
+            'set_featured_image' => 'Set featured image',
+            'remove_featured_image' => 'Remove featured image',
+            'use_featured_image' => 'Use as featured image',
+            'menu_name' => 'Occasions',
+            'filter_items_list' => 'Filter occasions list',
+            'items_list_navigation' => 'Occasions list navigation',
+            'items_list' => 'Occasions list',
+        ),
+        'public' => true,
+        'has_archive' => true,
+        'rewrite' => array('slug' => 'occasions'),
+        'supports' => array('title', 'editor', 'thumbnail', 'excerpt', 'custom-fields'),
+        'menu_icon' => 'dashicons-car',
+        'show_in_rest' => true,
+        'capability_type' => 'post',
+        'hierarchical' => false,
+        'menu_position' => 5,
+        'can_export' => true,
+        'delete_with_user' => false,
+    ));
+
+    // Flush rewrite rules on plugin activation
+    if (get_option('vwe_flush_rewrite_rules', false)) {
+        flush_rewrite_rules();
+        delete_option('vwe_flush_rewrite_rules');
+    }
+}
+add_action('init', 'vwe_register_post_types');
+
+/**
+ * Plugin activation hook
+ */
+function vwe_plugin_activation() {
+    // Set flag to flush rewrite rules on next init
+    update_option('vwe_flush_rewrite_rules', true);
+}
+register_activation_hook(__FILE__, 'vwe_plugin_activation');
+
+/**
+ * Template redirect for occasion detail pages
+ */
+function vwe_template_redirect() {
+    global $wp_query;
+
+    if (get_query_var('occasion')) {
+        $car_id = get_query_var('occasion');
+
+        // Get XML data
+        $xml = get_xml_data();
+        if (!$xml) {
+            wp_redirect(home_url('/occasions/'));
+            exit;
+        }
+
+        // Find the matching car
+        $car_data = null;
+        foreach ($xml->voertuig as $car) {
+            $title = (string)$car->merk . ' ' . (string)$car->model;
+            if ((string)$car->cilinder_inhoud) $title .= ' ' . (string)$car->cilinder_inhoud;
+            if ((string)$car->transmissie) $title .= ' ' . (string)$car->transmissie;
+            if ((string)$car->brandstof) $title .= ' ' . (string)$car->brandstof;
+            if ((string)$car->aantal_deuren) $title .= ' ' . (string)$car->aantal_deuren . ' Deurs';
+            $title .= ' NL Auto';
+
+            $current_id = sanitize_title($title);
+            if ($current_id === $car_id) {
+                $car_data = extract_car_data($car, get_image_base_url());
+                break;
+            }
+        }
+
+        if (!$car_data) {
+            wp_redirect(home_url('/occasions/'));
+            exit;
+        }
+
+        include(plugin_dir_path(__FILE__) . 'templates/occasion-detail.php');
+        exit;
+    }
+}
+add_action('template_redirect', 'vwe_template_redirect');
+
+// ... existing code ...
