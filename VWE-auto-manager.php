@@ -429,8 +429,25 @@ function display_car_listing() {
     echo '<div class="filter-bar">';
     echo '<div class="result-count" id="resultCount">0 results found</div>';
     echo '<div class="dropdown-group">';
-    echo '<select id="sortSelect" class="filter-dropdown"><option value="">Sort By Default</option><option value="prijs-asc">Price (Low-High)</option><option value="prijs-desc">Price (High-Low)</option><option value="km-asc">Mileage (Low-High)</option><option value="km-desc">Mileage (High-Low)</option><option value="jaar-desc">Newest First</option><option value="jaar-asc">Oldest First</option></select>';
-    echo '<select id="showSelect" class="filter-dropdown"><option value="12">Show 12</option><option value="24">Show 24</option><option value="50">Show 50</option><option value="100">Show 100</option></select>';
+    echo '<div class="custom-select">
+        <select id="sortSelect" class="filter-dropdown">
+            <option value="">Sort By Default</option>
+            <option value="prijs-asc">Price (Low-High)</option>
+            <option value="prijs-desc">Price (High-Low)</option>
+            <option value="km-asc">Mileage (Low-High)</option>
+            <option value="km-desc">Mileage (High-Low)</option>
+            <option value="jaar-desc">Newest First</option>
+            <option value="jaar-asc">Oldest First</option>
+        </select>
+    </div>';
+    echo '<div class="custom-select">
+        <select id="showSelect" class="filter-dropdown">
+            <option value="12">Show 12</option>
+            <option value="24">Show 24</option>
+            <option value="50">Show 50</option>
+            <option value="100">Show 100</option>
+        </select>
+    </div>';
     echo '</div>';
     echo '</div>';
 

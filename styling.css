@@ -140,9 +140,70 @@ background-color: #FCFCFC;
     box-shadow: none;
     outline: none;
     transition: border 0.2s;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23666' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-color: #FCFCFC;
 }
+
 .filter-dropdown:focus, .filter-dropdown:hover {
     border: 1.5px solid #22b3ff;
+}
+
+/* Dropdown group styling */
+.dropdown-group {
+    display: flex;
+    gap: 12px;
+    margin-left: auto;
+}
+
+.dropdown-group .custom-select {
+    margin: 0;
+    padding: 0;
+    width: auto;
+}
+
+.dropdown-group .custom-select select {
+    margin: 0;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    font-size: 14px;
+    background: #fff;
+    color: #222;
+    min-width: 120px;
+    max-width: 150px;
+    box-shadow: none;
+    outline: none;
+    transition: border 0.2s;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23666' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-color: #FCFCFC;
+}
+
+.dropdown-group .custom-select select:focus,
+.dropdown-group .custom-select select:hover {
+    border: 1.5px solid #22b3ff;
+}
+
+/* Responsive styling for dropdowns */
+@media (max-width: 768px) {
+    .dropdown-group {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .dropdown-group .custom-select {
+        flex: 1;
+    }
+
+    .dropdown-group .custom-select select {
+        width: 100%;
+        max-width: none;
+    }
 }
 
 /* Header */
@@ -2143,5 +2204,172 @@ background-color: #FCFCFC;
     .action-btn {
         width: 100%;
         justify-content: center;
+    }
+}
+
+/* Mobile Filter Toggle */
+.mobile-filter-toggle {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: #63C3DB;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.mobile-filter-toggle i {
+    font-size: 16px;
+}
+
+/* Filters Panel Mobile Styles */
+.filters-header {
+    display: none;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.filters-header h2 {
+    font-size: 20px;
+    margin: 0;
+}
+
+.close-filters {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #666;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.filters-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    .mobile-filter-toggle {
+        display: flex;
+    }
+
+    .filters-header {
+        display: flex;
+    }
+
+    .main-content {
+        flex-direction: column;
+        padding: 15px;
+    }
+
+    .filters-panel {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 85%;
+        max-width: 320px;
+        height: 100vh;
+        z-index: 999;
+        background: white;
+        transition: left 0.3s ease;
+        overflow-y: auto;
+        border-radius: 0;
+        border: none;
+        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .filters-panel.active {
+        left: 0;
+    }
+
+    .filters-overlay.active {
+        display: block;
+    }
+
+    .content-right {
+        width: 100%;
+    }
+
+    .filter-bar {
+        flex-direction: column;
+        gap: 12px;
+        padding: 15px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .result-count {
+        margin: 0;
+        text-align: center;
+    }
+
+    .filter-bar .dropdown-group {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .filter-dropdown {
+        flex: 1;
+        max-width: none;
+    }
+
+    .cars-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        padding: 0;
+    }
+
+    .car-card {
+        margin: 0;
+    }
+
+    .car-image {
+        height: 200px;
+    }
+
+    .car-info {
+        padding: 15px;
+    }
+
+    .car-title {
+        font-size: 16px;
+        min-height: auto;
+    }
+
+    .car-specs {
+        padding: 10px 15px;
+    }
+
+    .view-button {
+        padding: 12px 15px;
+    }
+}
+
+/* Tablet Responsive Styles */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .main-content {
+        padding: 20px;
+    }
+
+    .filters-panel {
+        width: 280px;
+    }
+
+    .cars-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
