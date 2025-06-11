@@ -584,18 +584,72 @@ function renderCars() {
 
 function updatePagination() {
     const totalPages = Math.ceil(filteredCars.length / carsPerPage);
+    const paginationNumbers = document.querySelector('.pagination-numbers');
+    const prevBtn = document.querySelector('.pagination-prev');
+    const nextBtn = document.querySelector('.pagination-next');
 
-    // Update Previous/Next buttons
-    document.querySelector(".pagination-prev").disabled = currentPage === 1;
-    document.querySelector(".pagination-next").disabled = currentPage === totalPages || totalPages === 0;
+    // Update prev/next buttons
+    if (prevBtn) {
+        prevBtn.disabled = currentPage === 1;
+    }
+    if (nextBtn) {
+        nextBtn.disabled = currentPage === totalPages;
+    }
 
-    // Update page number buttons
-    const pageButtons = document.querySelectorAll('.pagination-number');
-    pageButtons.forEach(button => {
-        const pageNum = parseInt(button.dataset.page);
-        button.classList.toggle('active', pageNum === currentPage);
-        button.disabled = pageNum === currentPage;
-    });
+    // Update page numbers
+    if (paginationNumbers) {
+        paginationNumbers.innerHTML = '';
+
+        // Calculate which page numbers to show
+        let startPage = Math.max(1, currentPage - 2);
+        let endPage = Math.min(totalPages, startPage + 4);
+
+        // Adjust start page if we're near the end
+        if (endPage - startPage < 4) {
+            startPage = Math.max(1, endPage - 4);
+        }
+
+        // Add first page and ellipsis if needed
+        if (startPage > 1) {
+            const firstPageBtn = document.createElement('button');
+            firstPageBtn.className = 'pagination-number';
+            firstPageBtn.textContent = '1';
+            firstPageBtn.onclick = () => goToPage(1);
+            paginationNumbers.appendChild(firstPageBtn);
+
+            if (startPage > 2) {
+                const ellipsis = document.createElement('span');
+                ellipsis.className = 'pagination-ellipsis';
+                ellipsis.textContent = '...';
+                paginationNumbers.appendChild(ellipsis);
+            }
+        }
+
+        // Add page numbers
+        for (let i = startPage; i <= endPage; i++) {
+            const pageBtn = document.createElement('button');
+            pageBtn.className = `pagination-number${i === currentPage ? ' active' : ''}`;
+            pageBtn.textContent = i;
+            pageBtn.onclick = () => goToPage(i);
+            paginationNumbers.appendChild(pageBtn);
+        }
+
+        // Add last page and ellipsis if needed
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                const ellipsis = document.createElement('span');
+                ellipsis.className = 'pagination-ellipsis';
+                ellipsis.textContent = '...';
+                paginationNumbers.appendChild(ellipsis);
+            }
+
+            const lastPageBtn = document.createElement('button');
+            lastPageBtn.className = 'pagination-number';
+            lastPageBtn.textContent = totalPages;
+            lastPageBtn.onclick = () => goToPage(totalPages);
+            paginationNumbers.appendChild(lastPageBtn);
+        }
+    }
 }
 
 function goToPage(page) {
@@ -608,12 +662,10 @@ function goToPage(page) {
 
 function applyFilters() {
     filteredCars = allCars.filter(checkFilters);
-    sortCars(); // Apply current sorting after filtering
-    currentPage = 1;
+    currentPage = 1; // Reset to first page when filters change
     renderCars();
     updatePagination();
     updateResultsCount();
-    console.log(`Total cars after filtering: ${filteredCars.length}`);
 }
 
 function sortCars() {
