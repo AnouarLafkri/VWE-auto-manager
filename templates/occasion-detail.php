@@ -139,70 +139,202 @@ get_header();
             <div class="carousel" id="carCarousel">
                 <?php foreach ($car_data['afbeeldingen'] as $i => $img) : ?>
                     <div class="carousel-slide<?php echo $i === 0 ? ' active' : ''; ?>">
-                        <img src="<?php echo esc_url($img); ?>" alt="<?php echo esc_attr($car_title . ' foto ' . ($i+1)); ?>" loading="lazy">
+                        <img src="<?php echo esc_url($img); ?>"
+                             alt="<?php echo esc_attr($car_title . ' foto ' . ($i+1)); ?>"
+                             loading="lazy"
+                             class="clickable-image"
+                             data-image-index="<?php echo $i; ?>"
+                             onclick="openLightbox(<?php echo $i; ?>)">
                     </div>
                 <?php endforeach; ?>
                 <button class="carousel-arrow left" id="carouselPrev" aria-label="Vorige foto">&#10094;</button>
                 <button class="carousel-arrow right" id="carouselNext" aria-label="Volgende foto">&#10095;</button>
-                <div class="carousel-dots" id="carouselDots">
-                    <?php foreach ($car_data['afbeeldingen'] as $i => $img) : ?>
-                        <button class="carousel-dot<?php echo $i === 0 ? ' active' : ''; ?>" data-slide="<?php echo $i; ?>" aria-label="Ga naar foto <?php echo $i+1; ?>"></button>
-                    <?php endforeach; ?>
-                </div>
             </div>
         </div>
         <script>
         document.addEventListener('DOMContentLoaded', function() {
             const slides = document.querySelectorAll('.carousel-slide');
-            const dots = document.querySelectorAll('.carousel-dot');
             const prevBtn = document.getElementById('carouselPrev');
             const nextBtn = document.getElementById('carouselNext');
+            const carousel = document.getElementById('carCarousel');
+
             let current = 0;
             let startX = 0;
             let isDragging = false;
+            let autoPlayInterval = null;
+            let isAutoPlaying = true;
+
+            // Add counter to carousel
+            const counter = document.createElement('div');
+            counter.className = 'carousel-counter';
+            counter.innerHTML = `<span id="currentSlide">1</span> / <span id="totalSlides">${slides.length}</span>`;
+            carousel.appendChild(counter);
+
             function showSlide(idx) {
+                // Remove active class from all slides
                 slides.forEach((slide, i) => {
                     slide.classList.toggle('active', i === idx);
+                    slide.style.zIndex = i === idx ? '2' : '1';
                 });
-                dots.forEach((dot, i) => {
-                    dot.classList.toggle('active', i === idx);
-                });
+
+                // Update counter
+                document.getElementById('currentSlide').textContent = idx + 1;
+
                 current = idx;
+
+                // Reset auto-play timer
+                if (isAutoPlaying) {
+                    resetAutoPlay();
+                }
             }
+
+            function nextSlide() {
+                showSlide((current + 1) % slides.length);
+            }
+
+            function prevSlide() {
+                showSlide((current - 1 + slides.length) % slides.length);
+            }
+
+            function resetAutoPlay() {
+                if (autoPlayInterval) {
+                    clearInterval(autoPlayInterval);
+                }
+                if (isAutoPlaying && slides.length > 1) {
+                    autoPlayInterval = setInterval(nextSlide, 5000); // 5 seconds
+                }
+            }
+
+            function toggleAutoPlay() {
+                isAutoPlaying = !isAutoPlaying;
+                if (isAutoPlaying) {
+                    resetAutoPlay();
+                } else if (autoPlayInterval) {
+                    clearInterval(autoPlayInterval);
+                }
+            }
+
+            // Event listeners for navigation buttons
             if (prevBtn && nextBtn) {
-                prevBtn.addEventListener('click', () => {
-                    showSlide((current - 1 + slides.length) % slides.length);
+                prevBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    prevSlide();
                 });
-                nextBtn.addEventListener('click', () => {
-                    showSlide((current + 1) % slides.length);
+
+                nextBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    nextSlide();
                 });
             }
-            dots.forEach((dot, i) => {
-                dot.addEventListener('click', () => showSlide(i));
-            });
-            // Touch/swipe support
-            const carousel = document.getElementById('carCarousel');
+
+            // Improved touch/swipe support
             if (carousel) {
-                carousel.addEventListener('touchstart', e => {
+                let touchStartX = 0;
+                let touchStartY = 0;
+                let touchEndX = 0;
+                let touchEndY = 0;
+
+                carousel.addEventListener('touchstart', (e) => {
+                    touchStartX = e.changedTouches[0].screenX;
+                    touchStartY = e.changedTouches[0].screenY;
                     isDragging = true;
-                    startX = e.touches[0].clientX;
-                });
-                carousel.addEventListener('touchmove', e => {
-                    if (!isDragging) return;
-                    let diff = e.touches[0].clientX - startX;
-                    if (Math.abs(diff) > 50) {
-                        if (diff > 0) {
-                            prevBtn.click();
-                        } else {
-                            nextBtn.click();
-                        }
-                        isDragging = false;
+
+                    // Pause auto-play on touch
+                    if (autoPlayInterval) {
+                        clearInterval(autoPlayInterval);
                     }
-                });
-                carousel.addEventListener('touchend', () => {
+                }, { passive: true });
+
+                carousel.addEventListener('touchmove', (e) => {
+                    if (!isDragging) return;
+                    e.preventDefault();
+                }, { passive: false });
+
+                carousel.addEventListener('touchend', (e) => {
+                    if (!isDragging) return;
+
+                    touchEndX = e.changedTouches[0].screenX;
+                    touchEndY = e.changedTouches[0].screenY;
+
+                    const diffX = touchStartX - touchEndX;
+                    const diffY = touchStartY - touchEndY;
+
+                    // Check if horizontal swipe is more significant than vertical
+                    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+                        if (diffX > 0) {
+                            nextSlide(); // Swipe left = next
+                        } else {
+                            prevSlide(); // Swipe right = previous
+                        }
+                    }
+
                     isDragging = false;
-                });
+
+                    // Resume auto-play
+                    if (isAutoPlaying) {
+                        resetAutoPlay();
+                    }
+                }, { passive: true });
             }
+
+            // Keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+                switch(e.key) {
+                    case 'ArrowLeft':
+                        e.preventDefault();
+                        prevSlide();
+                        break;
+                    case 'ArrowRight':
+                        e.preventDefault();
+                        nextSlide();
+                        break;
+                    case ' ':
+                        e.preventDefault();
+                        toggleAutoPlay();
+                        break;
+                }
+            });
+
+            // Pause auto-play on hover
+            carousel.addEventListener('mouseenter', () => {
+                if (autoPlayInterval) {
+                    clearInterval(autoPlayInterval);
+                }
+            });
+
+            carousel.addEventListener('mouseleave', () => {
+                if (isAutoPlaying) {
+                    resetAutoPlay();
+                }
+            });
+
+            // Initialize auto-play
+            if (slides.length > 1) {
+                resetAutoPlay();
+            }
+
+            // Preload next image for smoother transitions
+            function preloadNextImage() {
+                const nextIndex = (current + 1) % slides.length;
+                const nextSlide = slides[nextIndex];
+                const img = nextSlide.querySelector('img');
+                if (img && !img.complete) {
+                    const preloadImg = new Image();
+                    preloadImg.src = img.src;
+                }
+            }
+
+            // Preload next image when slide changes
+            const originalShowSlide = showSlide;
+            showSlide = function(idx) {
+                originalShowSlide(idx);
+                preloadNextImage();
+            };
+
+            // Initial preload
+            preloadNextImage();
 
             /* Tab switching */
             const tabButtons = document.querySelectorAll('.tab-btn');
@@ -280,12 +412,144 @@ get_header();
         <!-- Foto's Tab -->
         <div class="tab-content" id="fotos">
             <div class="photo-grid">
-                <?php foreach ($car_data['afbeeldingen'] as $img) : ?>
-                    <div class="photo-item"><img src="<?php echo esc_url($img); ?>" alt="<?php echo esc_attr($car_title); ?>" loading="lazy"></div>
+                <?php foreach ($car_data['afbeeldingen'] as $i => $img) : ?>
+                    <div class="photo-item">
+                        <img src="<?php echo esc_url($img); ?>"
+                             alt="<?php echo esc_attr($car_title); ?>"
+                             loading="lazy"
+                             class="clickable-image"
+                             data-image-index="<?php echo $i; ?>"
+                             onclick="openLightbox(<?php echo $i; ?>)">
+                    </div>
                 <?php endforeach; ?>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Lightbox Modal -->
+<div id="lightbox" class="lightbox">
+    <div class="lightbox-content">
+        <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+        <button class="lightbox-arrow lightbox-prev" onclick="changeLightboxImage(-1)">&#10094;</button>
+        <button class="lightbox-arrow lightbox-next" onclick="changeLightboxImage(1)">&#10095;</button>
+        <div class="lightbox-image-container">
+            <img id="lightbox-image" src="" alt="">
+        </div>
+        <div class="lightbox-counter">
+            <span id="lightbox-current">1</span> / <span id="lightbox-total"><?php echo count($car_data['afbeeldingen']); ?></span>
+        </div>
+    </div>
+</div>
+
+<script>
+// Store images array globally for lightbox
+const lightboxImages = <?php echo json_encode($car_data['afbeeldingen']); ?>;
+let currentLightboxIndex = 0;
+
+function openLightbox(imageIndex) {
+    currentLightboxIndex = imageIndex;
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImage = document.getElementById('lightbox-image');
+    const currentSpan = document.getElementById('lightbox-current');
+
+    lightboxImage.src = lightboxImages[imageIndex];
+    lightboxImage.alt = '<?php echo esc_js($car_title); ?> - Foto ' + (imageIndex + 1);
+    currentSpan.textContent = imageIndex + 1;
+
+    lightbox.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+    const lightbox = document.getElementById('lightbox');
+    lightbox.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+function changeLightboxImage(direction) {
+    const newIndex = (currentLightboxIndex + direction + lightboxImages.length) % lightboxImages.length;
+    openLightbox(newIndex);
+}
+
+// Close lightbox with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeLightbox();
+    } else if (e.key === 'ArrowLeft') {
+        changeLightboxImage(-1);
+    } else if (e.key === 'ArrowRight') {
+        changeLightboxImage(1);
+    }
+});
+
+// Close lightbox when clicking outside the image
+document.getElementById('lightbox').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeLightbox();
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const slides = document.querySelectorAll('.carousel-slide');
+    const prevBtn = document.getElementById('carouselPrev');
+    const nextBtn = document.getElementById('carouselNext');
+    const carousel = document.getElementById('carCarousel');
+
+    let current = 0;
+    let startX = 0;
+    let isDragging = false;
+    function showSlide(idx) {
+        slides.forEach((slide, i) => {
+            slide.classList.toggle('active', i === idx);
+        });
+        current = idx;
+    }
+    if (prevBtn && nextBtn) {
+        prevBtn.addEventListener('click', () => {
+            showSlide((current - 1 + slides.length) % slides.length);
+        });
+        nextBtn.addEventListener('click', () => {
+            showSlide((current + 1) % slides.length);
+        });
+    }
+    dots.forEach((dot, i) => {
+        dot.addEventListener('click', () => showSlide(i));
+    });
+    // Touch/swipe support
+    if (carousel) {
+        carousel.addEventListener('touchstart', e => {
+            isDragging = true;
+            startX = e.touches[0].clientX;
+        });
+        carousel.addEventListener('touchmove', e => {
+            if (!isDragging) return;
+            let diff = e.touches[0].clientX - startX;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) {
+                    prevBtn.click();
+                } else {
+                    nextBtn.click();
+                }
+                isDragging = false;
+            }
+        });
+        carousel.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+    }
+
+    /* Tab switching */
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const target = btn.getAttribute('data-tab');
+            tabButtons.forEach(b => b.classList.toggle('active', b === btn));
+            tabContents.forEach(c => c.classList.toggle('active', c.id === target));
+        });
+    });
+});
+</script>
 
 <?php get_footer(); ?>
