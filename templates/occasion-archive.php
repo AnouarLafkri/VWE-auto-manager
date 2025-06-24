@@ -1,22 +1,24 @@
 <?php
 /**
- * Template for displaying the occasions archive
+ * Archive template for occasion custom post type
+ * Loaded via template_include filter in plugin.
  */
 
-// Include header
-include_once(dirname(__FILE__) . '/../header.php');
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+get_header();
 ?>
 
-<div class="page-wrapper">
-    <div class="main-content">
-        <?php
-        // Display the car listing
+<div class="vwe-archive-container" style="max-width:1400px;margin:0 auto;padding:0 10px;">
+    <?php
+    if (function_exists('display_car_listing')) {
         display_car_listing();
-        ?>
-    </div>
+    } else {
+        echo do_shortcode('[vwe_auto_listing]');
+    }
+    ?>
 </div>
 
-<?php
-// Include footer
-include_once(dirname(__FILE__) . '/../footer.php');
-?>
+<?php get_footer(); ?>

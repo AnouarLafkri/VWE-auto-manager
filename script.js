@@ -1,100 +1,75 @@
-jQuery(document).ready(function($) {
-    // Initialize gallery
-    let currentSlide = 0;
-    const slides = document.querySelectorAll('.gallery-slide');
-    const thumbnails = document.querySelectorAll('.gallery-thumbnail');
-    const counter = document.querySelector('.gallery-counter');
-    const totalSlides = slides.length;
+// Gallery functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const gallery = document.querySelector('.gallery');
+    if (!gallery) return;
 
-    function updateGallery() {
-        slides.forEach((slide, index) => {
-            slide.classList.toggle('active', index === currentSlide);
-        });
+    const mainImage = gallery.querySelector('.gallery-main img');
+    const thumbnails = gallery.querySelectorAll('.thumbnail');
+    let currentIndex = 0;
 
-        thumbnails.forEach((thumb, index) => {
-            thumb.classList.toggle('active', index === currentSlide);
-        });
+    // Update main image
+    function updateMainImage(index) {
+        const newSrc = thumbnails[index].querySelector('img').src;
+        mainImage.src = newSrc;
 
-        if (counter) {
-            counter.textContent = `${currentSlide + 1} / ${totalSlides}`;
-        }
+        // Update active thumbnail
+        thumbnails.forEach(thumb => thumb.classList.remove('active'));
+        thumbnails[index].classList.add('active');
+
+        currentIndex = index;
     }
 
-    // Initialize first slide
-    if (slides.length > 0) {
-        updateGallery();
-    }
-
-    // Handle prev/next buttons
-    document.querySelector('.gallery-prev')?.addEventListener('click', () => {
-        currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-        updateGallery();
-    });
-
-    document.querySelector('.gallery-next')?.addEventListener('click', () => {
-        currentSlide = (currentSlide + 1) % totalSlides;
-        updateGallery();
-    });
-
-    // Handle thumbnail clicks
+    // Thumbnail click handler
     thumbnails.forEach((thumb, index) => {
-        thumb.addEventListener('click', () => {
-            currentSlide = index;
-            updateGallery();
+        thumb.addEventListener('click', () => updateMainImage(index));
+    });
+
+    // Tab functionality
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const target = button.getAttribute('data-tab');
+
+            // Update active tab button
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            // Show target content
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+                if (content.getAttribute('data-tab') === target) {
+                    content.classList.add('active');
+                }
+            });
         });
     });
 
-    // Handle share button click
-    $('.share-btn').on('click', function() {
-        const shareData = {
-            title: document.title,
-            text: 'Bekijk deze auto op onze website!',
-            url: window.location.href
-        };
-
-        if (navigator.share) {
-            navigator.share(shareData)
-                .then(() => showNotification('Succesvol gedeeld!'))
-                .catch((error) => {
-                    console.error('Error sharing:', error);
-                    fallbackShare();
+    // Share functionality
+    const shareButton = document.querySelector('.share-button');
+    if (shareButton) {
+        shareButton.addEventListener('click', async () => {
+            try {
+                await navigator.share({
+                    title: document.querySelector('.car-title').textContent,
+                    url: window.location.href
                 });
-        } else {
-            fallbackShare();
-        }
-    });
-
-    function fallbackShare() {
-        const dummy = document.createElement('input');
-        document.body.appendChild(dummy);
-        dummy.value = window.location.href;
-        dummy.select();
-        document.execCommand('copy');
-        document.body.removeChild(dummy);
-        showNotification('Link gekopieerd naar klembord!');
+            } catch (err) {
+                console.log('Error sharing:', err);
+            }
+        });
     }
 
-    function showNotification(message) {
-        const notification = document.createElement('div');
-        notification.className = 'notification';
-        notification.textContent = message;
-        document.body.appendChild(notification);
-
-        setTimeout(() => {
-            notification.classList.add('show');
-        }, 100);
-
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => {
-                document.body.removeChild(notification);
-            }, 300);
-        }, 3000);
+    // Contact button functionality
+    const contactButton = document.querySelector('.contact-button');
+    if (contactButton) {
+        contactButton.addEventListener('click', () => {
+            // Scroll to contact form or open contact modal
+            const contactForm = document.querySelector('#contact-form');
+            if (contactForm) {
+                contactForm.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
     }
-
-    // Handle contact button click
-    $('.contact-btn').on('click', function() {
-        const subject = 'Informatie over ' + document.title;
-        window.location.href = 'mailto:info@example.com?subject=' + encodeURIComponent(subject);
-    });
 });

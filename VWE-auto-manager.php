@@ -26,7 +26,13 @@ define('LOCAL_XML_PATH', VWE_PLUGIN_DIR . 'local_file.xml');
 define('DEBUG_MODE', false);
 define('LAST_UPDATE_FILE', VWE_PLUGIN_DIR . 'last_update.txt');
 define('UPDATE_INTERVAL', 86400); // 24 hours in seconds
-define('IMAGE_URL_BASE', 'https://staging.mvsautomotive.nl/wp-content/plugins/VWE-auto-manager/images/');
+define('REMOTE_IMAGE_HTTP', 'https://staging.mvsautomotive.nl/wp-content/plugins/xml/images/');
+// Dynamisch pad naar de images-map binnen de plugin (hoofdletter‐safe)
+if (!defined('IMAGE_URL_BASE')) {
+    $vwe_img_tmp = call_user_func('plugin_dir_url', __FILE__) . 'images/';
+    define('IMAGE_URL_BASE', $vwe_img_tmp);
+    unset($vwe_img_tmp);
+}
 
 // Cronjob configuration
 add_action('init', function() {
@@ -233,7 +239,7 @@ function display_car_listing() {
     // Add preloading for images
     output_image_preload($cars);
 
-    echo '<div class="page-wrapper">';
+    echo '<div class="vwe-page-wrapper">';
 
     echo '<div class="main-content" style="display:flex; flex-direction:row; align-items:flex-start; gap:30px;">';
 
@@ -486,7 +492,7 @@ function display_car_listing() {
     }
 
     echo '</div>'; // Close cars-container
-    echo '</div></div>'; // Close main-content and page-wrapper
+    echo '</div></div>'; // Close main-content and vwe-page-wrapper
 
     // Add pagination JavaScript
     $allCarsJson = json_encode(array_map(function($car) use ($image_url_base) { return extract_car_data($car, $image_url_base); }, $cars));
@@ -559,9 +565,16 @@ function renderCars() {
         const card = document.createElement("div");
         card.className = "car-card";
         card.dataset.car = JSON.stringify(car);
+        // Bepaal SEO-vriendelijke slug op basis van titel of merk+model
+        const slug = car.slug ? car.slug : (car.titel || `${car.merk} ${car.model}${car.cilinder_inhoud ? ' ' + car.cilinder_inhoud : ''}${car.transmissie ? ' ' + car.transmissie : ''}${car.brandstof ? ' ' + car.brandstof : ''}${car.deuren ? ' ' + car.deuren + ' Deurs' : ''}`)
+            .toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, '') // verwijder speciale tekens
+            .trim()
+            .replace(/\s+/g, '-')        // spaties naar streepjes
+            .replace(/-+/g, '-');         // dubbele streepjes samenvoegen
         card.innerHTML = `
             <div class="car-image">
-                <img src="${car.eersteAfbeelding}" alt="${car.merk} ${car.model}" class="car-image" loading="lazy" decoding="async" onclick="showCarDetails(this.closest('.car-card').querySelector('.view-button'))" style="cursor: pointer;">
+                <img src="${car.eersteAfbeelding}" alt="${car.merk} ${car.model}" class="car-image" loading="lazy" decoding="async" style="cursor: pointer;" onclick="window.location.href='/occasions/${slug}/'">
                 <div class="car-badges">
                     <span class="status-badge ${car.status}">${car.status === "beschikbaar" ? "AVAILABLE" : (car.status === "verkocht" ? "VERKOCHT" : "GERESERVEERD")}</span>
                     <span class="year-badge">${car.bouwjaar}</span>
@@ -575,7 +588,7 @@ function renderCars() {
                     <span><img src="https://raw.githubusercontent.com/anouarlafkri/SVG/main/Tank.svg" alt="Kilometerstand" width="18" style="vertical-align:middle;margin-right:4px;">${car.kilometerstand || '0 km'}</span>
                     <span><img src="https://raw.githubusercontent.com/anouarlafkri/SVG/main/pK.svg" alt="Vermogen" width="18" style="vertical-align:middle;margin-right:4px;">${car.vermogen || '0 pk'}</span>
                 </div>
-                <button type="button" class="view-button" onclick="showCarDetails(this)">BEKIJKEN <span class="arrow">→</span></button>
+                <a href="/occasions/${slug}/" class="view-button">BEKIJKEN <span class="arrow">→</span></a>
             </div>
         `;
         carsGrid.appendChild(card);
@@ -584,72 +597,18 @@ function renderCars() {
 
 function updatePagination() {
     const totalPages = Math.ceil(filteredCars.length / carsPerPage);
-    const paginationNumbers = document.querySelector('.pagination-numbers');
-    const prevBtn = document.querySelector('.pagination-prev');
-    const nextBtn = document.querySelector('.pagination-next');
 
-    // Update prev/next buttons
-    if (prevBtn) {
-        prevBtn.disabled = currentPage === 1;
-    }
-    if (nextBtn) {
-        nextBtn.disabled = currentPage === totalPages;
-    }
+    // Update Previous/Next buttons
+    document.querySelector(".pagination-prev").disabled = currentPage === 1;
+    document.querySelector(".pagination-next").disabled = currentPage === totalPages || totalPages === 0;
 
-    // Update page numbers
-    if (paginationNumbers) {
-        paginationNumbers.innerHTML = '';
-
-        // Calculate which page numbers to show
-        let startPage = Math.max(1, currentPage - 2);
-        let endPage = Math.min(totalPages, startPage + 4);
-
-        // Adjust start page if we're near the end
-        if (endPage - startPage < 4) {
-            startPage = Math.max(1, endPage - 4);
-        }
-
-        // Add first page and ellipsis if needed
-        if (startPage > 1) {
-            const firstPageBtn = document.createElement('button');
-            firstPageBtn.className = 'pagination-number';
-            firstPageBtn.textContent = '1';
-            firstPageBtn.onclick = () => goToPage(1);
-            paginationNumbers.appendChild(firstPageBtn);
-
-            if (startPage > 2) {
-                const ellipsis = document.createElement('span');
-                ellipsis.className = 'pagination-ellipsis';
-                ellipsis.textContent = '...';
-                paginationNumbers.appendChild(ellipsis);
-            }
-        }
-
-        // Add page numbers
-        for (let i = startPage; i <= endPage; i++) {
-            const pageBtn = document.createElement('button');
-            pageBtn.className = `pagination-number${i === currentPage ? ' active' : ''}`;
-            pageBtn.textContent = i;
-            pageBtn.onclick = () => goToPage(i);
-            paginationNumbers.appendChild(pageBtn);
-        }
-
-        // Add last page and ellipsis if needed
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) {
-                const ellipsis = document.createElement('span');
-                ellipsis.className = 'pagination-ellipsis';
-                ellipsis.textContent = '...';
-                paginationNumbers.appendChild(ellipsis);
-            }
-
-            const lastPageBtn = document.createElement('button');
-            lastPageBtn.className = 'pagination-number';
-            lastPageBtn.textContent = totalPages;
-            lastPageBtn.onclick = () => goToPage(totalPages);
-            paginationNumbers.appendChild(lastPageBtn);
-        }
-    }
+    // Update page number buttons
+    const pageButtons = document.querySelectorAll('.pagination-number');
+    pageButtons.forEach(button => {
+        const pageNum = parseInt(button.dataset.page);
+        button.classList.toggle('active', pageNum === currentPage);
+        button.disabled = pageNum === currentPage;
+    });
 }
 
 function goToPage(page) {
@@ -662,10 +621,12 @@ function goToPage(page) {
 
 function applyFilters() {
     filteredCars = allCars.filter(checkFilters);
-    currentPage = 1; // Reset to first page when filters change
+    sortCars(); // Apply current sorting after filtering
+    currentPage = 1;
     renderCars();
     updatePagination();
     updateResultsCount();
+    console.log(`Total cars after filtering: ${filteredCars.length}`);
 }
 
 function sortCars() {
@@ -1191,7 +1152,7 @@ function updateFavoritesDisplay() {
         card.dataset.car = JSON.stringify(car);
         card.innerHTML = `
             <div class="car-image">
-                <img src="${car.eersteAfbeelding}" alt="${car.merk} ${car.model}" class="car-image" loading="lazy" decoding="async" onclick="showCarDetails(this.closest('.car-card').querySelector('.view-button'))" style="cursor: pointer;">
+                <img src="${car.eersteAfbeelding}" alt="${car.merk} ${car.model}" class="car-image" loading="lazy" decoding="async" style="cursor: pointer;" onclick="window.location.href='/occasions/${slug}/'">
                 <div class="car-badges">
                     <span class="status-badge ${car.status}">${car.status === "beschikbaar" ? "AVAILABLE" : (car.status === "verkocht" ? "VERKOCHT" : "GERESERVEERD")}</span>
                     <span class="year-badge">${car.bouwjaar}</span>
@@ -1205,7 +1166,7 @@ function updateFavoritesDisplay() {
                     <span><img src="https://raw.githubusercontent.com/anouarlafkri/SVG/main/Tank.svg" alt="Kilometerstand" width="18" style="vertical-align:middle;margin-right:4px;">${car.kilometerstand || '0 km'}</span>
                     <span><img src="https://raw.githubusercontent.com/anouarlafkri/SVG/main/pK.svg" alt="Vermogen" width="18" style="vertical-align:middle;margin-right:4px;">${car.vermogen || '0 pk'}</span>
                 </div>
-                <button type="button" class="view-button" onclick="showCarDetails(this)">BEKIJKEN <span class="arrow">→</span></button>
+                <a href="/occasions/${slug}/" class="view-button">BEKIJKEN <span class="arrow">→</span></a>
             </div>
         `;
         favoritesGrid.appendChild(card);
@@ -1397,7 +1358,29 @@ function extract_car_data($car, $image_url_base) {
         'model' => $get_xml_value($car, 'model', 'Onbekend model'),
         'titel' => $get_xml_value($car, 'titel', 'Onbekende titel'),
         'bouwjaar' => $get_xml_value($car, 'bouwjaar', 'Onbekend bouwjaar'),
-        'prijs' => $get_xml_value($car, 'verkoopprijs_particulier', 'Prijs op aanvraag'),
+        'prijs' => (function($car) use ($clean_value) {
+            // 1️⃣ Newest structure: nested bedrag in eerste <prijs>
+            if (isset($car->verkoopprijs_particulier->prijzen->prijs[0]->bedrag) &&
+                (string)$car->verkoopprijs_particulier->prijzen->prijs[0]->bedrag !== '') {
+                return $clean_value($car->verkoopprijs_particulier->prijzen->prijs[0]->bedrag, 'Prijs op aanvraag');
+            }
+
+            // 2️⃣ Legacy: scalar inhoud zonder children
+            if (isset($car->verkoopprijs_particulier) && !isset($car->verkoopprijs_particulier->prijzen)) {
+                $scalar = trim((string)$car->verkoopprijs_particulier);
+                if ($scalar !== '') {
+                    return $clean_value($scalar, 'Prijs op aanvraag');
+                }
+            }
+
+            // 3️⃣ Fallback via xpath (dekt onverwachte structuren)
+            $xpathResult = $car->xpath('verkoopprijs_particulier//bedrag');
+            if ($xpathResult && isset($xpathResult[0]) && (string)$xpathResult[0] !== '') {
+                return $clean_value($xpathResult[0], 'Prijs op aanvraag');
+            }
+
+            return 'Prijs op aanvraag';
+        })($car),
         'kilometerstand' => $get_xml_value($car, 'tellerstand', '0'),
         'brandstof' => $get_xml_value($car, 'brandstof', 'Onbekend'),
         'kleur' => $get_xml_value($car, 'basiskleur', 'Onbekend'),
@@ -1413,9 +1396,24 @@ function extract_car_data($car, $image_url_base) {
         'interieurkleur' => $get_xml_value($car, 'interieurkleur', 'Onbekend'),
         'bekleding' => $get_xml_value($car, 'bekleding', 'Onbekend'),
         'opmerkingen' => $get_xml_value($car, 'opmerkingen', 'Geen aanvullende opmerkingen beschikbaar.'),
+        'opties' => $get_xml_value($car, 'opties', ''),
         'afbeeldingen' => [],
         'carrosserie' => $get_xml_value($car, 'carrosserie', 'Onbekend')
     ];
+
+    // Bouw titel exact zoals create_occasion_posts doet
+    $slug_title = $data['merk'] . ' ' . $data['model'];
+    if ($data['cilinder_inhoud'] !== 'Onbekend') $slug_title .= ' ' . $data['cilinder_inhoud'];
+    if ($data['transmissie'] !== 'Onbekend') $slug_title .= ' ' . $data['transmissie'];
+    if ($data['brandstof'] !== 'Onbekend') $slug_title .= ' ' . $data['brandstof'];
+    if ($data['deuren'] !== 'Onbekend') $slug_title .= ' ' . $data['deuren'] . ' Deurs';
+    $slug_title .= ' NL Auto';
+
+    if (function_exists('sanitize_title')) {
+        $data['slug'] = sanitize_title($slug_title);
+    } else {
+        $data['slug'] = strtolower(preg_replace('/[^a-z0-9-]/', '', str_replace(' ', '-', $slug_title)));
+    }
 
     // Map brandstof codes to full names
     $brandstof_map = [
@@ -1464,20 +1462,45 @@ function extract_car_data($car, $image_url_base) {
     $data['status'] = (string)$car->verkocht === 'j' ? 'verkocht' :
                      ((string)$car->gereserveerd === 'j' ? 'gereserveerd' : 'beschikbaar');
 
-    // Collect images
+    // Collect images (robust: try all case/ext variants)
     if (isset($car->afbeeldingen) && isset($car->afbeeldingen->afbeelding)) {
-    foreach ($car->afbeeldingen->afbeelding as $afbeelding) {
-            if (isset($afbeelding->bestandsnaam)) {
-        $bestandsnaam = (string)$afbeelding->bestandsnaam;
-                if ($bestandsnaam !== '') {
-        $data['afbeeldingen'][] = $image_url_base . $bestandsnaam;
+        foreach ($car->afbeeldingen->afbeelding as $afbeelding) {
+            $url = isset($afbeelding->url) ? trim((string)$afbeelding->url) : '';
+            $bestandsnaam = isset($afbeelding->bestandsnaam) ? trim((string)$afbeelding->bestandsnaam) : '';
+
+            if ($url !== '') {
+                $data['afbeeldingen'][] = $url;
+            } elseif ($bestandsnaam !== '') {
+                // Try all case and extension combinations
+                $name_no_ext = preg_replace('/\.[a-zA-Z0-9]+$/', '', $bestandsnaam);
+                $extensions = ['jpg', 'jpeg', 'png', 'gif', 'JPG', 'JPEG', 'PNG', 'GIF'];
+                $variants = [];
+                foreach ($extensions as $ext) {
+                    $variants[] = $name_no_ext . '.' . $ext;
+                    $variants[] = strtolower($name_no_ext) . '.' . $ext;
+                    $variants[] = strtoupper($name_no_ext) . '.' . $ext;
+                    $variants[] = ucfirst(strtolower($name_no_ext)) . '.' . $ext;
                 }
+                $variants[] = $bestandsnaam;
+                $variants = array_unique($variants);
+
+                $found = false;
+                foreach ($variants as $variant) {
+                    $local_path = LOCAL_IMAGES_PATH . $variant;
+                    if (file_exists($local_path)) {
+                        $data['afbeeldingen'][] = $image_url_base . $variant;
+                        $found = true;
+                        break;
+                    }
+                }
+                if (!$found) {
+                    // fallback: remote
+                    $data['afbeeldingen'][] = REMOTE_IMAGE_HTTP . strtolower($name_no_ext) . '.jpg';
             }
         }
     }
-
-    $data['eersteAfbeelding'] = empty($data['afbeeldingen']) ?
-        $image_url_base . 'placeholder.jpg' : $data['afbeeldingen'][0];
+    }
+    $data['eersteAfbeelding'] = empty($data['afbeeldingen']) ? $image_url_base . 'placeholder.jpg' : $data['afbeeldingen'][0];
 
     return $data;
 }
@@ -1486,44 +1509,44 @@ function extract_car_data($car, $image_url_base) {
  * Display a single car card
  */
 function display_car_card($car) {
-    // Generate a unique identifier for the car
+    // Generate unique identifier for the car
     $car_id = strtolower(str_replace(' ', '-', $car['merk'] . '-' . $car['model'] . '-' . $car['kenteken']));
 
-    // Ensure proper JSON encoding of the car data
-    $jsonData = htmlspecialchars(json_encode($car, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP), ENT_QUOTES);
+    // Calculate formatted price once
+    $price_raw = isset($car['prijs']) ? $car['prijs'] : '';
+    $price_numeric = preg_replace('/[^0-9]/', '', $price_raw);
+    $formatted_price = ($price_numeric === '' || !is_numeric($price_numeric))
+        ? 'Op aanvraag'
+        : '€ ' . number_format((int)$price_numeric, 0, ',', '.');
 
-    $status_label = strtoupper($car['status'] === "beschikbaar" ? "AVAILABLE" :
-                   ($car['status'] === "verkocht" ? "VERKOCHT" : "GERESERVEERD"));
-    $status_class = $car['status'];
+    // Ensure proper JSON encoding
+    $jsonData = json_encode($car, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE);
 
     // Use the titel field from XML for the car card title
     $detailed_title = $car['titel'];
 
+    // Gebruik vooraf berekende slug uit de array (gelijk aan sanitize_title)
+    $url_title = $car['slug'];
+
     echo '<div class="car-card" data-car=\'' . $jsonData . '\' data-car-id="' . $car_id . '">
-        <div class="car-image">';
-
-    // Use the new optimized image function
-    echo get_optimized_image_html(
-        $car['eersteAfbeelding'],
-        $car['merk'] . ' ' . $car['model'],
-        'car-image'
-    );
-
-    echo '<div class="car-badges">
-                <span class="status-badge ' . $status_class . '">' . $status_label . '</span>
-                <span class="year-badge">' . $car['bouwjaar'] . '</span>
+        <div class="car-image">
+            <img src="' . esc_url($car['eersteAfbeelding']) . '" alt="' . esc_attr($car['merk'] . ' ' . $car['model']) . '" loading="lazy" decoding="async">
+            <div class="car-badges">
+                <span class="status-badge ' . esc_attr($car['status']) . '">' .
+                    ($car['status'] === "beschikbaar" ? "AVAILABLE" : ($car['status'] === "verkocht" ? "VERKOCHT" : "GERESERVEERD")) .
+                '</span>
+                <span class="year-badge">' . esc_html($car['bouwjaar']) . '</span>
             </div>
-    </div>';
-
-    echo '<div class="car-info">
+        </div>
+        <div class="car-info">
             <div class="car-brand">' . strtoupper($car['merk']) . '</div>
             <h3 class="car-title">' . htmlspecialchars($detailed_title) . '</h3>
-            <div class="car-price">€ ' . number_format((float)str_replace(',', '.', preg_replace('/[^0-9,]/i', '', $car['prijs'])), 0, ',', '.') . '</div>
+            <div class="car-price">' . $formatted_price . '</div>
             <div class="car-specs">
                 <span><img src="https://raw.githubusercontent.com/anouarlafkri/SVG/main/Tank.svg" alt="Kilometerstand" width="18" style="vertical-align:middle;margin-right:4px;">' . $car['kilometerstand'] . '</span>
                 <span><img src="https://raw.githubusercontent.com/anouarlafkri/SVG/main/pK.svg" alt="Vermogen" width="18" style="vertical-align:middle;margin-right:4px;">' . $car['vermogen'] . '</span>
             </div>
-            <button type="button" class="view-button" onclick="showCarDetails(this)">
+            <button type="button" class="view-button" onclick="window.location.href=\'/occasions/' . $url_title . '/\'">
                 BEKIJKEN <span class="arrow">→</span>
             </button>
         </div>
@@ -1534,8 +1557,8 @@ function display_car_card($car) {
  * Output CSS styles
  */
 function output_css_styles() {
-    $base_url = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
-    echo '<link rel="stylesheet" href="' . $base_url . '/styling.css?v=' . filemtime(__DIR__ . '/styling.css') . '">';
+    // Stylesheet wordt via wp_enqueue_style geladen; alleen kleine globale offset hier.
+    echo '<style>.vwe-page-wrapper{margin-top:160px!important}.top-nav{margin-top:160px!important}#brx-footer,#brx-footer .brxe-section{padding-left:0!important;padding-right:0!important}</style>';
 }
 
 /**
@@ -1687,6 +1710,10 @@ function ensure_all_images_exist() {
         if (isset($car->afbeeldingen)) {
             foreach ($car->afbeeldingen->children() as $afbeelding) {
                 if ($afbeelding->getName() === 'afbeelding') {
+                    // Skip images that already contain a full URL – these are hosted remotely
+                    if (isset($afbeelding->url) && trim((string)$afbeelding->url) !== '') {
+                        continue;
+                    }
                     if (isset($afbeelding->bestandsnaam)) {
                         $filename = trim((string)$afbeelding->bestandsnaam);
                         if ($filename !== '') {
@@ -1820,6 +1847,7 @@ function create_new_xml_file($data) {
         $voertuig->addChild('interieurkleur', htmlspecialchars($vehicle['interieurkleur']));
         $voertuig->addChild('bekleding', htmlspecialchars($vehicle['bekleding']));
         $voertuig->addChild('opmerkingen', htmlspecialchars($vehicle['opmerkingen']));
+        $voertuig->addChild('opties', htmlspecialchars($vehicle['opties']));
 
         // Add status information
         $voertuig->addChild('verkocht', $vehicle['status'] === 'verkocht' ? 'j' : 'n');
@@ -1936,6 +1964,14 @@ function get_xml_data() {
         return false;
     }
 
+    // Repareer niet-standaard XML-entiteiten zodat SimpleXML kan parsen
+    if (function_exists('fixXmlEntities')) {
+        $xml_content = fixXmlEntities($xml_content);
+    } else {
+        // Fallback: vervang veelvoorkomende entiteiten manueel
+        $xml_content = str_replace(['&euro;', '&pound;'], ['€', '£'], $xml_content);
+    }
+
     $xml = simplexml_load_string($xml_content);
     if (!$xml) {
         error_log('Error parsing XML content from: ' . LOCAL_XML_PATH);
@@ -1946,40 +1982,52 @@ function get_xml_data() {
     $vehicle_count = count($xml->voertuig);
     error_log('Found ' . $vehicle_count . ' vehicles in XML data');
 
+    // Download ontbrekende afbeeldingen als ze nog niet lokaal staan
+    ensure_all_images_exist();
+
     return $xml;
+}
+
+// Check if fixXmlEntities is not available (this file may be standalone)
+if (!function_exists('fixXmlEntities')) {
+    function fixXmlEntities($xmlContent) {
+        $map = [
+            '&euro;' => '€',
+            '&pound;' => '£',
+            '&dollar;' => '$',
+            '&yen;' => '¥',
+            '&cent;' => '¢',
+            '&copy;' => '©',
+            '&reg;' => '®',
+            '&trade;' => '™',
+            '&nbsp;' => ' ',
+            '&ndash;' => '–',
+            '&mdash;' => '—',
+            '&lsquo;' => "'",
+            '&rsquo;' => "'",
+            '&ldquo;' => '"',
+            '&rdquo;' => '"',
+            '&hellip;' => '…'
+        ];
+        return str_replace(array_keys($map), array_values($map), $xmlContent);
+    }
 }
 
 /**
  * Preload images for better performance
  */
 function output_image_preload($cars) {
-    // Preload placeholder image with high priority
     echo '<link rel="preload" as="image" href="' . get_image_base_url() . 'placeholder.jpg" fetchpriority="high">';
-
-    // Track already preloaded images to avoid duplicates
-    $preloaded_images = array();
-
-    // Only preload the first 9 images (initial viewport)
+    $preloaded = [];
     $count = 0;
     foreach ($cars as $car) {
-        if ($count >= 9) break; // Only preload first 9 images (initial viewport)
-
-        if (isset($car->afbeeldingen) && isset($car->afbeeldingen->afbeelding)) {
-            // Get the first image
-            $first_image = is_array($car->afbeeldingen->afbeelding)
-                ? $car->afbeeldingen->afbeelding[0]
-                : $car->afbeeldingen->afbeelding;
-
-            if (isset($first_image->bestandsnaam)) {
-                $bestandsnaam = (string)$first_image->bestandsnaam;
-                if ($bestandsnaam !== '' && !in_array($bestandsnaam, $preloaded_images)) {
-                    // Add fetchpriority="high" for the first 3 images
+        if ($count >= 30) break; // only current batch
+        $img = isset($car['eersteAfbeelding']) ? $car['eersteAfbeelding'] : '';
+        if ($img && !in_array($img, $preloaded)) {
                     $priority = $count < 3 ? 'high' : 'low';
-                    echo '<link rel="preload" as="image" href="' . get_image_base_url() . $bestandsnaam . '" fetchpriority="' . $priority . '">';
-                    $preloaded_images[] = $bestandsnaam;
+            echo '<link rel="preload" as="image" href="' . htmlspecialchars($img, ENT_QUOTES, 'UTF-8') . '" fetchpriority="' . $priority . '">';
+            $preloaded[] = $img;
                     $count++;
-                }
-            }
         }
     }
 }
@@ -1997,245 +2045,35 @@ function vwe_init() {
     if (!file_exists(LOCAL_IMAGES_PATH)) {
         wp_mkdir_p(LOCAL_IMAGES_PATH);
     }
+
+    // Synchronisatie van WP-posts gebeurt nu alleen nog na een geslaagde XML-update via update_all_data()
 }
 
 /**
  * Enqueue scripts and styles
  */
 function vwe_enqueue_scripts() {
-    wp_enqueue_style('vwe-styles', VWE_PLUGIN_URL . 'styling.css', array(), filemtime(VWE_PLUGIN_DIR . 'styling.css'));
-    wp_enqueue_script('vwe-scripts', VWE_PLUGIN_URL . 'scripts.js', array('jquery'), filemtime(VWE_PLUGIN_DIR . 'scripts.js'), true);
+    // Laad alleen wanneer nodig.
+    if ( ! vwe_should_load_assets() ) {
+        return;
+    }
 
-    // Add optimized CSS
-    wp_add_inline_style('vwe-styles', '
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
+    wp_enqueue_style(
+        'vwe-styles',
+        plugins_url('styling.css', __FILE__),
+        array(),
+        filemtime(VWE_PLUGIN_DIR . 'styling.css')
+    );
 
-        .modal-content {
-            position: relative;
-            background: #fff;
-            margin: 20px auto;
-            padding: 20px;
-            width: 90%;
-            max-width: 1200px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            animation: modalFadeIn 0.3s ease-out;
-        }
+    wp_enqueue_script(
+        'vwe-scripts',
+        plugins_url('js/scripts.js', __FILE__),
+        array('jquery'),
+        filemtime(VWE_PLUGIN_DIR . 'js/scripts.js'),
+        true
+    );
 
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .modal-carousel {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        .carousel-container {
-            position: relative;
-            overflow: hidden;
-            border-radius: 4px;
-            background: #f5f5f5;
-        }
-
-        .carousel-slides {
-            display: flex;
-            transition: transform 0.3s ease-out;
-            will-change: transform;
-        }
-
-        .carousel-slide {
-            flex: 0 0 100%;
-            position: relative;
-        }
-
-        .carousel-slide img {
-            width: 100%;
-            height: auto;
-            display: block;
-            object-fit: cover;
-            aspect-ratio: 16/9;
-        }
-
-        .carousel-prev,
-        .carousel-next {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            cursor: pointer;
-            font-size: 18px;
-            border-radius: 4px;
-            transition: background-color 0.2s;
-        }
-
-        .carousel-prev { left: 10px; }
-        .carousel-next { right: 10px; }
-
-        .carousel-prev:hover,
-        .carousel-next:hover {
-            background: rgba(0, 0, 0, 0.7);
-        }
-
-        .carousel-dots {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 10px;
-        }
-
-        .carousel-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #ccc;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .carousel-dot.active {
-            background: #333;
-        }
-
-        .modal-details {
-            padding: 20px 0;
-        }
-
-        .modal-section {
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f9f9f9;
-            border-radius: 4px;
-        }
-
-        .title-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #fff;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 15px;
-        }
-
-        .title-content h3 {
-            margin: 0;
-            font-size: 24px;
-            color: #333;
-        }
-
-        .car-status {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-top: 5px;
-        }
-
-        .car-status.beschikbaar { background: #e6f4ea; color: #1e7e34; }
-        .car-status.verkocht { background: #fbe9e7; color: #d32f2f; }
-        .car-status.reserve { background: #fff3e0; color: #f57c00; }
-
-        .price-tag {
-            font-size: 24px;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-
-        .specs-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 10px;
-        }
-
-        .spec-item {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .spec-label {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .spec-value {
-            font-weight: 500;
-            color: #333;
-        }
-
-        .description-content {
-            line-height: 1.6;
-            color: #444;
-        }
-
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
-
-        .modal-action-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .share-btn {
-            background: #2196f3;
-            color: white;
-        }
-
-        .share-btn:hover {
-            background: #1976d2;
-        }
-
-        @media (max-width: 768px) {
-            .modal-content {
-                width: 95%;
-                margin: 10px auto;
-                padding: 15px;
-            }
-
-            .title-section {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-
-            .specs-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .carousel-prev,
-            .carousel-next {
-                padding: 8px 12px;
-                font-size: 16px;
-            }
-        }
-    ');
+    // Geen inline CSS meer om conflicts met thema's/builders te voorkomen.
 }
 
 /**
@@ -2587,3 +2425,46 @@ function vwe_template_redirect() {
 add_action('template_redirect', 'vwe_template_redirect');
 
 // ... existing code ...
+
+add_filter('template_include', function($template) {
+    if (is_post_type_archive('occasion')) {
+        $archive_tpl = VWE_PLUGIN_DIR . 'templates/occasion-archive.php';
+        if (file_exists($archive_tpl)) {
+            return $archive_tpl;
+        }
+    }
+    return $template;
+});
+// ... existing code ...
+
+/**
+ * Bepaal of de plugin assets op de huidige request geladen moeten worden.
+ * – Laadt niet in wp-admin (behalve AJAX)
+ * – Laadt alleen op occasion archive / single of wanneer de shortcode in de content staat.
+ */
+function vwe_should_load_assets() {
+    // Niet in wp-admin / Bricks builder iframe.
+    if (is_admin() && !wp_doing_ajax()) {
+        return false;
+    }
+
+    // Skip wanneer Bricks builder preview open staat (?bricks=preview)
+    if (isset($_GET['bricks']) && $_GET['bricks'] === 'preview') {
+        return false;
+    }
+
+    // Occasion archive of single.
+    if (is_post_type_archive('occasion') || is_singular('occasion')) {
+        return true;
+    }
+
+    // Pagina/post met de shortcode
+    if (is_singular()) {
+        $post = get_post();
+        if ($post && has_shortcode($post->post_content, 'vwe_auto_listing')) {
+            return true;
+        }
+    }
+
+    return false;
+}
