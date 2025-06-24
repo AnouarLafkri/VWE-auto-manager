@@ -198,61 +198,6 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     border-radius: 8px;
     overflow: hidden;
-    margin-bottom: 0;
-}
-.info-table th, .info-table td {
-    text-align: left;
-    padding: 14px 16px;
-    font-size: 1.05rem;
-    border-bottom: 1px solid #f0f0f0;
-    vertical-align: top;
-}
-.info-table th {
-    color: #1a237e;
-    font-weight: 700;
-    background: #f5f7fa;
-    width: 200px;
-    letter-spacing: 0.01em;
-}
-.info-table tr:nth-child(even) td {
-    background: #fafbfc;
-}
-.info-table tr:last-child th, .info-table tr:last-child td {
-    border-bottom: none;
-}
-.info-table tr:hover td {
-    background: #e3f2fd;
-    transition: background 0.2s;
-}
-@media (max-width: 700px) {
-    .info-table, .info-table tbody, .info-table tr, .info-table th, .info-table td {
-        display: block;
-        width: 100%;
-    }
-    .info-table tr {
-        margin-bottom: 12px;
-        border-radius: 6px;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.03);
-        background: #fff;
-    }
-    .info-table th {
-        background: #f5f7fa;
-        color: #1a237e;
-        font-size: 1rem;
-        padding: 10px 12px 2px 12px;
-        border-bottom: none;
-        border-radius: 6px 6px 0 0;
-    }
-    .info-table td {
-        padding: 2px 12px 10px 12px;
-        font-size: 1.05rem;
-        background: #fafbfc;
-        border-bottom: none;
-        border-radius: 0 0 6px 6px;
-    }
-    .info-table tr:nth-child(even) td {
-        background: #f5f7fa;
-    }
 }
 /* Overview */
 .overview-box {
@@ -351,21 +296,3 @@ body {
     white-space: nowrap;
 }
 .price-tag::after { content: ''; display:none; }
-
-/* --- Footer full-width override --- */
-#brx-footer,
-#brx-footer .brxe-section {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-}
-#brx-footer .brxe-container,
-#brx-footer .brx-grid,
-#brx-footer .brxe-section > .brxe-container,
-#brx-footer .brxe-section > .brx-grid {
-    max-width: none !important;
-    width: 100% !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-}

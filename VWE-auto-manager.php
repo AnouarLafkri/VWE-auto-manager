@@ -1935,10 +1935,11 @@ function update_all_data() {
 
 // Update the get_xml_data function to use the new update mechanism
 function get_xml_data() {
-    // Check if we need to update and perform update if needed
-    if (needs_update()) {
-        error_log('Update needed, running update_all_data()');
-        update_all_data();
+    // Only check for updates, don't run them during frontend requests
+    // This prevents the heavy update process from running on every page load
+    if (needs_update() && !is_admin()) {
+        error_log('Update needed but skipping during frontend request - will run via cron');
+        // Don't call update_all_data() here - let the cron job handle it
     }
 
     if (!file_exists(LOCAL_XML_PATH)) {
@@ -1982,8 +1983,10 @@ function get_xml_data() {
     $vehicle_count = count($xml->voertuig);
     error_log('Found ' . $vehicle_count . ' vehicles in XML data');
 
-    // Download ontbrekende afbeeldingen als ze nog niet lokaal staan
-    ensure_all_images_exist();
+    // Only ensure images exist during admin requests or when explicitly needed
+    if (is_admin() || isset($_GET['force_image_check'])) {
+        ensure_all_images_exist();
+    }
 
     return $xml;
 }
