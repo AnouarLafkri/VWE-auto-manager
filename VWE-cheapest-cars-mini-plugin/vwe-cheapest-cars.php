@@ -97,6 +97,14 @@ function vwe_cheapest_cars_shortcode() {
     ob_start();
     echo '<div class="vwe-cheapest-cars">';
 
+    // Titel en knop boven de cards
+    // Pas de URL van de occasions-pagina aan indien nodig
+    $occasions_url = '/occasions';
+    echo '<div class="vwe-cheapest-cars-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">';
+    echo '<h2 class="vwe-cheapest-cars-title" style="margin: 0; font-size: 2.7rem;">Scherp geprijsd</h2>';
+    echo '<a class="vwe-cheapest-cars-btn" href="' . htmlspecialchars($occasions_url) . '" style="color: #7a2d19; font-weight: 700; text-decoration: none; font-size: 1.55rem; padding: 14px 32px; border-radius: 8px;">Bekijk alle occasions <span style="font-size: 1.3em; vertical-align: middle; font-weight: 900;">&rarr;</span></a>';
+    echo '</div>';
+
     // Debug informatie (tijdelijk uitgeschakeld)
     /*
     if (function_exists('current_user_can') && current_user_can('administrator')) {
