@@ -473,8 +473,9 @@ function display_car_listing() {
     $total_pages = ceil($total_items / $cars_per_page);
 
     echo '</div>';
+    echo '</div>'; // Close cars-container
 
-    // Add pagination controls
+    // Add pagination controls - buiten de cars-container voor centrering
     if ($total_pages > 1) {
         echo '<div class="pagination-controls">
             <button class="pagination-prev" onclick="changePage(-1)" disabled>Previous</button>
@@ -491,7 +492,6 @@ function display_car_listing() {
         </div>';
     }
 
-    echo '</div>'; // Close cars-container
     echo '</div></div>'; // Close main-content and vwe-page-wrapper
 
     // Add pagination JavaScript
@@ -678,6 +678,36 @@ function changePage(direction) {
     document.getElementById("carsGrid").scrollIntoView({ behavior: "smooth" });
 }
 
+function handleCheckboxGroupChange(checkbox, groupName) {
+    const allCheckboxes = document.querySelectorAll(`input[name="${groupName}"]`);
+    const allCheckbox = document.querySelector(`input[name="${groupName}"][value="all"]`);
+
+    if (checkbox.value === "all") {
+        // If "Alle" checkbox is clicked, uncheck all other checkboxes
+        allCheckboxes.forEach(cb => {
+            if (cb.value !== "all") {
+                cb.checked = false;
+            }
+        });
+    } else {
+        // If a specific checkbox is clicked, uncheck the "Alle" checkbox
+        if (allCheckbox) {
+            allCheckbox.checked = false;
+        }
+
+        // If no specific checkboxes are checked, check the "Alle" checkbox
+        const specificCheckboxes = Array.from(allCheckboxes).filter(cb => cb.value !== "all");
+        const anySpecificChecked = specificCheckboxes.some(cb => cb.checked);
+
+        if (!anySpecificChecked && allCheckbox) {
+            allCheckbox.checked = true;
+        }
+    }
+
+    // Apply filters after checkbox changes
+    applyFilters();
+}
+
 function resetAllFilters() {
     document.querySelectorAll("select").forEach(select => { select.value = ""; });
     document.querySelectorAll("input[type='number']").forEach(input => { input.value = ""; });
@@ -742,8 +772,16 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    document.querySelectorAll("input[name='year']").forEach(cb => { cb.addEventListener("change", applyFilters); });
-    document.querySelectorAll("input[name='status']").forEach(cb => { cb.addEventListener("change", applyFilters); });
+    document.querySelectorAll("input[name='year']").forEach(cb => {
+        cb.addEventListener("change", function() {
+            handleCheckboxGroupChange(this, 'year');
+        });
+    });
+    document.querySelectorAll("input[name='status']").forEach(cb => {
+        cb.addEventListener("change", function() {
+            handleCheckboxGroupChange(this, 'status');
+        });
+    });
     const resetButton = document.getElementById("resetFilters");
     if (resetButton) { resetButton.addEventListener("click", resetAllFilters); }
     const prevBtn = document.querySelector(".pagination-prev");

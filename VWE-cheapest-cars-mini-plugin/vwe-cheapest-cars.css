@@ -30,48 +30,6 @@ body {
     padding: 20px;
 }
 
-/* VWE Page Wrapper - occasions pagina */
-.vwe-page-wrapper {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 20px 20px 40px 20px; /* 20px padding aan de onderkant */
-}
-
-/* Responsive padding voor verschillende schermgroottes */
-@media (max-width: 1600px) {
-    .vwe-page-wrapper {
-        max-width: 1200px;
-        padding: 16px 16px 36px 16px;
-    }
-}
-
-@media (max-width: 1200px) {
-    .vwe-page-wrapper {
-        max-width: 1000px;
-        padding: 14px 14px 34px 14px;
-    }
-}
-
-@media (max-width: 992px) {
-    .vwe-page-wrapper {
-        max-width: 900px;
-        padding: 12px 12px 32px 12px;
-    }
-}
-
-@media (max-width: 768px) {
-    .vwe-page-wrapper {
-        max-width: 100%;
-        padding: 10px 10px 30px 10px;
-    }
-}
-
-@media (max-width: 480px) {
-    .vwe-page-wrapper {
-        padding: 8px 8px 28px 8px;
-    }
-}
-
 /* Optimize container width for different screen sizes */
 @media (max-width: 1600px) {
     .page-wrapper {
@@ -1771,45 +1729,36 @@ background-color: #FCFCFC;
     }
 }
 
-/* Pagination Controls - Centered on page */
+/* Pagination Controls */
 .pagination-controls {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 1rem;
-    margin: 3rem auto 2rem auto; /* Meer ruimte boven en onder */
+    margin-top: 2rem;
     flex-wrap: wrap;
-    width: 100%;
-    max-width: 600px; /* Beperk de breedte voor betere centrering */
 }
 
 .pagination-numbers {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    justify-content: center;
 }
 
 .pagination-number {
-    min-width: 40px; /* Iets groter voor betere klikbaarheid */
-    height: 40px;
+    min-width: 32px;
+    height: 32px;
     padding: 0 8px;
     border: 1px solid #e0e0e0;
     background: white;
     color: #333;
     font-size: 14px;
     font-weight: 500;
-    border-radius: 6px; /* Iets meer afgerond */
+    border-radius: 4px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
-}
-
-.pagination-number:hover {
-    background: #f5f5f5;
-    border-color: #ccc;
 }
 
 .pagination-number.active {
@@ -1826,26 +1775,19 @@ background-color: #FCFCFC;
 
 .pagination-prev,
 .pagination-next {
-    min-width: 40px;
-    height: 40px;
+    min-width: 32px;
+    height: 32px;
     padding: 0 12px;
     border: 1px solid #e0e0e0;
     background: white;
     color: #333;
     font-size: 14px;
     font-weight: 500;
-    border-radius: 6px;
+    border-radius: 4px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
-}
-
-.pagination-prev:hover,
-.pagination-next:hover {
-    background: #f5f5f5;
-    border-color: #ccc;
 }
 
 .pagination-prev:disabled,
@@ -1858,26 +1800,44 @@ background-color: #FCFCFC;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
     color: #666;
     font-weight: bold;
 }
 
-/* Cars Container - zonder paginering */
+@media (max-width: 768px) {
+    .pagination-controls {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .pagination-numbers {
+        order: 2;
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .pagination-prev,
+    .pagination-next {
+        order: 1;
+    }
+}
+
+/* Cars Container */
 .cars-container {
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    margin-bottom: 0; /* Verwijder bottom margin */
 }
 
-/* Cars Grid - zonder bottom margin */
+/* Cars Grid */
 .cars-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
-    margin-bottom: 0; /* Verwijder bottom margin */
+    margin-bottom: 2rem;
 }
 
 @media (max-width: 1200px) {
@@ -1894,19 +1854,6 @@ background-color: #FCFCFC;
     .pagination-controls {
         flex-direction: column;
         gap: 0.5rem;
-        margin: 2rem auto 1.5rem auto;
-    }
-
-    .pagination-numbers {
-        order: 2;
-        width: 100%;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-
-    .pagination-prev,
-    .pagination-next {
-        order: 1;
     }
 }
 

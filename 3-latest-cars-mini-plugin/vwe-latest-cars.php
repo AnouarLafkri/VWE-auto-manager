@@ -12,6 +12,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Laad de CSS voor de widget
+ */
+function vwe_latest_cars_enqueue_styles() {
+    wp_enqueue_style(
+        'vwe-latest-cars-styles',
+        plugin_dir_url(__FILE__) . 'vwe-latest-cars.css',
+        array(),
+        '1.0.0'
+    );
+}
+add_action('wp_enqueue_scripts', 'vwe_latest_cars_enqueue_styles');
+
+/**
  * Shortcode om drie nieuwste occasions te tonen.
  * Gebruik: [vwe_latest_cars]
  */
@@ -40,8 +53,7 @@ function vwe_latest_cars_shortcode() {
     $image_base = get_image_base_url();
 
     ob_start();
-    echo '<div class="vwe-latest-cars" style="display:flex;gap:20px;flex-wrap:wrap;">';
-    // Zelfde grid-structuur & card-functies als hoofdplugin
+    echo '<div class="vwe-latest-cars">';
     echo '<div class="cars-grid">';
     foreach ( $cars as $carNode ) {
         $car_arr = extract_car_data( $carNode, $image_base );
