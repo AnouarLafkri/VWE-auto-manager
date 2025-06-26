@@ -1568,9 +1568,18 @@ function display_car_card($car, $extra_class = '') {
 
     $class_attr = 'car-card' . ($extra_class ? ' ' . $extra_class : '');
 
+    $image_html = '';
+    if (strpos($extra_class, 'big-card') !== false) {
+        // For mini plugins: make image a link
+        $image_html = '<a href="/occasions/' . $url_title . '/"><img src="' . esc_url($car['eersteAfbeelding']) . '" alt="' . esc_attr($car['merk'] . ' ' . $car['model']) . '" loading="lazy" decoding="async"></a>';
+    } else {
+        // For normal cards: just the image
+        $image_html = '<img src="' . esc_url($car['eersteAfbeelding']) . '" alt="' . esc_attr($car['merk'] . ' ' . $car['model']) . '" loading="lazy" decoding="async">';
+    }
+
     echo '<div class="' . $class_attr . '" data-car=\'' . $jsonData . '\' data-car-id="' . $car_id . '">
         <div class="car-image">
-            <img src="' . esc_url($car['eersteAfbeelding']) . '" alt="' . esc_attr($car['merk'] . ' ' . $car['model']) . '" loading="lazy" decoding="async">
+            ' . $image_html . '
             <div class="car-badges">
                 <span class="status-badge ' . esc_attr($car['status']) . '">' .
                     ($car['status'] === "beschikbaar" ? "AVAILABLE" : ($car['status'] === "verkocht" ? "VERKOCHT" : "GERESERVEERD")) .
