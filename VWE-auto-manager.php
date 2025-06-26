@@ -1546,7 +1546,7 @@ function extract_car_data($car, $image_url_base) {
 /**
  * Display a single car card
  */
-function display_car_card($car) {
+function display_car_card($car, $extra_class = '') {
     // Generate unique identifier for the car
     $car_id = strtolower(str_replace(' ', '-', $car['merk'] . '-' . $car['model'] . '-' . $car['kenteken']));
 
@@ -1566,7 +1566,9 @@ function display_car_card($car) {
     // Gebruik vooraf berekende slug uit de array (gelijk aan sanitize_title)
     $url_title = $car['slug'];
 
-    echo '<div class="car-card" data-car=\'' . $jsonData . '\' data-car-id="' . $car_id . '">
+    $class_attr = 'car-card' . ($extra_class ? ' ' . $extra_class : '');
+
+    echo '<div class="' . $class_attr . '" data-car=\'' . $jsonData . '\' data-car-id="' . $car_id . '">
         <div class="car-image">
             <img src="' . esc_url($car['eersteAfbeelding']) . '" alt="' . esc_attr($car['merk'] . ' ' . $car['model']) . '" loading="lazy" decoding="async">
             <div class="car-badges">

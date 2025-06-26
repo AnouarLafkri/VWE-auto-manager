@@ -63,7 +63,7 @@ function vwe_latest_cars_shortcode() {
     echo '<div class="cars-grid">';
     foreach ( $cars as $carNode ) {
         $car_arr = extract_car_data( $carNode, $image_base );
-        display_car_card( $car_arr ); // gebruikt orig. card-markup
+        display_car_card( $car_arr, 'big-card' ); // gebruikt orig. card-markup, now with big-card
     }
     echo '</div></div>';
     return ob_get_clean();

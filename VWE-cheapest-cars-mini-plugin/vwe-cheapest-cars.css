@@ -2566,10 +2566,15 @@ background-color: #FCFCFC;
     }
 }
 
+
 /* --- Smaller car image heights --- */
 .cars-grid .car-card .car-image {
     height: 222px !important;
 }
 @media (max-width: 620px) {
   .cars-grid .car-card .car-image { height: 222px !important; }
+}
+/* --- Grote cards (big-card) --- */
+.cars-grid .car-card.big-card .car-image {
+    height: 322px !important;
 }
