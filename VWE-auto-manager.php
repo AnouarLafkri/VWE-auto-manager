@@ -34,6 +34,14 @@ if (!defined('IMAGE_URL_BASE')) {
     unset($vwe_img_tmp);
 }
 
+// Update image path constants
+if (!defined('SHARED_IMAGES_PATH')) {
+    define('SHARED_IMAGES_PATH', WP_CONTENT_DIR . '/plugins/xml/images/');
+}
+if (!defined('SHARED_IMAGES_URL_BASE')) {
+    define('SHARED_IMAGES_URL_BASE', content_url('plugins/xml/images/'));
+}
+
 // Cronjob configuration
 add_action('init', function() {
     if (!wp_next_scheduled('vwe_daily_update')) {
@@ -783,7 +791,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
     const resetButton = document.getElementById("resetFilters");
-    if (resetButton) { resetButton.addEventListener("click", resetAllFilters); }
+    if (resetButton) resetButton.addEventListener("click", resetAllFilters);
     const prevBtn = document.querySelector(".pagination-prev");
     const nextBtn = document.querySelector(".pagination-next");
     if (prevBtn) prevBtn.addEventListener("click", () => changePage(-1));
@@ -1241,7 +1249,7 @@ function generate_options($items) {
  * Helper function to get base URL for images
  */
 function get_image_base_url() {
-    return IMAGE_URL_BASE;
+    return SHARED_IMAGES_URL_BASE;
 }
 
 /**
@@ -1991,26 +1999,30 @@ function get_xml_data() {
         // Don't call update_all_data() here - let the cron job handle it
     }
 
-    if (!file_exists(LOCAL_XML_PATH)) {
-        error_log('XML file not found: ' . LOCAL_XML_PATH);
+    // Find any XML file in the shared /plugins/xml/ directory
+    $xml_dir = WP_CONTENT_DIR . '/plugins/xml/';
+    $xml_files = glob($xml_dir . '*.xml');
+    if (empty($xml_files)) {
+        error_log('No XML files found in ' . $xml_dir);
         return false;
     }
+    $xml_file = $xml_files[0];
 
     // Read XML file in chunks to handle large files
     $xml_content = '';
-    $handle = fopen(LOCAL_XML_PATH, 'r');
+    $handle = fopen($xml_file, 'r');
     if ($handle) {
         while (!feof($handle)) {
             $xml_content .= fread($handle, 8192); // Read in 8KB chunks
         }
         fclose($handle);
     } else {
-        error_log('Could not open XML file: ' . LOCAL_XML_PATH);
+        error_log('Could not open XML file: ' . $xml_file);
         return false;
     }
 
     if (empty($xml_content)) {
-        error_log('XML file is empty: ' . LOCAL_XML_PATH);
+        error_log('XML file is empty: ' . $xml_file);
         return false;
     }
 
@@ -2024,7 +2036,7 @@ function get_xml_data() {
 
     $xml = simplexml_load_string($xml_content);
     if (!$xml) {
-        error_log('Error parsing XML content from: ' . LOCAL_XML_PATH);
+        error_log('Error parsing XML content from: ' . $xml_file);
         return false;
     }
 
