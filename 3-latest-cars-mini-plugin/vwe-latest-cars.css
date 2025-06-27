@@ -2576,5 +2576,24 @@ background-color: #FCFCFC;
 }
 /* --- Grote cards (big-card) --- */
 .cars-grid .car-card.big-card .car-image {
-    height: 322px !important;
+    aspect-ratio: 16 / 9;
+    height: auto !important;
+    min-height: 322px;
+    max-height: 700px;
+}
+.cars-grid .car-card.big-card .car-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+@media (max-width: 1024px) {
+    .cars-grid .car-card.big-card .car-image {
+        height: 400px !important;
+    }
+}
+@media (max-width: 600px) {
+    .cars-grid .car-card.big-card .car-image {
+        height: 480px !important;
+    }
 }
