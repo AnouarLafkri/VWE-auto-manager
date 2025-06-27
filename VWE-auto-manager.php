@@ -20,13 +20,13 @@ define('VWE_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('FTP_SERVER', '91.184.31.234');
 define('FTP_USER', 'anmvs-auto');
 define('FTP_PASS', 'f6t23U~8t');
-define('REMOTE_IMAGES_PATH', '/staging.mvsautomotive.nl/wp-content/plugins/xml/images/');
-define('LOCAL_IMAGES_PATH', VWE_PLUGIN_DIR . 'images/');
+define('REMOTE_IMAGES_PATH', '/staging.mvsautomotive.nl/wp-content/plugins/VWE-auto-manager/xml/images/');
+define('LOCAL_IMAGES_PATH', WP_CONTENT_DIR . '/plugins/VWE-auto-manager/xml/images/');
 define('LOCAL_XML_PATH', VWE_PLUGIN_DIR . 'local_file.xml');
 define('DEBUG_MODE', false);
 define('LAST_UPDATE_FILE', VWE_PLUGIN_DIR . 'last_update.txt');
 define('UPDATE_INTERVAL', 86400); // 24 hours in seconds
-define('REMOTE_IMAGE_HTTP', 'https://staging.mvsautomotive.nl/wp-content/plugins/xml/images/');
+define('REMOTE_IMAGE_HTTP', 'https://staging.mvsautomotive.nl/wp-content/plugins/VWE-auto-manager/xml/images/');
 // Dynamisch pad naar de images-map binnen de plugin (hoofdletter‐safe)
 if (!defined('IMAGE_URL_BASE')) {
     $vwe_img_tmp = call_user_func('plugin_dir_url', __FILE__) . 'images/';
@@ -34,12 +34,46 @@ if (!defined('IMAGE_URL_BASE')) {
     unset($vwe_img_tmp);
 }
 
-// Update image path constants
+// Update image path constants - try multiple locations
 if (!defined('SHARED_IMAGES_PATH')) {
-    define('SHARED_IMAGES_PATH', WP_CONTENT_DIR . '/plugins/xml/images/');
+    define('SHARED_IMAGES_PATH', WP_CONTENT_DIR . '/plugins/VWE-auto-manager/xml/images/');
 }
+
 if (!defined('SHARED_IMAGES_URL_BASE')) {
-    define('SHARED_IMAGES_URL_BASE', content_url('plugins/xml/images/'));
+    define('SHARED_IMAGES_URL_BASE', content_url('plugins/VWE-auto-manager/xml/images/'));
+}
+
+/**
+ * Initialize image paths after WordPress is loaded
+ */
+function vwe_init_image_paths() {
+    // Check if images directory exists in plugin directory
+    $plugin_images_path = VWE_PLUGIN_DIR . 'images/';
+    if (is_dir($plugin_images_path)) {
+        // Images are in plugin directory - this is already set correctly
+        error_log('Using images from plugin directory: ' . $plugin_images_path);
+    } else {
+        // Try alternative locations
+        $alternative_paths = [
+            WP_CONTENT_DIR . '/plugins/VWE-auto-manager/xml/images/',
+            WP_CONTENT_DIR . '/plugins/xml/images/',
+            WP_CONTENT_DIR . '/uploads/vwe-images/'
+        ];
+
+        foreach ($alternative_paths as $path) {
+            if (is_dir($path)) {
+                error_log('Found images in alternative location: ' . $path);
+                // Update the constants dynamically
+                if (!defined('SHARED_IMAGES_PATH_OVERRIDE')) {
+                    define('SHARED_IMAGES_PATH_OVERRIDE', $path);
+                }
+                if (!defined('SHARED_IMAGES_URL_BASE_OVERRIDE')) {
+                    define('SHARED_IMAGES_URL_BASE_OVERRIDE', content_url(str_replace(WP_CONTENT_DIR, '', $path)));
+                }
+                break;
+            }
+        }
+    }
 }
 
 // Cronjob configuration
@@ -223,11 +257,16 @@ function cleanup_unused_images() {
  * Display car listing with improved performance
  */
 function display_car_listing() {
+    error_log('display_car_listing() called');
+
     $xml = get_xml_data();
     if (!$xml) {
+        error_log('Failed to get XML data in display_car_listing');
         echo "<div class='error-message'>Error loading XML data. Please check the error logs for more information.</div>";
         return;
     }
+
+    error_log('XML data loaded successfully, converting to array...');
 
     // Convert SimpleXMLElement to array
     $cars = [];
@@ -236,10 +275,15 @@ function display_car_listing() {
     }
 
     $total_items = count($cars);
+    error_log('Total cars found: ' . $total_items);
+
     if ($total_items === 0) {
+        error_log('No cars found in XML data');
         echo "<div class='error-message'>No cars found in the XML data.</div>";
         return;
     }
+
+    error_log('Starting to display car listing with ' . $total_items . ' cars');
 
     $image_url_base = get_image_base_url();
     output_css_styles();
@@ -249,10 +293,23 @@ function display_car_listing() {
 
     echo '<div class="vwe-page-wrapper">';
 
+    // Mobile filter toggle button
+    echo '<button class="mobile-filter-toggle" id="mobileFilterToggle" type="button">
+        <i class="fas fa-filter"></i>
+        <span>Filters</span>
+    </button>';
+
+    // Filters overlay
+    echo '<div class="filters-overlay" id="filtersOverlay"></div>';
+
     echo '<div class="main-content" style="display:flex; flex-direction:row; align-items:flex-start; gap:30px;">';
 
     // Filters panel links
-    echo '<aside class="filters-panel">';
+    echo '<aside class="filters-panel" id="filtersPanel">';
+    echo '<div class="filters-header">
+        <h2>Filters & Sorteren</h2>
+        <button class="close-filters" type="button">&times;</button>
+    </div>';
     echo '<div class="filters-body">';
     echo '<div class="filter-group">
                 <div class="filters-title">FILTERS & SORTS</div>
@@ -441,25 +498,25 @@ function display_car_listing() {
     echo '<div class="content-right" style="flex:1; display:flex; flex-direction:column; gap:24px;">';
     // Filter bar boven de cards
     echo '<div class="filter-bar">';
-    echo '<div class="result-count" id="resultCount">0 results found</div>';
+    echo '<div class="result-count" id="resultCount">0 resultaten gevonden</div>';
     echo '<div class="dropdown-group">';
     echo '<div class="custom-select">
         <select id="sortSelect" class="filter-dropdown">
-            <option value="">Sort By Default</option>
-            <option value="prijs-asc">Price (Low-High)</option>
-            <option value="prijs-desc">Price (High-Low)</option>
-            <option value="km-asc">Mileage (Low-High)</option>
-            <option value="km-desc">Mileage (High-Low)</option>
-            <option value="jaar-desc">Newest First</option>
-            <option value="jaar-asc">Oldest First</option>
+            <option value="">Sorteren op standaard</option>
+            <option value="prijs-asc">Prijs (laag-hoog)</option>
+            <option value="prijs-desc">Prijs (hoog-laag)</option>
+            <option value="km-asc">Kilometerstand (laag-hoog)</option>
+            <option value="km-desc">Kilometerstand (hoog-laag)</option>
+            <option value="jaar-desc">Nieuwste eerst</option>
+            <option value="jaar-asc">Oudste eerst</option>
         </select>
     </div>';
     echo '<div class="custom-select">
         <select id="showSelect" class="filter-dropdown">
-            <option value="12">Show 12</option>
-            <option value="24">Show 24</option>
-            <option value="50">Show 50</option>
-            <option value="100">Show 100</option>
+            <option value="12">Toon 12</option>
+            <option value="24">Toon 24</option>
+            <option value="50">Toon 50</option>
+            <option value="100">Toon 100</option>
         </select>
     </div>';
     echo '</div>';
@@ -483,10 +540,10 @@ function display_car_listing() {
     echo '</div>';
     echo '</div>'; // Close cars-container
 
-    // Add pagination controls - buiten de cars-container voor centrering
-    if ($total_pages > 1) {
-        echo '<div class="pagination-controls">
-            <button class="pagination-prev" onclick="changePage(-1)" disabled>Previous</button>
+    // Add pagination controls - alleen tonen als er meer dan 9 auto's zijn
+    if ($total_items > $cars_per_page) {
+        echo '<div class="pagination-controls" id="paginationControls" style="display: none;">
+            <button class="pagination-prev" onclick="changePage(-1)" disabled>Vorige</button>
             <div class="pagination-numbers">';
 
         // Show all page numbers
@@ -496,7 +553,7 @@ function display_car_listing() {
         }
 
         echo '</div>
-            <button class="pagination-next" onclick="changePage(1)">Next</button>
+            <button class="pagination-next" onclick="changePage(1)">Volgende</button>
         </div>';
     }
 
@@ -511,6 +568,33 @@ let carsPerPage = 9; // Default value, will be updated by showSelect
 let allCars = __ALL_CARS_JSON__;
 let filteredCars = allCars.slice();
 const totalItems = allCars.length;
+
+// Utility functions
+function safeParseFloat(value) {
+    if (!value) return NaN;
+    const cleaned = value.toString().replace(/[^0-9.,]/g, '').replace(',', '.');
+    return parseFloat(cleaned);
+}
+
+function safeParseInt(value) {
+    if (!value) return NaN;
+    const cleaned = value.toString().replace(/[^0-9]/g, '');
+    return parseInt(cleaned, 10);
+}
+
+function getElementSafely(id) {
+    try {
+        return document.getElementById(id);
+    } catch (error) {
+        console.error('Error getting element:', id, error);
+        return null;
+    }
+}
+
+function getElementValueSafely(id) {
+    const element = getElementSafely(id);
+    return element ? element.value : '';
+}
 
 function checkFilters(carData) {
     const brandFilter = document.getElementById("brandFilter").value;
@@ -605,10 +689,27 @@ function renderCars() {
 
 function updatePagination() {
     const totalPages = Math.ceil(filteredCars.length / carsPerPage);
+    const paginationControls = document.getElementById('paginationControls');
+
+    // Hide pagination if there's only 1 page or no results or less than 10 cars
+    if (totalPages <= 1 || filteredCars.length === 0 || filteredCars.length <= 9) {
+        if (paginationControls) {
+            paginationControls.style.display = 'none';
+        }
+        return;
+    }
+
+    // Show pagination if it was hidden and we have more than 9 cars
+    if (paginationControls && filteredCars.length > 9) {
+        paginationControls.style.display = 'flex';
+    }
 
     // Update Previous/Next buttons
-    document.querySelector(".pagination-prev").disabled = currentPage === 1;
-    document.querySelector(".pagination-next").disabled = currentPage === totalPages || totalPages === 0;
+    const prevBtn = document.querySelector(".pagination-prev");
+    const nextBtn = document.querySelector(".pagination-next");
+
+    if (prevBtn) prevBtn.disabled = currentPage === 1;
+    if (nextBtn) nextBtn.disabled = currentPage === totalPages || totalPages === 0;
 
     // Update page number buttons
     const pageButtons = document.querySelectorAll('.pagination-number');
@@ -620,8 +721,19 @@ function updatePagination() {
 }
 
 function goToPage(page) {
-    if (page < 1 || page > Math.ceil(filteredCars.length / carsPerPage)) return;
+    const totalPages = Math.ceil(filteredCars.length / carsPerPage);
+    if (page < 1 || page > totalPages || totalPages <= 1 || filteredCars.length <= 9) return;
     currentPage = page;
+    renderCars();
+    updatePagination();
+    document.getElementById("carsGrid").scrollIntoView({ behavior: "smooth" });
+}
+
+function changePage(direction) {
+    const totalPages = Math.ceil(filteredCars.length / carsPerPage);
+    const newPage = currentPage + direction;
+    if (newPage < 1 || newPage > totalPages || totalPages <= 1 || filteredCars.length <= 9) return;
+    currentPage = newPage;
     renderCars();
     updatePagination();
     document.getElementById("carsGrid").scrollIntoView({ behavior: "smooth" });
@@ -638,48 +750,84 @@ function applyFilters() {
 }
 
 function sortCars() {
-    const sortValue = document.getElementById("sortSelect").value;
-    if (!sortValue) return;
+    try {
+        const sortSelect = getElementSafely("sortSelect");
+        if (!sortSelect) return;
 
-    const [sortBy, sortOrder] = sortValue.split("-");
+        const sortValue = sortSelect.value;
 
-    filteredCars.sort((a, b) => {
-        let valA, valB;
-
-        if (sortBy === "prijs") {
-            valA = parseFloat((a.prijs || '').toString().replace(/[^0-9.]/g, ''));
-            valB = parseFloat((b.prijs || '').toString().replace(/[^0-9.]/g, ''));
-        } else if (sortBy === "km") {
-            valA = parseFloat((a.kilometerstand || '').toString().replace(/[^0-9]/g, ""));
-            valB = parseFloat((b.kilometerstand || '').toString().replace(/[^0-9]/g, ""));
-        } else if (sortBy === "jaar") {
-            valA = parseInt(a.bouwjaar);
-            valB = parseInt(b.bouwjaar);
-        } else {
-            return 0; // No specific sort, maintain current order
+        // If no sort value or default, maintain original order
+        if (!sortValue || sortValue === "") {
+            // Restore original order from allCars
+            const carIds = allCars.map(car => car.id || car.kenteken || car.merk + car.model);
+            filteredCars.sort((a, b) => {
+                const aId = a.id || a.kenteken || a.merk + a.model;
+                const bId = b.id || b.kenteken || b.merk + b.model;
+                return carIds.indexOf(aId) - carIds.indexOf(bId);
+            });
+            return;
         }
 
-        if (isNaN(valA)) valA = sortOrder === 'asc' ? Infinity : -Infinity;
-        if (isNaN(valB)) valB = sortOrder === 'asc' ? Infinity : -Infinity;
+        // Apply smart sorting first
+        if (sortValue.startsWith('smart-')) {
+            filteredCars = smartSort(filteredCars);
+            return;
+        }
 
-        if (valA < valB) return sortOrder === "asc" ? -1 : 1;
-        if (valA > valB) return sortOrder === "asc" ? 1 : -1;
-        return 0;
-    });
+        // Apply regular sorting
+        const [sortBy, sortOrder] = sortValue.split("-");
+
+        if (!sortBy || !sortOrder) {
+            console.warn('Invalid sort value:', sortValue);
+            return;
+        }
+
+        filteredCars.sort((a, b) => {
+            try {
+                let valA, valB;
+
+                if (sortBy === "prijs") {
+                    valA = safeParseFloat(a.prijs);
+                    valB = safeParseFloat(b.prijs);
+                } else if (sortBy === "km") {
+                    valA = safeParseFloat(a.kilometerstand);
+                    valB = safeParseFloat(b.kilometerstand);
+                } else if (sortBy === "jaar") {
+                    valA = safeParseInt(a.bouwjaar);
+                    valB = safeParseInt(b.bouwjaar);
+                } else {
+                    return 0;
+                }
+
+                // Handle NaN values
+                if (isNaN(valA)) valA = sortOrder === 'asc' ? Infinity : -Infinity;
+                if (isNaN(valB)) valB = sortOrder === 'asc' ? Infinity : -Infinity;
+
+                if (valA < valB) return sortOrder === "asc" ? -1 : 1;
+                if (valA > valB) return sortOrder === "asc" ? 1 : -1;
+                return 0;
+            } catch (error) {
+                console.error('Error in sort comparison:', error);
+                return 0;
+            }
+        });
+    } catch (error) {
+        console.error('Error in sortCars:', error);
+    }
 }
 
 function updateResultsCount() {
     const resultCountElement = document.getElementById("resultCount");
     if (resultCountElement) {
         const count = filteredCars.length;
-        resultCountElement.textContent = count + (count === 1 ? " result found" : " results found");
+        resultCountElement.textContent = count + (count === 1 ? " resultaat gevonden" : " resultaten gevonden");
     }
 }
 
 function changePage(direction) {
     const totalPages = Math.ceil(filteredCars.length / carsPerPage);
     const newPage = currentPage + direction;
-    if (newPage < 1 || newPage > totalPages) return;
+    if (newPage < 1 || newPage > totalPages || totalPages <= 1) return;
     currentPage = newPage;
     renderCars();
     updatePagination();
@@ -1249,6 +1397,24 @@ function generate_options($items) {
  * Helper function to get base URL for images
  */
 function get_image_base_url() {
+    // First check if we have an override
+    if (defined('SHARED_IMAGES_URL_BASE_OVERRIDE')) {
+        return SHARED_IMAGES_URL_BASE_OVERRIDE;
+    }
+
+    // Check if images exist in the correct xml/images directory
+    $xml_images_path = WP_CONTENT_DIR . '/plugins/VWE-auto-manager/xml/images/';
+    if (is_dir($xml_images_path)) {
+        return content_url('plugins/VWE-auto-manager/xml/images/');
+    }
+
+    // Check if images exist in plugin directory
+    $plugin_images_path = VWE_PLUGIN_DIR . 'images/';
+    if (is_dir($plugin_images_path)) {
+        return VWE_PLUGIN_URL . 'images/';
+    }
+
+    // Fallback to the default
     return SHARED_IMAGES_URL_BASE;
 }
 
@@ -1693,7 +1859,7 @@ function download_xml_from_ftp() {
     }
 
     // Define remote and local XML paths
-    $remote_xml_path = '/staging.mvsautomotive.nl/wp-content/plugins/xml/voertuigen.xml';
+    $remote_xml_path = '/staging.mvsautomotive.nl/wp-content/plugins/VWE-auto-manager/xml/voertuigen.xml';
     $local_xml_path = LOCAL_XML_PATH;
     $temp_xml_path = $local_xml_path . '.temp';
 
@@ -1999,14 +2165,32 @@ function get_xml_data() {
         // Don't call update_all_data() here - let the cron job handle it
     }
 
-    // Find any XML file in the shared /plugins/xml/ directory
-    $xml_dir = WP_CONTENT_DIR . '/plugins/xml/';
-    $xml_files = glob($xml_dir . '*.xml');
+    // Look for XML files in the plugin directory first
+    $plugin_xml_dir = VWE_PLUGIN_DIR;
+    $xml_files = glob($plugin_xml_dir . '*.xml');
+
+    // If no XML files found in plugin directory, try the shared /plugins/xml/ directory
     if (empty($xml_files)) {
-        error_log('No XML files found in ' . $xml_dir);
+        $xml_dir = WP_CONTENT_DIR . '/plugins/xml/';
+        $xml_files = glob($xml_dir . '*.xml');
+    }
+
+    // If still no XML files found, try the specific path mentioned by user
+    if (empty($xml_files)) {
+        $specific_xml_dir = WP_CONTENT_DIR . '/plugins/VWE-auto-manager/xml/';
+        if (is_dir($specific_xml_dir)) {
+            $xml_files = glob($specific_xml_dir . '*.xml');
+        }
+    }
+
+    if (empty($xml_files)) {
+        error_log('No XML files found in any of the expected directories');
+        error_log('Searched in: ' . $plugin_xml_dir . ', ' . WP_CONTENT_DIR . '/plugins/xml/, and ' . WP_CONTENT_DIR . '/plugins/VWE-auto-manager/xml/');
         return false;
     }
+
     $xml_file = $xml_files[0];
+    error_log('Using XML file: ' . $xml_file);
 
     // Read XML file in chunks to handle large files
     $xml_content = '';
@@ -2100,6 +2284,8 @@ function output_image_preload($cars) {
 add_action('init', 'vwe_init');
 add_action('wp_enqueue_scripts', 'vwe_enqueue_scripts');
 add_shortcode('vwe_auto_listing', 'vwe_display_car_listing');
+add_shortcode('vwe_debug_xml', 'vwe_debug_xml_data');
+add_shortcode('vwe_debug_images', 'vwe_debug_images');
 
 /**
  * Initialize plugin
@@ -2134,6 +2320,15 @@ function vwe_enqueue_scripts() {
         plugins_url('js/scripts.js', __FILE__),
         array('jquery'),
         filemtime(VWE_PLUGIN_DIR . 'js/scripts.js'),
+        true
+    );
+
+    // Mobile filters script
+    wp_enqueue_script(
+        'vwe-mobile-filters',
+        plugins_url('assets/js/vwe-mobile-filters.js', __FILE__),
+        array(),
+        filemtime(VWE_PLUGIN_DIR . 'assets/js/vwe-mobile-filters.js'),
         true
     );
 
@@ -2531,4 +2726,88 @@ function vwe_should_load_assets() {
     }
 
     return false;
+}
+
+/**
+ * Debug function to test XML data loading
+ */
+function vwe_debug_xml_data($atts) {
+    error_log('vwe_debug_xml_data() called');
+
+    $xml = get_xml_data();
+    if (!$xml) {
+        return '<div style="color: red; padding: 20px; border: 1px solid red;">Failed to load XML data</div>';
+    }
+
+    $cars = [];
+    foreach ($xml->voertuig as $car) {
+        $cars[] = $car;
+    }
+
+    $output = '<div style="padding: 20px; border: 1px solid #ccc; margin: 20px;">';
+    $output .= '<h3>XML Debug Info</h3>';
+    $output .= '<p><strong>Total cars found:</strong> ' . count($cars) . '</p>';
+
+    if (count($cars) > 0) {
+        $output .= '<h4>First 3 cars:</h4>';
+        $output .= '<ul>';
+        for ($i = 0; $i < min(3, count($cars)); $i++) {
+            $car = $cars[$i];
+            $output .= '<li>';
+            $output .= '<strong>Merk:</strong> ' . htmlspecialchars((string)$car->merk) . '<br>';
+            $output .= '<strong>Model:</strong> ' . htmlspecialchars((string)$car->model) . '<br>';
+            $output .= '<strong>Bouwjaar:</strong> ' . htmlspecialchars((string)$car->bouwjaar) . '<br>';
+            $output .= '<strong>Prijs:</strong> €' . htmlspecialchars((string)$car->prijs) . '<br>';
+            $output .= '</li>';
+        }
+        $output .= '</ul>';
+    }
+
+    $output .= '</div>';
+
+    return $output;
+}
+
+/**
+ * Debug function to test image locations
+ */
+function vwe_debug_images($atts) {
+    $output = '<div style="padding: 20px; border: 1px solid #ccc; margin: 20px;">';
+    $output .= '<h3>Image Debug Info</h3>';
+
+    // Test different image locations
+    $locations = [
+        'Plugin Directory' => VWE_PLUGIN_DIR . 'images/',
+        'Shared Images Path' => SHARED_IMAGES_PATH,
+        'Image URL Base' => get_image_base_url(),
+        'Plugin URL' => VWE_PLUGIN_URL . 'images/'
+    ];
+
+    $output .= '<h4>Image Locations:</h4>';
+    $output .= '<ul>';
+    foreach ($locations as $name => $path) {
+        $exists = is_dir($path) ? 'EXISTS' : 'NOT FOUND';
+        $output .= '<li><strong>' . $name . ':</strong> ' . htmlspecialchars($path) . ' - <span style="color: ' . (is_dir($path) ? 'green' : 'red') . ';">' . $exists . '</span></li>';
+    }
+    $output .= '</ul>';
+
+    // Test if we can find any images
+    $plugin_images = glob(VWE_PLUGIN_DIR . 'images/*.{jpg,jpeg,png,gif,JPG,JPEG,PNG,GIF}', GLOB_BRACE);
+    $shared_images = glob(SHARED_IMAGES_PATH . '*.{jpg,jpeg,png,gif,JPG,JPEG,PNG,GIF}', GLOB_BRACE);
+
+    $output .= '<h4>Found Images:</h4>';
+    $output .= '<p><strong>Plugin directory:</strong> ' . count($plugin_images) . ' images</p>';
+    $output .= '<p><strong>Shared directory:</strong> ' . count($shared_images) . ' images</p>';
+
+    if (count($plugin_images) > 0) {
+        $output .= '<p><strong>First 3 plugin images:</strong></p><ul>';
+        for ($i = 0; $i < min(3, count($plugin_images)); $i++) {
+            $output .= '<li>' . htmlspecialchars(basename($plugin_images[$i])) . '</li>';
+        }
+        $output .= '</ul>';
+    }
+
+    $output .= '</div>';
+
+    return $output;
 }

@@ -277,7 +277,7 @@ background-color: #FCFCFC;
     background: #fff;
     color: #222;
     min-width: 120px;
-    max-width: 150px;
+    max-width: 190px;
     box-shadow: none;
     outline: none;
     transition: border 0.2s;
@@ -1782,8 +1782,9 @@ background-color: #FCFCFC;
     gap: 1rem;
     margin: 3rem auto 2rem auto; /* Meer ruimte boven en onder */
     flex-wrap: wrap;
-    width: 100%;
+    width: auto; /* Verander van 100% naar auto */
     max-width: 600px; /* Beperk de breedte voor betere centrering */
+    padding: 0 20px; /* Voeg padding toe voor ruimte aan de zijkanten */
 }
 
 .pagination-numbers {
@@ -1791,6 +1792,7 @@ background-color: #FCFCFC;
     align-items: center;
     gap: 0.5rem;
     justify-content: center;
+    flex-wrap: wrap; /* Zorg ervoor dat nummers kunnen wrappen op kleine schermen */
 }
 
 .pagination-number {
@@ -1808,6 +1810,7 @@ background-color: #FCFCFC;
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
+    flex-shrink: 0; /* Voorkom dat knoppen krimpen */
 }
 
 .pagination-number:hover {
@@ -1843,6 +1846,7 @@ background-color: #FCFCFC;
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
+    flex-shrink: 0; /* Voorkom dat knoppen krimpen */
 }
 
 .pagination-prev:hover,
@@ -1865,6 +1869,7 @@ background-color: #FCFCFC;
     height: 40px;
     color: #666;
     font-weight: bold;
+    flex-shrink: 0; /* Voorkom dat ellipsis krimpt */
 }
 
 /* Cars Container - zonder paginering */
@@ -1898,18 +1903,31 @@ background-color: #FCFCFC;
         flex-direction: column;
         gap: 0.5rem;
         margin: 2rem auto 1.5rem auto;
+        width: auto;
+        max-width: 400px; /* Kleinere max-width op mobiel */
+        padding: 0 15px; /* Minder padding op mobiel */
     }
 
     .pagination-numbers {
         order: 2;
-        width: 100%;
+        width: auto; /* Verander van 100% naar auto */
         justify-content: center;
         flex-wrap: wrap;
+        gap: 0.25rem; /* Kleinere gap op mobiel */
     }
 
     .pagination-prev,
     .pagination-next {
         order: 1;
+        min-width: 35px; /* Iets kleiner op mobiel */
+        height: 35px;
+        font-size: 13px;
+    }
+
+    .pagination-number {
+        min-width: 35px; /* Iets kleiner op mobiel */
+        height: 35px;
+        font-size: 13px;
     }
 }
 
@@ -2332,16 +2350,27 @@ background-color: #FCFCFC;
 /* Mobile Filter Toggle */
 .mobile-filter-toggle {
     display: none;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 20px;
-    background: #63C3DB;
-    color: white;
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    right: auto;
+    width: auto;
+    min-width: 80px;
+    height: 50px;
+    background: var(--primary-color);
     border: none;
-    border-radius: 8px;
+    border-radius: 25px;
+    color: white;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    margin-bottom: 20px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: var(--transition);
+    padding: 0 16px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .mobile-filter-toggle i {
@@ -2577,4 +2606,31 @@ background-color: #FCFCFC;
 /* --- Grote cards (big-card) --- */
 .cars-grid .car-card.big-card .car-image {
     height: 322px !important;
+}
+
+@media (max-width: 480px) {
+    .pagination-controls {
+        max-width: 350px; /* Nog kleinere max-width op zeer kleine schermen */
+        padding: 0 10px; /* Nog minder padding */
+        gap: 0.25rem; /* Kleinere gap */
+    }
+
+    .pagination-numbers {
+        gap: 0.2rem; /* Nog kleinere gap tussen nummers */
+    }
+
+    .pagination-prev,
+    .pagination-next {
+        min-width: 32px; /* Nog kleiner op zeer kleine schermen */
+        height: 32px;
+        font-size: 12px;
+        padding: 0 8px;
+    }
+
+    .pagination-number {
+        min-width: 32px; /* Nog kleiner op zeer kleine schermen */
+        height: 32px;
+        font-size: 12px;
+        padding: 0 6px;
+    }
 }
