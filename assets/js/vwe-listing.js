@@ -301,8 +301,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     <img src="${image}"
                          alt="${carData.merk} ${carData.model} - Image ${index + 1}"
                          loading="lazy"
-                         decoding="async"
-                         onclick="openLightbox('${image}')">
+                         decoding="async">
                 `;
                 carouselSlides.appendChild(slide);
 

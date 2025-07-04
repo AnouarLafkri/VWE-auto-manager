@@ -143,8 +143,7 @@ get_header();
                              alt="<?php echo esc_attr($car_title . ' foto ' . ($i+1)); ?>"
                              loading="lazy"
                              class="clickable-image"
-                             data-image-index="<?php echo $i; ?>"
-                             onclick="openLightbox(<?php echo $i; ?>)">
+                             data-image-index="<?php echo $i; ?>">
                     </div>
                 <?php endforeach; ?>
                 <button class="carousel-arrow left" id="carouselPrev" aria-label="Vorige foto">&#10094;</button>
@@ -221,26 +220,10 @@ get_header();
                              alt="<?php echo esc_attr($car_title); ?>"
                              loading="lazy"
                              class="clickable-image"
-                             data-image-index="<?php echo $i; ?>"
-                             onclick="openLightbox(<?php echo $i; ?>)">
+                             data-image-index="<?php echo $i; ?>">
                     </div>
                 <?php endforeach; ?>
             </div>
-        </div>
-    </div>
-</div>
-
-<!-- Lightbox Modal -->
-<div id="lightbox" class="lightbox">
-    <div class="lightbox-content">
-        <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
-        <button class="lightbox-arrow lightbox-prev" onclick="changeLightboxImage(-1)">&#10094;</button>
-        <button class="lightbox-arrow lightbox-next" onclick="changeLightboxImage(1)">&#10095;</button>
-        <div class="lightbox-image-container">
-            <img id="lightbox-image" src="" alt="">
-        </div>
-        <div class="lightbox-counter">
-            <span id="lightbox-current">1</span> / <span id="lightbox-total"><?php echo count($car_data['afbeeldingen']); ?></span>
         </div>
     </div>
 </div>
@@ -249,55 +232,6 @@ get_header();
 // Store images array globally for lightbox
 const lightboxImages = <?php echo json_encode($car_data['afbeeldingen']); ?>;
 let currentLightboxIndex = 0;
-
-function openLightbox(imageIndex) {
-    try {
-        currentLightboxIndex = imageIndex;
-        const lightbox = document.getElementById('lightbox');
-        const lightboxImage = document.getElementById('lightbox-image');
-        const currentSpan = document.getElementById('lightbox-current');
-
-        if (!lightbox || !lightboxImage || !currentSpan) {
-            console.error('Lightbox elements not found');
-            return;
-        }
-
-        if (imageIndex < 0 || imageIndex >= lightboxImages.length) {
-            console.error('Invalid image index:', imageIndex);
-            return;
-        }
-
-        lightboxImage.src = lightboxImages[imageIndex];
-        lightboxImage.alt = '<?php echo esc_js($car_title); ?> - Foto ' + (imageIndex + 1);
-        currentSpan.textContent = imageIndex + 1;
-
-        lightbox.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    } catch (error) {
-        console.error('Error opening lightbox:', error);
-    }
-}
-
-function closeLightbox() {
-    try {
-        const lightbox = document.getElementById('lightbox');
-        if (lightbox) {
-            lightbox.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-    } catch (error) {
-        console.error('Error closing lightbox:', error);
-    }
-}
-
-function changeLightboxImage(direction) {
-    try {
-        const newIndex = (currentLightboxIndex + direction + lightboxImages.length) % lightboxImages.length;
-        openLightbox(newIndex);
-    } catch (error) {
-        console.error('Error changing lightbox image:', error);
-    }
-}
 
 // Share car function
 function shareCar() {
@@ -478,9 +412,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.preventDefault();
                 toggleAutoPlay();
                 break;
-            case 'Escape':
-                closeLightbox();
-                break;
         }
     });
 
@@ -533,21 +464,6 @@ document.addEventListener('DOMContentLoaded', function() {
             tabContents.forEach(c => c.classList.toggle('active', c.id === target));
         });
     });
-
-    // Lightbox event listeners
-    const lightbox = document.getElementById('lightbox');
-    if (lightbox) {
-        lightbox.addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeLightbox();
-            }
-        });
-    }
-
-    // Initialize first slide as active
-    if (slides.length > 0) {
-        showSlide(0);
-    }
 });
 </script>
 

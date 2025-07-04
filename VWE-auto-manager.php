@@ -1013,8 +1013,7 @@ function openModal(carData) {
                 <img src="${image}"
                      alt="${carData.merk} ${carData.model} - Image ${index + 1}"
                      loading="lazy"
-                     decoding="async"
-                     onclick="openLightbox(this.src)">
+                     decoding="async">
             `;
             carouselSlides.appendChild(slide);
 

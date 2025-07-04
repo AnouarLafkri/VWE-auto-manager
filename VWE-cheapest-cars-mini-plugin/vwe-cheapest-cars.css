@@ -748,9 +748,7 @@ background-color: #FCFCFC;
     transition: transform 0.3s ease;
 }
 
-.carousel-slide img:hover {
-    transform: scale(1.02);
-}
+
 
 .carousel-prev,
 .carousel-next {
