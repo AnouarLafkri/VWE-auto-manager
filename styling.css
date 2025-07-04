@@ -32,12 +32,12 @@ body {
     line-height: 1.5;
     margin: 0;
     padding: 0;
-    background: #ffffff !important;
+    background: #ffffff;
 }
 
 /* Utility classes */
-.hide { display: none !important; }
-.show { display: block !important; }
+.hide { display: none; }
+.show { display: block; }
 
 /* ========================================
    2. LAYOUT CONTAINERS
@@ -49,9 +49,9 @@ body {
 }
 
 .vwe-page-wrapper {
-    padding-bottom: 0 !important;
-    margin-bottom: 0 !important;
-    background: transparent !important;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    background: transparent;
 }
 
 .main-content {
@@ -259,14 +259,14 @@ body {
     font-size: 14px;
     font-weight: 600;
     color: #444;
-    margin-bottom: 0 !important;
+    margin-bottom: 0;
     padding: 0 5px;
     width: 100%;
     box-sizing: border-box;
 }
 
 .custom-select {
-    margin-top: 0 !important;
+    margin-top: 0;
     margin-bottom: 5px;
     padding: 0 5px;
     width: 100%;
@@ -275,7 +275,7 @@ body {
 }
 
 .custom-select select {
-    margin-top: 0 !important;
+    margin-top: 0;
     border-radius: 6px;
     width: 100%;
     box-sizing: border-box;
@@ -576,7 +576,7 @@ body {
     font-size: 14px;
     font-weight: 600;
     color: #444;
-    margin-bottom: 0 !important;
+    margin-bottom: 0;
     padding: 0 5px;
     width: 100%;
     box-sizing: border-box;
@@ -584,7 +584,7 @@ body {
 
 /* Select dropdowns */
 .custom-select {
-    margin-top: 0 !important;
+    margin-top: 0;
     margin-bottom: 5px;
     padding: 0 5px;
     width: 100%;
@@ -593,7 +593,7 @@ body {
 }
 
 .custom-select select {
-    margin-top: 0 !important;
+    margin-top: 0;
     border-radius: 6px;
     width: 100%;
     box-sizing: border-box;
@@ -728,7 +728,7 @@ body {
 .car-image img {
     object-fit: fill;
     transition: filter 0.4s ease, border-color 0.3s ease;
-    object-position: center 50% !important;
+    object-position: center 50%;
     background: #f5f5f5;
 }
 
@@ -1075,8 +1075,8 @@ body {
     display: flex;
     align-items: center;
     gap: 6px;
-    border: none !important;
-    background: transparent !important;
+    border: none;
+    background: transparent;
 }
 
 .specs-grid {
@@ -1090,9 +1090,9 @@ body {
     flex-direction: column;
     padding: 0;
     margin: 0;
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
+    background: transparent;
+    border: none;
+    box-shadow: none;
     align-items: flex-start;
 }
 
@@ -1108,16 +1108,16 @@ body {
 }
 
 .spec-label i {
-    color: #34BBE0 !important;
+    color: #34BBE0;
 }
 
 .spec-value {
     font-size: 0.95em;
     color: #2c3e50;
     font-weight: 500;
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
+    background: transparent;
+    border: none;
+    box-shadow: none;
 }
 
 .title-section {
@@ -1125,33 +1125,33 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 0;
-    background: transparent !important;
-    border: none !important;
+    background: transparent;
+    border: none;
     margin-bottom: 15px;
-    box-shadow: none !important;
+    box-shadow: none;
 }
 
 .title-content h3 {
     font-size: 1.4em;
     margin: 0 0 4px 0;
-    color: #000 !important;
-    background: transparent !important;
-    -webkit-text-fill-color: #000 !important;
+    color: #000;
+    background: transparent;
+    -webkit-text-fill-color: #000;
 }
 
 .price-tag {
-    font-size: 2.4em !important;
-    font-weight: 900 !important;
-    color:  #000000 !important;
-    background: linear-gradient(90deg, #34BBE0 0%, #1976D2 100%) !important;
-    padding: 20px 44px !important;
-    border-radius: 18px !important;
-    box-shadow: 0 6px 32px rgba(52, 187, 224, 0.22) !important;
-    display: inline-block !important;
-    margin: 28px 0 28px 10px !important;
-    border: 4px solid #34BBE0 !important;
-    letter-spacing: 1.5px !important;
-    text-align: center !important;
+    font-size: 2.4em;
+    font-weight: 900;
+    color:  #000000;
+    background: linear-gradient(90deg, #34BBE0 0%, #1976D2 100%);
+    padding: 20px 44px;
+    border-radius: 18px;
+    box-shadow: 0 6px 32px rgba(52, 187, 224, 0.22);
+    display: inline-block;
+    margin: 28px 0 28px 10px;
+    border: 4px solid #34BBE0;
+    letter-spacing: 1.5px;
+    text-align: center;
 }
 
 .description-content {
@@ -1159,10 +1159,10 @@ body {
     line-height: 1.5;
     color: #495057;
     padding: 0;
-    background: transparent !important;
-    border: none !important;
+    background: transparent;
+    border: none;
     margin: 15px 0;
-    box-shadow: none !important;
+    box-shadow: none;
 }
 
 .modal-actions {
@@ -1560,7 +1560,7 @@ body {
 }
 
 .spec-label i {
-    color: var(--accent-blue) !important;
+    color: var(--accent-blue);
 }
 
 .spec-value {
@@ -1755,16 +1755,7 @@ body {
     justify-content: flex-start;
 }
 
-/* Remove Favorites Section Styles */
-.favorites-section,
-.favorites-header,
-.favorites-header h2,
-.favorites-header h2 i,
-.favorites-count,
-.favorites-grid,
-.no-favorites {
-    display: none;
-}
+
 
 /* Update modal actions to only show share button */
 .modal-actions {
@@ -1808,9 +1799,9 @@ body {
 .spec-item *,
 .title-section *,
 .description-content * {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
+    background: transparent;
+    border: none;
+    box-shadow: none;
 }
 
 /* Occasion Detail Page Styles */
@@ -2096,7 +2087,6 @@ body {
     margin-right: calc(-50vw + 50%) !important;
     padding-left: 0 !important;
     padding-right: 0 !important;
-    background: #000 !important;
     margin-bottom: 0 !important;
     padding-bottom: 0 !important;
     border: none !important;
@@ -2154,36 +2144,6 @@ body {
     }
 }
 
-/* ========================================
-   12. HIDDEN/REMOVED ELEMENTS
-   ======================================== */
-/* Remove Favorites Section Styles */
-.favorites-section,
-.favorites-header,
-.favorites-header h2,
-.favorites-header h2 i,
-.favorites-count,
-.favorites-grid,
-.no-favorites {
-    display: none;
-}
-
-/* Enhanced Delivery Packages Section */
-.delivery-packages,
-.afleverpakketten,
-.pakketten-section {
-    display: none !important;
-}
-
-/* Remove all box-like styling from other elements */
-.modal-section *,
-.spec-item *,
-.title-section *,
-.description-content * {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-}
 
 /* ========================================
    13. RESPONSIVE ADJUSTMENTS
