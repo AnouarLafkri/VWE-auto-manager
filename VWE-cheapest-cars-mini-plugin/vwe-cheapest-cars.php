@@ -16,10 +16,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function vwe_cheapest_cars_enqueue_styles() {
     wp_enqueue_style(
-        'vwe-cheapest-cars-styles',
-        plugin_dir_url(__FILE__) . 'vwe-cheapest-cars.css',
+        'vwe-main-styles',
+        plugin_dir_url(dirname(__FILE__)) . 'styling.css',
         array(),
-        '1.1.0'
+        '2.0.0'
     );
 }
 add_action('wp_enqueue_scripts', 'vwe_cheapest_cars_enqueue_styles');
@@ -95,14 +95,19 @@ function vwe_cheapest_cars_shortcode() {
     $image_base = get_image_base_url();
 
     ob_start();
+
+    // Laad CSS direct in de output
+    $css_url = plugin_dir_url(dirname(__FILE__)) . 'styling.css';
+    echo '<link rel="stylesheet" href="' . $css_url . '" type="text/css" media="all" />';
+
     echo '<div class="vwe-cheapest-cars">';
 
     // Titel en knop boven de cards
     // Pas de URL van de occasions-pagina aan indien nodig
     $occasions_url = '/occasions';
-    echo '<div class="vwe-cheapest-cars-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">';
-    echo '<h2 class="vwe-cheapest-cars-title" style="margin: 0; font-size: 2.7rem;">Scherp geprijsd</h2>';
-    echo '<a class="vwe-cheapest-cars-btn" href="' . htmlspecialchars($occasions_url) . '" style="color: #7a2d19; font-weight: 700; text-decoration: none; font-size: 1.55rem; padding: 14px 32px; border-radius: 8px;">Bekijk alle occasions <span style="font-size: 1.3em; vertical-align: middle; font-weight: 900;">&rarr;</span></a>';
+    echo '<div class="vwe-cheapest-cars-header">';
+    echo '<h2 class="vwe-cheapest-cars-title">Scherp geprijsd</h2>';
+    echo '<a class="vwe-cheapest-cars-btn" href="' . htmlspecialchars($occasions_url) . '">Bekijk alle occasions <span>&rarr;</span></a>';
     echo '</div>';
 
     // Debug informatie (tijdelijk uitgeschakeld)
