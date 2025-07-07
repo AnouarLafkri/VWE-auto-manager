@@ -611,6 +611,16 @@ function checkFilters(carData) {
     const powerMin = document.getElementById("powerMin").value;
     const powerMax = document.getElementById("powerMax").value;
 
+    // Debug logging voor de eerste auto
+    if (carData === allCars[0]) {
+        console.log('checkFilters debug - first car:', carData.merk, carData.model);
+        console.log('Filter values:', {
+            brandFilter, modelFilter, fuelFilter, transmissionFilter,
+            bodyFilter, doorsFilter, seatsFilter, priceMin, priceMax,
+            kmMin, kmMax, powerMin, powerMax
+        });
+    }
+
     const yearCheckboxes = document.querySelectorAll("input[name='year']:checked");
     const selectedYears = Array.from(yearCheckboxes).map(cb => cb.value);
     const yearMatch = selectedYears.includes("all") || selectedYears.some(range => {
@@ -626,7 +636,7 @@ function checkFilters(carData) {
     const carKm = parseFloat((carData.kilometerstand||'').toString().replace(/[^0-9]/g, ""));
     const carPower = parseFloat((carData.vermogen_pk||'').toString().replace(/[^0-9]/g, ""));
 
-    return (!brandFilter || carData.merk === brandFilter) &&
+    const result = (!brandFilter || carData.merk === brandFilter) &&
            (!modelFilter || carData.model === modelFilter) &&
            (!fuelFilter || carData.brandstof === fuelFilter) &&
            (!transmissionFilter || carData.transmissie === transmissionFilter) &&
@@ -641,6 +651,14 @@ function checkFilters(carData) {
            (!powerMax || carPower <= parseFloat(powerMax)) &&
            yearMatch &&
            statusMatch;
+
+    // Debug logging voor de eerste auto
+    if (carData === allCars[0]) {
+        console.log('checkFilters result for first car:', result);
+        console.log('Year match:', yearMatch, 'Status match:', statusMatch);
+    }
+
+    return result;
 }
 
 function renderCars() {
@@ -740,7 +758,12 @@ function changePage(direction) {
 }
 
 function applyFilters() {
+    console.log('applyFilters called');
+    console.log('allCars length:', allCars.length);
+
     filteredCars = allCars.filter(checkFilters);
+    console.log('After filter - filteredCars length:', filteredCars.length);
+
     sortCars(); // Apply current sorting after filtering
     currentPage = 1;
     renderCars();
@@ -864,12 +887,7 @@ function handleCheckboxGroupChange(checkbox, groupName) {
     applyFilters();
 }
 
-function resetAllFilters() {
-    document.querySelectorAll("select").forEach(select => { select.value = ""; });
-    document.querySelectorAll("input[type='number']").forEach(input => { input.value = ""; });
-    document.querySelectorAll("input[type='checkbox']").forEach(checkbox => { checkbox.checked = checkbox.value === "all"; });
-    applyFilters();
-}
+// Deze functie wordt vervangen door de verbeterde versie verderop in de code
 
 document.addEventListener("DOMContentLoaded", function() {
     const filterElements = [
@@ -1296,16 +1314,54 @@ function filterCars() {
     updateResultsCount();
 }
 
-// Reset beide bars in resetAllFilters
+// Verbeterde resetAllFilters functie
 function resetAllFilters() {
-    ["brandFilter", "modelFilter", "fuelFilter", "transmissionFilter", "brandFilterBar", "modelFilterBar", "fuelFilterBar", "transmissionFilterBar"].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.value = "";
+    console.log('resetAllFilters called');
+
+    // Reset alle select dropdowns
+    document.querySelectorAll("select").forEach(select => {
+        select.value = "";
+        console.log('Reset select:', select.id, 'to empty');
     });
-    document.querySelectorAll("input[name='year'], input[name='status']").forEach(cb => cb.checked = cb.value === "all");
-    sortSelect.value = "default";
-    showSelect.value = "all";
-    filterCars();
+
+    // Reset alle number inputs
+    document.querySelectorAll("input[type='number']").forEach(input => {
+        input.value = "";
+        console.log('Reset number input:', input.id, 'to empty');
+    });
+
+    // Reset alle checkboxes naar "all" status
+    document.querySelectorAll("input[type='checkbox']").forEach(checkbox => {
+        checkbox.checked = checkbox.value === "all";
+        console.log('Reset checkbox:', checkbox.name, checkbox.value, 'to checked:', checkbox.checked);
+    });
+
+    // Reset sort en show selects naar standaard waarden
+    const sortSelect = document.getElementById("sortSelect");
+    const showSelect = document.getElementById("showSelect");
+    if (sortSelect) {
+        sortSelect.value = "";
+        console.log('Reset sortSelect to empty');
+    }
+    if (showSelect) {
+        showSelect.value = "12";
+        console.log('Reset showSelect to 12');
+    }
+
+    // Reset model filter opties
+    const modelFilter = document.getElementById("modelFilter");
+    if (modelFilter) {
+        modelFilter.innerHTML = '<option value="">Alle Modellen</option>';
+        console.log('Reset modelFilter options');
+    }
+
+    console.log('Before applyFilters - allCars length:', allCars.length);
+    console.log('Before applyFilters - filteredCars length:', filteredCars.length);
+
+    // Apply filters using the correct function
+    applyFilters();
+
+    console.log('After applyFilters - filteredCars length:', filteredCars.length);
 }
 
 // updateResultsCount blijft hetzelfde
