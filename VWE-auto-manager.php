@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: VWE Auto Manager
-Description: A plugin that advertises the cars from VWE
+Description: A plugin that advertises the cars from VWE. Includes integrated shortcodes: [vwe_latest_cars] for latest cars and [vwe_cheapest_cars] for cheapest cars.
 Author: Anouar
 */
 
@@ -2866,3 +2866,207 @@ function vwe_debug_images($atts) {
 
     return $output;
 }
+
+// ============================================================================
+// INTEGRATED MINI PLUGINS FUNCTIONALITY
+// ============================================================================
+
+/**
+ * Shortcode om drie nieuwste occasions te tonen.
+ * Gebruik: [vwe_latest_cars]
+ */
+function vwe_latest_cars_shortcode() {
+    // Controleer of de hoofdplugin functies beschikbaar zijn
+    if ( ! function_exists( 'get_xml_data' ) || ! function_exists( 'extract_car_data' ) || ! function_exists( 'get_image_base_url' ) ) {
+        return '<p>VWE Auto Manager plugin is niet geactiveerd.</p>';
+    }
+
+    $xml = get_xml_data();
+    if ( ! $xml ) {
+        return '<p>Geen voertuigen beschikbaar.</p>';
+    }
+
+    // Zet voertuigen in array en sorteer op bouwjaar (nieuwste eerst)
+    $cars = [];
+    foreach ( $xml->voertuig as $car ) {
+        $cars[] = $car;
+    }
+
+    usort( $cars, function ( $a, $b ) {
+        return intval( $b->bouwjaar ) <=> intval( $a->bouwjaar );
+    } );
+
+    $cars = array_slice( $cars, 0, 3 );
+    $image_base = get_image_base_url();
+
+    ob_start();
+
+    // Laad CSS direct in de output
+    $css_url = plugin_dir_url(__FILE__) . 'styling.css';
+    echo '<link rel="stylesheet" href="' . $css_url . '" type="text/css" media="all" />';
+
+    // Header met titel en knop
+    $occasions_url = htmlspecialchars('/occasions');
+    echo '<div class="vwe-cards-header">';
+    echo '<h2 class="vwe-cards-title">Laatste occasions</h2>';
+    echo '<a class="vwe-cheapest-cars-btn" href="' . $occasions_url . '">Bekijk alle occasions <span>&rarr;</span></a>';
+    echo '</div>';
+    echo '<div class="vwe-latest-cars">';
+    echo '<div class="cars-grid">';
+    foreach ( $cars as $carNode ) {
+        $car_arr = extract_car_data( $carNode, $image_base );
+        display_car_card( $car_arr, 'big-card' );
+    }
+    echo '</div></div>';
+    return ob_get_clean();
+}
+add_shortcode( 'vwe_latest_cars', 'vwe_latest_cars_shortcode' );
+
+/**
+ * Shortcode om drie goedkoopste occasions te tonen.
+ * Gebruik: [vwe_cheapest_cars]
+ */
+function vwe_cheapest_cars_shortcode() {
+    // Controleer of de hoofdplugin functies beschikbaar zijn
+    if ( ! function_exists( 'get_xml_data' ) || ! function_exists( 'extract_car_data' ) || ! function_exists( 'get_image_base_url' ) ) {
+        return '<p>VWE Auto Manager plugin is niet geactiveerd.</p>';
+    }
+
+    $xml = get_xml_data();
+    if ( ! $xml ) {
+        return '<p>Geen voertuigen beschikbaar.</p>';
+    }
+
+    // Zet voertuigen in array en filter op beschikbare auto's met geldige prijzen
+    $cars = [];
+
+    foreach ( $xml->voertuig as $car ) {
+        // Controleer of auto beschikbaar is (niet verkocht of gereserveerd)
+        $verkocht = (string)$car->verkocht === 'j';
+        $gereserveerd = (string)$car->gereserveerd === 'j';
+
+        if ($verkocht || $gereserveerd) {
+            continue; // Skip verkochte of gereserveerde auto's
+        }
+
+        // Haal prijs op
+        $price = '';
+
+        // Probeer verschillende prijsvelden
+        if (isset($car->verkoopprijs_particulier->prijzen->prijs[0]->bedrag) &&
+            (string)$car->verkoopprijs_particulier->prijzen->prijs[0]->bedrag !== '') {
+            $price = (string)$car->verkoopprijs_particulier->prijzen->prijs[0]->bedrag;
+        } elseif (isset($car->verkoopprijs_particulier) && !isset($car->verkoopprijs_particulier->prijzen)) {
+            $price = trim((string)$car->verkoopprijs_particulier);
+        } else {
+            $xpathResult = $car->xpath('verkoopprijs_particulier//bedrag');
+            if ($xpathResult && isset($xpathResult[0]) && (string)$xpathResult[0] !== '') {
+                $price = (string)$xpathResult[0];
+            }
+        }
+
+        // Controleer of prijs geldig is (numeriek en groter dan 0)
+        $price_numeric = intval(preg_replace('/[^0-9]/', '', $price));
+
+        if ($price_numeric > 0) {
+            $cars[] = $car;
+        }
+    }
+
+    // Sorteer op prijs (goedkoopste eerst)
+    usort( $cars, function ( $a, $b ) {
+        $price_a = intval(preg_replace('/[^0-9]/', '', (string)$a->verkoopprijs_particulier));
+        $price_b = intval(preg_replace('/[^0-9]/', '', (string)$b->verkoopprijs_particulier));
+        return $price_a <=> $price_b;
+    } );
+
+    // Neem de 3 goedkoopste
+    $cars = array_slice( $cars, 0, 3 );
+    $image_base = get_image_base_url();
+
+    ob_start();
+
+    // Laad CSS direct in de output
+    $css_url = plugin_dir_url(__FILE__) . 'styling.css';
+    echo '<link rel="stylesheet" href="' . $css_url . '" type="text/css" media="all" />';
+
+    echo '<div class="vwe-cheapest-cars">';
+
+    // Titel en knop boven de cards
+    $occasions_url = '/occasions';
+    echo '<div class="vwe-cheapest-cars-header">';
+    echo '<h2 class="vwe-cheapest-cars-title">Scherp geprijsd</h2>';
+    echo '<a class="vwe-cheapest-cars-btn" href="' . htmlspecialchars($occasions_url) . '">Bekijk alle occasions <span>&rarr;</span></a>';
+    echo '</div>';
+
+    echo '<div class="cars-grid">';
+    foreach ( $cars as $carNode ) {
+        $car_arr = extract_car_data( $carNode, $image_base );
+        display_car_card( $car_arr, 'big-card' );
+    }
+    echo '</div></div>';
+    return ob_get_clean();
+}
+add_shortcode( 'vwe_cheapest_cars', 'vwe_cheapest_cars_shortcode' );
+
+/**
+ * Debug shortcode om te testen of de plugin correct werkt
+ * Gebruik: [vwe_debug_test]
+ */
+function vwe_debug_test_shortcode() {
+    try {
+        $output = '<div style="background: #f0f0f0; padding: 20px; margin: 20px; border: 1px solid #ccc;">';
+        $output .= '<h3>VWE Plugin Debug Test</h3>';
+
+        // Test basis functies
+        $output .= '<h4>Basis functies:</h4>';
+        $output .= '<ul>';
+        $output .= '<li>get_xml_data(): ' . (function_exists('get_xml_data') ? '✅ Beschikbaar' : '❌ Niet beschikbaar') . '</li>';
+        $output .= '<li>extract_car_data(): ' . (function_exists('extract_car_data') ? '✅ Beschikbaar' : '❌ Niet beschikbaar') . '</li>';
+        $output .= '<li>get_image_base_url(): ' . (function_exists('get_image_base_url') ? '✅ Beschikbaar' : '❌ Niet beschikbaar') . '</li>';
+        $output .= '<li>display_car_card(): ' . (function_exists('display_car_card') ? '✅ Beschikbaar' : '❌ Niet beschikbaar') . '</li>';
+        $output .= '</ul>';
+
+        // Test XML data
+        if (function_exists('get_xml_data')) {
+            $xml = get_xml_data();
+            if ($xml) {
+                $car_count = count($xml->voertuig);
+                $output .= '<h4>XML Data:</h4>';
+                $output .= '<p>✅ XML geladen - ' . $car_count . ' voertuigen gevonden</p>';
+
+                if ($car_count > 0) {
+                    $first_car = $xml->voertuig[0];
+                    $output .= '<p><strong>Eerste voertuig:</strong></p>';
+                    $output .= '<ul>';
+                    $output .= '<li>Merk: ' . htmlspecialchars((string)$first_car->merk) . '</li>';
+                    $output .= '<li>Model: ' . htmlspecialchars((string)$first_car->model) . '</li>';
+                    $output .= '<li>Bouwjaar: ' . htmlspecialchars((string)$first_car->bouwjaar) . '</li>';
+                    $output .= '</ul>';
+                }
+            } else {
+                $output .= '<h4>XML Data:</h4>';
+                $output .= '<p>❌ Kon XML data niet laden</p>';
+            }
+        }
+
+        // Test image base URL
+        if (function_exists('get_image_base_url')) {
+            $image_base = get_image_base_url();
+            $output .= '<h4>Image Base URL:</h4>';
+            $output .= '<p>' . htmlspecialchars($image_base) . '</p>';
+        }
+
+        $output .= '</div>';
+        return $output;
+    } catch (Exception $e) {
+        $error_output = '<div style="background: #ffebee; padding: 20px; margin: 20px; border: 1px solid #f44336;">';
+        $error_output .= '<h3>❌ Debug Test Error</h3>';
+        $error_output .= '<p><strong>Error:</strong> ' . htmlspecialchars($e->getMessage()) . '</p>';
+        $error_output .= '<p><strong>File:</strong> ' . htmlspecialchars($e->getFile()) . '</p>';
+        $error_output .= '<p><strong>Line:</strong> ' . htmlspecialchars($e->getLine()) . '</p>';
+        $error_output .= '</div>';
+        return $error_output;
+    }
+}
+add_shortcode( 'vwe_debug_test', 'vwe_debug_test_shortcode' );
