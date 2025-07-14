@@ -107,6 +107,8 @@ function update_timestamp() {
  * Fetch images from FTP server
  */
 function fetch_images_from_ftp() {
+    $settings = vwe_get_ftp_settings();
+
     if (!is_dir(LOCAL_IMAGES_PATH)) {
         if (!mkdir(LOCAL_IMAGES_PATH, 0777, true)) {
             error_log('Failed to create images directory: ' . LOCAL_IMAGES_PATH);
@@ -120,7 +122,7 @@ function fetch_images_from_ftp() {
 
     // Try SSL connection first
     if (function_exists('ftp_ssl_connect')) {
-        $ftp_conn = @ftp_ssl_connect(FTP_SERVER, 21, $timeout);
+        $ftp_conn = @ftp_ssl_connect($settings['ftp_server'], 21, $timeout);
         if ($ftp_conn) {
             $is_ssl = true;
         }
@@ -128,11 +130,11 @@ function fetch_images_from_ftp() {
 
     // Fallback to regular FTP if SSL fails
     if (!$ftp_conn) {
-        $ftp_conn = @ftp_connect(FTP_SERVER, 21, $timeout);
+        $ftp_conn = @ftp_connect($settings['ftp_server'], 21, $timeout);
     }
 
     if (!$ftp_conn) {
-        error_log('Could not connect to FTP server: ' . FTP_SERVER);
+        error_log('Could not connect to FTP server: ' . $settings['ftp_server']);
         return;
     }
 
@@ -140,13 +142,13 @@ function fetch_images_from_ftp() {
     ftp_set_option($ftp_conn, FTP_TIMEOUT_SEC, $timeout);
     ftp_set_option($ftp_conn, FTP_AUTOSEEK, true);
 
-    if (!@ftp_login($ftp_conn, FTP_USER, FTP_PASS)) {
+    if (!@ftp_login($ftp_conn, $settings['ftp_user'], $settings['ftp_pass'])) {
         if ($is_ssl) {
             @ftp_close($ftp_conn);
         } else {
         ftp_close($ftp_conn);
         }
-        error_log('FTP login failed for user: ' . FTP_USER);
+        error_log('FTP login failed for user: ' . $settings['ftp_user']);
         return;
     }
 
@@ -157,19 +159,19 @@ function fetch_images_from_ftp() {
         ftp_set_option($ftp_conn, FTP_USEPASVADDRESS, true);
     }
 
-    $files = @ftp_nlist($ftp_conn, REMOTE_IMAGES_PATH);
+    $files = @ftp_nlist($ftp_conn, $settings['remote_images_path']);
     if ($files === false) {
         if ($is_ssl) {
             @ftp_close($ftp_conn);
         } else {
         ftp_close($ftp_conn);
         }
-        error_log('Could not retrieve file list from FTP path: ' . REMOTE_IMAGES_PATH);
+        error_log('Could not retrieve file list from FTP path: ' . $settings['remote_images_path']);
         return;
     }
 
     foreach ($files as $file) {
-        $remote_file = REMOTE_IMAGES_PATH . basename($file);
+        $remote_file = $settings['remote_images_path'] . basename($file);
         $local_file = LOCAL_IMAGES_PATH . basename($file);
 
         if (!file_exists($local_file)) {
@@ -1762,7 +1764,8 @@ function extract_car_data($car, $image_url_base) {
                 }
                 if (!$found) {
                     // fallback: remote
-                    $data['afbeeldingen'][] = REMOTE_IMAGE_HTTP . strtolower($name_no_ext) . '.jpg';
+                    $settings = vwe_get_ftp_settings();
+                    $data['afbeeldingen'][] = $settings['remote_image_http'] . strtolower($name_no_ext) . '.jpg';
             }
         }
     }
@@ -1870,13 +1873,15 @@ function render_modals() {
  * Download XML file from FTP server
  */
 function download_xml_from_ftp() {
+    $settings = vwe_get_ftp_settings();
+
     // Set FTP timeout
     $timeout = 30;
     $is_ssl = false;
 
     // Try SSL connection first
     if (function_exists('ftp_ssl_connect')) {
-        $ftp_conn = @ftp_ssl_connect(FTP_SERVER, 21, $timeout);
+        $ftp_conn = @ftp_ssl_connect($settings['ftp_server'], 21, $timeout);
         if ($ftp_conn) {
             $is_ssl = true;
         }
@@ -1884,11 +1889,11 @@ function download_xml_from_ftp() {
 
     // Fallback to regular FTP if SSL fails
     if (!$ftp_conn) {
-        $ftp_conn = @ftp_connect(FTP_SERVER, 21, $timeout);
+        $ftp_conn = @ftp_connect($settings['ftp_server'], 21, $timeout);
     }
 
     if (!$ftp_conn) {
-        error_log('Could not connect to FTP server: ' . FTP_SERVER);
+        error_log('Could not connect to FTP server: ' . $settings['ftp_server']);
         return false;
     }
 
@@ -1896,13 +1901,13 @@ function download_xml_from_ftp() {
     ftp_set_option($ftp_conn, FTP_TIMEOUT_SEC, $timeout);
     ftp_set_option($ftp_conn, FTP_AUTOSEEK, true);
 
-    if (!@ftp_login($ftp_conn, FTP_USER, FTP_PASS)) {
+    if (!@ftp_login($ftp_conn, $settings['ftp_user'], $settings['ftp_pass'])) {
         if ($is_ssl) {
             @ftp_close($ftp_conn);
         } else {
             ftp_close($ftp_conn);
         }
-        error_log('FTP login failed for user: ' . FTP_USER);
+        error_log('FTP login failed for user: ' . $settings['ftp_user']);
         return false;
     }
 
@@ -1913,10 +1918,46 @@ function download_xml_from_ftp() {
         ftp_set_option($ftp_conn, FTP_USEPASVADDRESS, true);
     }
 
-    // Define remote and local XML paths
-    $remote_xml_path = '/staging.mvsautomotive.nl/wp-content/plugins/VWE-auto-manager/xml/voertuigen.xml';
+    // Define remote XML directory and local paths
+    $remote_xml_dir = $settings['remote_xml_dir'];
     $local_xml_path = LOCAL_XML_PATH;
     $temp_xml_path = $local_xml_path . '.temp';
+
+    // Get list of files in the remote XML directory
+    $remote_files = @ftp_nlist($ftp_conn, $remote_xml_dir);
+    if ($remote_files === false) {
+        error_log('Could not retrieve file list from FTP directory: ' . $remote_xml_dir);
+        if ($is_ssl) {
+            @ftp_close($ftp_conn);
+        } else {
+            ftp_close($ftp_conn);
+        }
+        return false;
+    }
+
+    // Find the first XML file in the directory
+    $xml_file_found = false;
+    $remote_xml_path = '';
+
+    foreach ($remote_files as $file) {
+        $filename = basename($file);
+        if (pathinfo($filename, PATHINFO_EXTENSION) === 'xml') {
+            $remote_xml_path = $remote_xml_dir . $filename;
+            $xml_file_found = true;
+            error_log('Found XML file: ' . $filename);
+            break;
+        }
+    }
+
+    if (!$xml_file_found) {
+        error_log('No XML file found in directory: ' . $remote_xml_dir);
+        if ($is_ssl) {
+            @ftp_close($ftp_conn);
+        } else {
+            ftp_close($ftp_conn);
+        }
+        return false;
+    }
 
     // Download XML file to temporary location
     if (!@ftp_get($ftp_conn, $temp_xml_path, $remote_xml_path, FTP_BINARY)) {
@@ -2015,9 +2056,11 @@ function ensure_all_images_exist() {
         $timeout = 30;
         $is_ssl = false;
 
+        $settings = vwe_get_ftp_settings();
+
         // Try SSL connection first
         if (function_exists('ftp_ssl_connect')) {
-            $ftp_conn = @ftp_ssl_connect(FTP_SERVER, 21, $timeout);
+            $ftp_conn = @ftp_ssl_connect($settings['ftp_server'], 21, $timeout);
             if ($ftp_conn) {
                 $is_ssl = true;
             }
@@ -2025,11 +2068,11 @@ function ensure_all_images_exist() {
 
         // Fallback to regular FTP if SSL fails
         if (!$ftp_conn) {
-            $ftp_conn = @ftp_connect(FTP_SERVER, 21, $timeout);
+            $ftp_conn = @ftp_connect($settings['ftp_server'], 21, $timeout);
         }
 
         if (!$ftp_conn) {
-            error_log('Could not connect to FTP server: ' . FTP_SERVER);
+            error_log('Could not connect to FTP server: ' . $settings['ftp_server']);
             continue;
         }
 
@@ -2037,13 +2080,13 @@ function ensure_all_images_exist() {
         ftp_set_option($ftp_conn, FTP_TIMEOUT_SEC, $timeout);
         ftp_set_option($ftp_conn, FTP_AUTOSEEK, true);
 
-        if (!@ftp_login($ftp_conn, FTP_USER, FTP_PASS)) {
+        if (!@ftp_login($ftp_conn, $settings['ftp_user'], $settings['ftp_pass'])) {
             if ($is_ssl) {
                 @ftp_close($ftp_conn);
             } else {
                 ftp_close($ftp_conn);
             }
-            error_log('FTP login failed for user: ' . FTP_USER);
+            error_log('FTP login failed for user: ' . $settings['ftp_user']);
             continue;
         }
 
@@ -2056,7 +2099,7 @@ function ensure_all_images_exist() {
 
         $still_missing = [];
         foreach ($missing_images as $filename) {
-            $remote_file = REMOTE_IMAGES_PATH . $filename;
+            $remote_file = $settings['remote_images_path'] . $filename;
             $local_file = LOCAL_IMAGES_PATH . $filename;
 
             if (@ftp_get($ftp_conn, $local_file, $remote_file, FTP_BINARY)) {
@@ -3070,3 +3113,277 @@ function vwe_debug_test_shortcode() {
     }
 }
 add_shortcode( 'vwe_debug_test', 'vwe_debug_test_shortcode' );
+
+// Admin menu en instellingen
+add_action('admin_menu', 'vwe_admin_menu');
+add_action('admin_init', 'vwe_settings_init');
+
+/**
+ * Voeg admin menu toe
+ */
+function vwe_admin_menu() {
+    add_menu_page(
+        'VWE Auto Manager',
+        'VWE Auto Manager',
+        'manage_options',
+        'vwe-auto-manager',
+        'vwe_settings_page',
+        'dashicons-car',
+        30
+    );
+}
+
+/**
+ * Initialiseer instellingen
+ */
+function vwe_settings_init() {
+    register_setting('vwe_settings', 'vwe_ftp_settings');
+}
+
+/**
+ * Settings page callback
+ */
+function vwe_settings_page() {
+    if (!current_user_can('manage_options')) {
+        return;
+    }
+
+    if (isset($_POST['submit'])) {
+        vwe_save_ftp_settings();
+    }
+
+    $settings = get_option('vwe_ftp_settings', array());
+    ?>
+    <div class="wrap">
+        <h1>VWE Auto Manager - FTP Instellingen</h1>
+
+        <form method="post" action="">
+            <?php wp_nonce_field('vwe_ftp_settings', 'vwe_ftp_nonce'); ?>
+
+            <table class="form-table">
+                <tr>
+                    <th scope="row">FTP Server</th>
+                    <td>
+                        <input type="text" name="vwe_ftp_settings[ftp_server]"
+                               value="<?php echo esc_attr($settings['ftp_server'] ?? FTP_SERVER); ?>"
+                               class="regular-text" />
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">FTP Gebruikersnaam</th>
+                    <td>
+                        <input type="text" name="vwe_ftp_settings[ftp_user]"
+                               value="<?php echo esc_attr($settings['ftp_user'] ?? FTP_USER); ?>"
+                               class="regular-text" />
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">FTP Wachtwoord</th>
+                    <td>
+                        <input type="password" name="vwe_ftp_settings[ftp_pass]"
+                               value="<?php echo esc_attr($settings['ftp_pass'] ?? FTP_PASS); ?>"
+                               class="regular-text" />
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Remote Images Pad</th>
+                    <td>
+                        <input type="text" name="vwe_ftp_settings[remote_images_path]"
+                               value="<?php echo esc_attr($settings['remote_images_path'] ?? REMOTE_IMAGES_PATH); ?>"
+                               class="regular-text" />
+                    </td>
+                </tr>
+                                <tr>
+                    <th scope="row">Remote Image HTTP URL</th>
+                    <td>
+                        <input type="text" name="vwe_ftp_settings[remote_image_http]"
+                               value="<?php echo esc_attr($settings['remote_image_http'] ?? REMOTE_IMAGE_HTTP); ?>"
+                               class="regular-text" />
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Remote XML Directory</th>
+                    <td>
+                        <input type="text" name="vwe_ftp_settings[remote_xml_dir]"
+                               value="<?php echo esc_attr($settings['remote_xml_dir'] ?? '/staging.mvsautomotive.nl/wp-content/plugins/VWE-auto-manager/xml/'); ?>"
+                               class="regular-text" />
+                        <p class="description">Directory containing the XML file (e.g., /path/to/xml/)</p>
+                    </td>
+                </tr>
+            </table>
+
+            <p class="submit">
+                <input type="submit" name="submit" id="submit" class="button button-primary" value="Instellingen Opslaan">
+            </p>
+        </form>
+
+        <hr>
+
+        <h2>Test FTP Verbinding</h2>
+        <p>Klik op de knop hieronder om de FTP verbinding te testen:</p>
+        <button type="button" id="test-ftp" class="button button-secondary">Test FTP Verbinding</button>
+        <div id="ftp-test-result"></div>
+
+        <hr>
+
+        <h2>Handmatige Update</h2>
+        <p>Klik op de knop hieronder om handmatig alle data bij te werken:</p>
+        <button type="button" id="manual-update" class="button button-secondary">Handmatige Update</button>
+        <div id="update-result"></div>
+    </div>
+
+    <script>
+    jQuery(document).ready(function($) {
+        $('#test-ftp').click(function() {
+            var button = $(this);
+            var resultDiv = $('#ftp-test-result');
+
+            button.prop('disabled', true).text('Testen...');
+            resultDiv.html('<p>FTP verbinding testen...</p>');
+
+            $.ajax({
+                url: ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'vwe_test_ftp',
+                    nonce: '<?php echo wp_create_nonce('vwe_test_ftp'); ?>'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        resultDiv.html('<p style="color: green;">✓ FTP verbinding succesvol!</p>');
+                    } else {
+                        resultDiv.html('<p style="color: red;">✗ FTP verbinding mislukt: ' + response.data + '</p>');
+                    }
+                },
+                error: function() {
+                    resultDiv.html('<p style="color: red;">✗ Er is een fout opgetreden bij het testen van de FTP verbinding.</p>');
+                },
+                complete: function() {
+                    button.prop('disabled', false).text('Test FTP Verbinding');
+                }
+            });
+        });
+
+        $('#manual-update').click(function() {
+            var button = $(this);
+            var resultDiv = $('#update-result');
+
+            button.prop('disabled', true).text('Updaten...');
+            resultDiv.html('<p>Data bijwerken...</p>');
+
+            $.ajax({
+                url: ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'vwe_manual_update',
+                    nonce: '<?php echo wp_create_nonce('vwe_manual_update'); ?>'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        resultDiv.html('<p style="color: green;">✓ Update succesvol voltooid!</p>');
+                    } else {
+                        resultDiv.html('<p style="color: red;">✗ Update mislukt: ' + response.data + '</p>');
+                    }
+                },
+                error: function() {
+                    resultDiv.html('<p style="color: red;">✗ Er is een fout opgetreden bij het updaten.</p>');
+                },
+                complete: function() {
+                    button.prop('disabled', false).text('Handmatige Update');
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+}
+
+/**
+ * Sla FTP instellingen op
+ */
+function vwe_save_ftp_settings() {
+    if (!current_user_can('manage_options')) {
+        return;
+    }
+
+    if (!wp_verify_nonce($_POST['vwe_ftp_nonce'], 'vwe_ftp_settings')) {
+        wp_die('Security check failed');
+    }
+
+    if (isset($_POST['vwe_ftp_settings'])) {
+        $settings = array_map('sanitize_text_field', $_POST['vwe_ftp_settings']);
+        update_option('vwe_ftp_settings', $settings);
+
+        // Toon succes bericht
+        echo '<div class="notice notice-success is-dismissible"><p>FTP instellingen succesvol opgeslagen!</p></div>';
+    }
+}
+
+/**
+ * Haal FTP instellingen op
+ */
+function vwe_get_ftp_settings() {
+    $settings = get_option('vwe_ftp_settings', array());
+
+    return array(
+        'ftp_server' => $settings['ftp_server'] ?? FTP_SERVER,
+        'ftp_user' => $settings['ftp_user'] ?? FTP_USER,
+        'ftp_pass' => $settings['ftp_pass'] ?? FTP_PASS,
+        'remote_images_path' => $settings['remote_images_path'] ?? REMOTE_IMAGES_PATH,
+        'remote_image_http' => $settings['remote_image_http'] ?? REMOTE_IMAGE_HTTP,
+        'remote_xml_dir' => $settings['remote_xml_dir'] ?? '/staging.mvsautomotive.nl/wp-content/plugins/VWE-auto-manager/xml/'
+    );
+}
+
+// AJAX handlers
+add_action('wp_ajax_vwe_test_ftp', 'vwe_test_ftp_ajax');
+add_action('wp_ajax_vwe_manual_update', 'vwe_manual_update_ajax');
+
+/**
+ * Test FTP verbinding via AJAX
+ */
+function vwe_test_ftp_ajax() {
+    check_ajax_referer('vwe_test_ftp', 'nonce');
+
+    if (!current_user_can('manage_options')) {
+        wp_die('Geen toegang');
+    }
+
+    $settings = vwe_get_ftp_settings();
+
+    // Test FTP verbinding
+    $timeout = 30;
+    $ftp_conn = @ftp_connect($settings['ftp_server'], 21, $timeout);
+
+    if (!$ftp_conn) {
+        wp_send_json_error('Kan geen verbinding maken met FTP server: ' . $settings['ftp_server']);
+        return;
+    }
+
+    if (!@ftp_login($ftp_conn, $settings['ftp_user'], $settings['ftp_pass'])) {
+        ftp_close($ftp_conn);
+        wp_send_json_error('FTP login mislukt voor gebruiker: ' . $settings['ftp_user']);
+        return;
+    }
+
+    ftp_close($ftp_conn);
+    wp_send_json_success('FTP verbinding succesvol!');
+}
+
+/**
+ * Handmatige update via AJAX
+ */
+function vwe_manual_update_ajax() {
+    check_ajax_referer('vwe_manual_update', 'nonce');
+
+    if (!current_user_can('manage_options')) {
+        wp_die('Geen toegang');
+    }
+
+    try {
+        update_all_data();
+        wp_send_json_success('Update succesvol voltooid!');
+    } catch (Exception $e) {
+        wp_send_json_error('Update mislukt: ' . $e->getMessage());
+    }
+}
