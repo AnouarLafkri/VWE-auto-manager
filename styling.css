@@ -53,7 +53,7 @@ body {
     display: grid;
     grid-template-columns: 300px 1fr;
     gap: 30px;
-    max-width: 1200px;
+    max-width: 1340px;
     margin: 0 auto;
     padding: 0 20px;
     margin-top: 20px;
@@ -2093,4 +2093,95 @@ body {
     align-items: stretch;
     gap: 0;
     width: 100%;
+}
+
+/* ========================================
+   10. VWE CHEAPEST CARS STYLING
+   ======================================== */
+.vwe-cheapest-cars {
+    margin-bottom: 40px;
+}
+
+.vwe-cheapest-cars-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding: 0 20px;
+}
+
+.vwe-cheapest-cars-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.vwe-cheapest-cars-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 14px;
+    transition: var(--transition);
+    border: none;
+    cursor: pointer;
+}
+
+.vwe-cheapest-cars-btn:hover {
+    background: #000000;
+    color: white;
+    text-decoration: none;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.vwe-cheapest-cars-btn span {
+    font-size: 16px;
+    font-weight: 700;
+    transition: var(--transition);
+}
+
+.vwe-cheapest-cars-btn:hover span {
+    transform: translateX(2px);
+}
+
+/* Responsive styles for VWE Cheapest Cars */
+@media (max-width: 768px) {
+    .vwe-cheapest-cars-header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+        padding: 0 15px;
+    }
+
+    .vwe-cheapest-cars-title {
+        font-size: 24px;
+    }
+
+    .vwe-cheapest-cars-btn {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .vwe-cheapest-cars-header {
+        padding: 0 10px;
+    }
+
+    .vwe-cheapest-cars-title {
+        font-size: 22px;
+    }
+
+    .vwe-cheapest-cars-btn {
+        padding: 8px 14px;
+        font-size: 12px;
+    }
 }
