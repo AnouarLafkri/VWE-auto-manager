@@ -204,8 +204,8 @@ body {
 }
 @media (max-width: 900px) {
     .occasion-container {
-        max-width: 99vw !important;
-        padding: 8px 2vw 8px 2vw;
+        max-width: 1340px !important;
+        padding: 8px 20px 8px 20px;
         margin: 24px auto 32px auto !important;
     }
     .detail-wrapper {

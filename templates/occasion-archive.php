@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
 get_header();
 ?>
 
-<div class="vwe-archive-container" style="max-width:1400px;margin:0 auto;padding:0 10px;">
+<div class="vwe-archive-container" style="max-width:1340px;margin:0 auto;padding:0 10px;">
     <?php
     if (function_exists('display_car_listing')) {
         display_car_listing();

@@ -125,20 +125,23 @@ body {
     .filters-panel {
         position: fixed;
         top: 0;
-        left: -100%;
-        width: 85%;
-        max-width: 320px;
+        left: 0;
+        width: 100%;
         height: 100vh;
         z-index: 999;
         background: white;
-        transition: left 0.3s ease;
+        transition: opacity 0.3s ease;
         overflow-y: auto;
         border-radius: 0;
         border: none;
-        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+        box-shadow: none;
+        opacity: 0;
+        visibility: hidden;
     }
+
     .filters-panel.active {
-        left: 0;
+        opacity: 1;
+        visibility: visible;
     }
     .mobile-filter-toggle {
         display: flex;
@@ -210,6 +213,34 @@ body {
     border-radius: var(--radius-md);
     background: var(--background-light);
     margin-top: 15px;
+}
+
+@media (max-width: 768px) {
+    .filters-panel {
+        min-width: unset;
+        max-width: unset;
+        width: 100vw;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 999;
+        background: white;
+        transition: opacity 0.3s ease;
+        overflow-y: auto;
+        border-radius: 0;
+        border: none;
+        box-shadow: none;
+        opacity: 0;
+        visibility: hidden;
+        margin: 0;
+        padding: 20px;
+    }
+
+    .filters-panel.active {
+        opacity: 1;
+        visibility: visible;
+    }
 }
 
 .filters-title {
@@ -916,7 +947,7 @@ body {
 }
 
 .modal-content {
-    max-width: 1200px;
+    max-width: 1340px;
     width: 95%;
     max-height: 90vh;
     margin: 20px auto;
@@ -1341,7 +1372,7 @@ body {
 
 /* Occasion Detail Page Styles */
 .occasion-detail-container {
-    max-width: 1200px;
+    max-width: 1340px;
     margin: 0 auto;
     padding: 20px;
 }
@@ -1638,7 +1669,7 @@ body {
 @media (max-width: 1600px) {
     #brx-footer .brxe-container,
     #brx-footer .brx-grid {
-        max-width: 1200px !important;
+        max-width: 1340px !important;
         padding-left: 16px !important;
         padding-right: 16px !important;
     }
@@ -1647,7 +1678,7 @@ body {
 @media (max-width: 1200px) {
     #brx-footer .brxe-container,
     #brx-footer .brx-grid {
-        max-width: 1000px !important;
+        max-width: 1340px !important;
         padding-left: 14px !important;
         padding-right: 14px !important;
     }
@@ -1656,7 +1687,7 @@ body {
 @media (max-width: 992px) {
     #brx-footer .brxe-container,
     #brx-footer .brx-grid {
-        max-width: 900px !important;
+        max-width: 1340px !important;
         padding-left: 12px !important;
         padding-right: 12px !important;
     }
@@ -1852,8 +1883,8 @@ body {
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
+    width: 100%;
+    height: 100%;
     background: rgba(0, 0, 0, 0.5);
     z-index: 998;
 }
@@ -1880,21 +1911,23 @@ body {
     .filters-panel {
         position: fixed;
         top: 0;
-        left: -100%;
-        width: 85%;
-        max-width: 320px;
+        left: 0;
+        width: 100vw;
         height: 100vh;
         z-index: 999;
         background: white;
-        transition: left 0.3s ease;
+        transition: opacity 0.3s ease;
         overflow-y: auto;
         border-radius: 0;
         border: none;
-        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+        box-shadow: none;
+        opacity: 0;
+        visibility: hidden;
     }
 
     .filters-panel.active {
-        left: 0;
+        opacity: 1;
+        visibility: visible;
     }
 
     .filters-overlay.active {
@@ -2183,5 +2216,127 @@ body {
     .vwe-cheapest-cars-btn {
         padding: 8px 14px;
         font-size: 12px;
+    }
+}
+
+/* ========================================
+   10b. VWE LATEST CARS STYLING (gelijk aan cheapest)
+   ======================================== */
+.vwe-latest-cars {
+    margin-bottom: 40px;
+}
+
+.vwe-latest-cars-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding: 0 20px;
+}
+
+.vwe-latest-cars-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.vwe-latest-cars-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 14px;
+    transition: var(--transition);
+    border: none;
+    cursor: pointer;
+}
+
+.vwe-latest-cars-btn:hover {
+    background: #000000;
+    color: white;
+    text-decoration: none;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.vwe-latest-cars-btn span {
+    font-size: 16px;
+    font-weight: 700;
+    transition: var(--transition);
+}
+
+.vwe-latest-cars-btn:hover span {
+    transform: translateX(2px);
+}
+
+@media (max-width: 768px) {
+    .vwe-latest-cars-header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+        padding: 0 15px;
+    }
+
+    .vwe-latest-cars-title {
+        font-size: 24px;
+    }
+
+    .vwe-latest-cars-btn {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .vwe-latest-cars-header {
+        padding: 0 10px;
+    }
+
+    .vwe-latest-cars-title {
+        font-size: 22px;
+    }
+
+    .vwe-latest-cars-btn {
+        padding: 8px 14px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .mobile-filter-toggle {
+        position: fixed;
+        top: 120px; /* Dynamische positie tussen navbar en resultaten bar */
+        right: 20px;
+        left: auto;
+        z-index: 2000;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        margin: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .filters-panel.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .filters-panel.active ~ .mobile-filter-toggle,
+    .filters-panel.active + .mobile-filter-toggle {
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+
+@media (max-width: 768px) {
+    .mobile-filter-toggle.active {
+        opacity: 0;
+        visibility: hidden;
     }
 }
