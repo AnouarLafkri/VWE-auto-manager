@@ -14,175 +14,244 @@ if (!defined('ABSPATH')) {
 set_time_limit(300); // 5 minutes
 ini_set('memory_limit', '256M');
 
-// Configuration - using admin settings only
+// Configuration
 define('VWE_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('VWE_PLUGIN_URL', plugin_dir_url(__FILE__));
+define('FTP_SERVER', '91.184.31.234');
+define('FTP_USER', 'anmvs-auto');
+define('FTP_PASS', 'f6t23U~8t');
+define('REMOTE_IMAGES_PATH', '/staging.mvsautomotive.nl/wp-content/plugins/VWE-auto-manager/xml/images/');
+define('LOCAL_IMAGES_PATH', WP_CONTENT_DIR . '/plugins/VWE-auto-manager/xml/images/');
+define('LOCAL_XML_PATH', VWE_PLUGIN_DIR . 'local_file.xml');
 define('DEBUG_MODE', false);
-define('XML_CACHE_DURATION', 300); // 5 minutes cache for XML data
+define('LAST_UPDATE_FILE', VWE_PLUGIN_DIR . 'last_update.txt');
+define('UPDATE_INTERVAL', 86400); // 24 hours in seconds
+define('REMOTE_IMAGE_HTTP', 'https://staging.mvsautomotive.nl/wp-content/plugins/VWE-auto-manager/xml/images/');
+// Dynamisch pad naar de images-map binnen de plugin (hoofdletter‐safe)
+if (!defined('IMAGE_URL_BASE')) {
+    $vwe_img_tmp = call_user_func('plugin_dir_url', __FILE__) . 'images/';
+    define('IMAGE_URL_BASE', $vwe_img_tmp);
+    unset($vwe_img_tmp);
+}
 
-/**
- * Get FTP settings from admin
- */
-function vwe_get_ftp_settings() {
-    // Cache FTP settings to avoid repeated database calls
-    static $cached_settings = null;
+// Update image path constants - try multiple locations
+if (!defined('SHARED_IMAGES_PATH')) {
+    define('SHARED_IMAGES_PATH', WP_CONTENT_DIR . '/plugins/VWE-auto-manager/xml/images/');
+}
 
-    if ($cached_settings !== null) {
-        return $cached_settings;
-    }
-
-    try {
-        $settings = get_option('vwe_ftp_settings', array());
-
-        $cached_settings = array(
-            'ftp_server' => $settings['ftp_server'] ?? '',
-            'ftp_user' => $settings['ftp_user'] ?? '',
-            'ftp_pass' => $settings['ftp_pass'] ?? '',
-            'remote_images_path' => $settings['remote_images_path'] ?? '',
-            'remote_image_http' => $settings['remote_image_http'] ?? '',
-            'remote_xml_dir' => $settings['remote_xml_dir'] ?? ''
-        );
-
-        return $cached_settings;
-    } catch (Exception $e) {
-        error_log('Error in vwe_get_ftp_settings: ' . $e->getMessage());
-        $cached_settings = array(
-            'ftp_server' => '',
-            'ftp_user' => '',
-            'ftp_pass' => '',
-            'remote_images_path' => '',
-            'remote_image_http' => '',
-            'remote_xml_dir' => ''
-        );
-        return $cached_settings;
-    }
+if (!defined('SHARED_IMAGES_URL_BASE')) {
+    define('SHARED_IMAGES_URL_BASE', content_url('plugins/VWE-auto-manager/xml/images/'));
 }
 
 /**
- * Get remote XML directory from settings
+ * Initialize image paths after WordPress is loaded
  */
-function vwe_get_remote_xml_dir() {
-    $settings = vwe_get_ftp_settings();
-    if (empty($settings['remote_xml_dir'])) {
-        error_log('Remote XML directory not configured in admin settings');
-        return false;
-    }
-    return $settings['remote_xml_dir'];
-}
+function vwe_init_image_paths() {
+    // Check if images directory exists in plugin directory
+    $plugin_images_path = VWE_PLUGIN_DIR . 'images/';
+    if (is_dir($plugin_images_path)) {
+        // Images are in plugin directory - this is already set correctly
+        error_log('Using images from plugin directory: ' . $plugin_images_path);
+    } else {
+        // Try alternative locations
+        $alternative_paths = [
+            WP_CONTENT_DIR . '/plugins/VWE-auto-manager/xml/images/',
+            WP_CONTENT_DIR . '/plugins/xml/images/',
+            WP_CONTENT_DIR . '/uploads/vwe-images/'
+        ];
 
-/**
- * Get remote images HTTP URL from settings
- */
-function vwe_get_remote_images_url() {
-    try {
-        $settings = vwe_get_ftp_settings();
-        if (empty($settings['remote_image_http'])) {
-            error_log('Remote image HTTP URL not configured in admin settings');
-            return false;
-        }
-        return $settings['remote_image_http'];
-    } catch (Exception $e) {
-        error_log('Error in vwe_get_remote_images_url: ' . $e->getMessage());
-        return false;
-    }
-}
-
-/**
- * Get XML data using admin settings
- */
-function get_xml_data() {
-    try {
-        // Check cache first
-        $cached_xml = get_transient('vwe_xml_cache');
-        if ($cached_xml !== false) {
-            return $cached_xml;
-        }
-
-        // Get FTP settings
-        $settings = vwe_get_ftp_settings();
-        if (empty($settings['ftp_server']) || empty($settings['ftp_user']) || empty($settings['ftp_pass'])) {
-            error_log('VWE: FTP settings incomplete - server: ' . ($settings['ftp_server'] ?: 'empty') . ', user: ' . ($settings['ftp_user'] ?: 'empty'));
-            return false;
-        }
-
-        // Connect to FTP server
-        $timeout = 30;
-        $ftp_conn = @ftp_connect($settings['ftp_server'], 21, $timeout);
-        if (!$ftp_conn) {
-            error_log('VWE: Failed to connect to FTP server: ' . $settings['ftp_server']);
-            return false;
-        }
-
-        if (!@ftp_login($ftp_conn, $settings['ftp_user'], $settings['ftp_pass'])) {
-            error_log('VWE: Failed to login to FTP server with user: ' . $settings['ftp_user']);
-            ftp_close($ftp_conn);
-            return false;
-        }
-
-        ftp_pasv($ftp_conn, true);
-
-        // Find XML file
-        $remote_files = @ftp_nlist($ftp_conn, $settings['remote_xml_dir']);
-        if (!$remote_files) {
-            error_log('VWE: Failed to list files in directory: ' . $settings['remote_xml_dir']);
-            ftp_close($ftp_conn);
-            return false;
-        }
-
-        $xml_file_found = false;
-        $remote_xml_path = '';
-
-        foreach ($remote_files as $file) {
-            $filename = basename($file);
-            if (pathinfo($filename, PATHINFO_EXTENSION) === 'xml') {
-                $remote_xml_path = $settings['remote_xml_dir'] . $filename;
-                $xml_file_found = true;
+        foreach ($alternative_paths as $path) {
+            if (is_dir($path)) {
+                error_log('Found images in alternative location: ' . $path);
+                // Update the constants dynamically
+                if (!defined('SHARED_IMAGES_PATH_OVERRIDE')) {
+                    define('SHARED_IMAGES_PATH_OVERRIDE', $path);
+                }
+                if (!defined('SHARED_IMAGES_URL_BASE_OVERRIDE')) {
+                    define('SHARED_IMAGES_URL_BASE_OVERRIDE', content_url(str_replace(WP_CONTENT_DIR, '', $path)));
+                }
                 break;
             }
         }
+    }
+}
 
-        if (!$xml_file_found) {
-            error_log('VWE: No XML file found in directory: ' . $settings['remote_xml_dir']);
-            ftp_close($ftp_conn);
-            return false;
+// Cronjob configuration
+add_action('init', function() {
+    if (!wp_next_scheduled('vwe_daily_update')) {
+        wp_schedule_event(time(), 'daily', 'vwe_daily_update');
+    }
+});
+
+add_action('vwe_daily_update', 'update_all_data');
+
+/**
+ * Check if update is needed
+ */
+function needs_update() {
+    if (!file_exists(LAST_UPDATE_FILE)) {
+        return true;
+    }
+    $last_update = file_get_contents(LAST_UPDATE_FILE);
+    return (time() - (int)$last_update) > UPDATE_INTERVAL;
+}
+
+/**
+ * Update last update timestamp
+ */
+function update_timestamp() {
+    file_put_contents(LAST_UPDATE_FILE, time());
+}
+
+/**
+ * Fetch images from FTP server
+ */
+function fetch_images_from_ftp() {
+    $settings = vwe_get_ftp_settings();
+
+    if (!is_dir(LOCAL_IMAGES_PATH)) {
+        if (!mkdir(LOCAL_IMAGES_PATH, 0777, true)) {
+            error_log('Failed to create images directory: ' . LOCAL_IMAGES_PATH);
+            return;
         }
+    }
 
-        // Download XML content directly to memory
-        $xml_content = '';
-        $temp_handle = fopen('php://temp', 'r+');
+    // Set FTP timeout
+    $timeout = 30;
+    $is_ssl = false;
 
-        if (@ftp_fget($ftp_conn, $temp_handle, $remote_xml_path, FTP_BINARY)) {
-            rewind($temp_handle);
-            $xml_content = stream_get_contents($temp_handle);
-            fclose($temp_handle);
+    // Try SSL connection first
+    if (function_exists('ftp_ssl_connect')) {
+        $ftp_conn = @ftp_ssl_connect($settings['ftp_server'], 21, $timeout);
+        if ($ftp_conn) {
+            $is_ssl = true;
+        }
+    }
+
+    // Fallback to regular FTP if SSL fails
+    if (!$ftp_conn) {
+        $ftp_conn = @ftp_connect($settings['ftp_server'], 21, $timeout);
+    }
+
+    if (!$ftp_conn) {
+        error_log('Could not connect to FTP server: ' . $settings['ftp_server']);
+        return;
+    }
+
+    // Set additional FTP options
+    ftp_set_option($ftp_conn, FTP_TIMEOUT_SEC, $timeout);
+    ftp_set_option($ftp_conn, FTP_AUTOSEEK, true);
+
+    if (!@ftp_login($ftp_conn, $settings['ftp_user'], $settings['ftp_pass'])) {
+        if ($is_ssl) {
+            @ftp_close($ftp_conn);
         } else {
-            error_log('VWE: Failed to download XML file: ' . $remote_xml_path);
-            fclose($temp_handle);
-            ftp_close($ftp_conn);
-            return false;
-        }
-
         ftp_close($ftp_conn);
-
-        if (empty($xml_content)) {
-            error_log('VWE: Downloaded XML content is empty');
-            return false;
         }
+        error_log('FTP login failed for user: ' . $settings['ftp_user']);
+        return;
+    }
 
-        // Parse XML content
-        $xml = simplexml_load_string($xml_content);
-        if (!$xml) {
-            error_log('VWE: Failed to parse XML content');
-            return false;
+    ftp_pasv($ftp_conn, true);
+
+    // Enable SSL if available
+    if ($is_ssl) {
+        ftp_set_option($ftp_conn, FTP_USEPASVADDRESS, true);
+    }
+
+    $files = @ftp_nlist($ftp_conn, $settings['remote_images_path']);
+    if ($files === false) {
+        if ($is_ssl) {
+            @ftp_close($ftp_conn);
+        } else {
+        ftp_close($ftp_conn);
         }
+        error_log('Could not retrieve file list from FTP path: ' . $settings['remote_images_path']);
+        return;
+    }
 
-        // Cache the XML data for 5 minutes
-        set_transient('vwe_xml_cache', $xml, XML_CACHE_DURATION);
+    foreach ($files as $file) {
+        $remote_file = $settings['remote_images_path'] . basename($file);
+        $local_file = LOCAL_IMAGES_PATH . basename($file);
 
-        return $xml;
-    } catch (Exception $e) {
-        error_log('VWE: Exception in get_xml_data: ' . $e->getMessage());
-        return false;
+        if (!file_exists($local_file)) {
+            if (@ftp_get($ftp_conn, $local_file, $remote_file, FTP_BINARY)) {
+                // Optimize the downloaded image
+                optimize_downloaded_image($local_file);
+            } else {
+                error_log('Failed to download file: ' . $remote_file);
+            }
+        }
+    }
+
+    // Properly close the connection based on connection type
+    if ($is_ssl) {
+        @ftp_close($ftp_conn);
+    } else {
+    ftp_close($ftp_conn);
+    }
+}
+
+/**
+ * Clean up unused images
+ */
+function cleanup_unused_images() {
+    if (!file_exists(LOCAL_XML_PATH)) {
+        error_log('XML file not found');
+        return;
+    }
+
+    $xml_content = file_get_contents(LOCAL_XML_PATH);
+    if (!$xml_content) {
+        error_log('Could not read XML file');
+        return;
+    }
+
+    $xml = new SimpleXMLElement($xml_content);
+    if (!$xml) {
+        error_log('Error parsing XML content');
+        return;
+    }
+
+    // Collect used images from XML
+    $usedImages = [];
+    foreach ($xml->voertuig as $car) {
+        if (isset($car->afbeeldingen)) {
+            foreach ($car->afbeeldingen->children() as $afbeelding) {
+                if ($afbeelding->getName() === 'afbeelding') {
+                    if (isset($afbeelding->bestandsnaam)) {
+                        $filename = trim((string)$afbeelding->bestandsnaam);
+                        if ($filename !== '') {
+                            $usedImages[] = $filename;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Remove unused files
+    if (!is_dir(LOCAL_IMAGES_PATH)) {
+        error_log('Images directory not found');
+        return;
+    }
+
+    $allLocalImages = glob(LOCAL_IMAGES_PATH . '*.{jpg,jpeg,png,gif,JPG,JPEG,PNG,GIF}', GLOB_BRACE);
+    if ($allLocalImages === false) {
+        error_log('Error reading images directory');
+        return;
+    }
+
+    foreach ($allLocalImages as $filePath) {
+        if (!is_file($filePath)) {
+            continue;
+        }
+        $fileName = basename($filePath);
+        if (!in_array($fileName, $usedImages, true)) {
+            if (!unlink($filePath)) {
+                error_log("Failed to delete unused file: $filePath");
+            }
+        }
     }
 }
 
@@ -1386,6 +1455,10 @@ function generate_options($items) {
  */
 function get_image_base_url() {
     // First check if we have an override
+    if (defined('SHARED_IMAGES_URL_BASE_OVERRIDE')) {
+        return SHARED_IMAGES_URL_BASE_OVERRIDE;
+    }
+
     // Check if images exist in the correct xml/images directory
     $xml_images_path = WP_CONTENT_DIR . '/plugins/VWE-auto-manager/xml/images/';
     if (is_dir($xml_images_path)) {
@@ -1398,9 +1471,8 @@ function get_image_base_url() {
         return VWE_PLUGIN_URL . 'images/';
     }
 
-    // Fallback to remote images URL from settings
-    $settings = vwe_get_ftp_settings();
-    return $settings['remote_image_http'] ?? VWE_PLUGIN_URL . 'images/';
+    // Fallback to the default
+    return SHARED_IMAGES_URL_BASE;
 }
 
 /**
@@ -1634,9 +1706,11 @@ function extract_car_data($car, $image_url_base) {
         $data['transmissie'] = $transmissie_map[$data['transmissie']];
     }
 
-    // Format values with units
-    if (is_numeric($data['kilometerstand'])) {
-        $data['kilometerstand'] = number_format($data['kilometerstand'], 0, ',', '.') . ' km';
+    // --- Kilometerstand formatting ---
+    // Strip non-digit characters and format; fallback to 0 km
+    $km_raw = preg_replace('/[^0-9]/', '', (string) $data['kilometerstand']);
+    if ($km_raw !== '') {
+        $data['kilometerstand'] = number_format((int) $km_raw, 0, ',', '.') . ' km';
     } else {
         $data['kilometerstand'] = '0 km';
     }
@@ -1681,9 +1755,20 @@ function extract_car_data($car, $image_url_base) {
                 $variants[] = $bestandsnaam;
                 $variants = array_unique($variants);
 
-                // Use remote image URL directly
-                $settings = vwe_get_ftp_settings();
-                $data['afbeeldingen'][] = $settings['remote_image_http'] . strtolower($name_no_ext) . '.jpg';
+                $found = false;
+                foreach ($variants as $variant) {
+                    $local_path = LOCAL_IMAGES_PATH . $variant;
+                    if (file_exists($local_path)) {
+                        $data['afbeeldingen'][] = $image_url_base . $variant;
+                        $found = true;
+                        break;
+                    }
+                }
+                if (!$found) {
+                    // fallback: remote
+                    $settings = vwe_get_ftp_settings();
+                    $data['afbeeldingen'][] = $settings['remote_image_http'] . strtolower($name_no_ext) . '.jpg';
+            }
         }
     }
     }
@@ -1786,15 +1871,472 @@ function render_modals() {
         </div>';
 }
 
+/**
+ * Download XML file from FTP server
+ */
+function download_xml_from_ftp() {
+    $settings = vwe_get_ftp_settings();
 
+    // Set FTP timeout
+    $timeout = 30;
+    $is_ssl = false;
 
+    // Try SSL connection first
+    if (function_exists('ftp_ssl_connect')) {
+        $ftp_conn = @ftp_ssl_connect($settings['ftp_server'], 21, $timeout);
+        if ($ftp_conn) {
+            $is_ssl = true;
+        }
+    }
 
+    // Fallback to regular FTP if SSL fails
+    if (!$ftp_conn) {
+        $ftp_conn = @ftp_connect($settings['ftp_server'], 21, $timeout);
+    }
 
+    if (!$ftp_conn) {
+        error_log('Could not connect to FTP server: ' . $settings['ftp_server']);
+        return false;
+    }
 
+    // Set additional FTP options
+    ftp_set_option($ftp_conn, FTP_TIMEOUT_SEC, $timeout);
+    ftp_set_option($ftp_conn, FTP_AUTOSEEK, true);
 
+    if (!@ftp_login($ftp_conn, $settings['ftp_user'], $settings['ftp_pass'])) {
+        if ($is_ssl) {
+            @ftp_close($ftp_conn);
+        } else {
+            ftp_close($ftp_conn);
+        }
+        error_log('FTP login failed for user: ' . $settings['ftp_user']);
+        return false;
+    }
 
+    ftp_pasv($ftp_conn, true);
 
+    // Enable SSL if available
+    if ($is_ssl) {
+        ftp_set_option($ftp_conn, FTP_USEPASVADDRESS, true);
+    }
 
+    // Define remote XML directory and local paths
+    $remote_xml_dir = $settings['remote_xml_dir'];
+    $local_xml_path = LOCAL_XML_PATH;
+    $temp_xml_path = $local_xml_path . '.temp';
+
+    // Get list of files in the remote XML directory
+    $remote_files = @ftp_nlist($ftp_conn, $remote_xml_dir);
+    if ($remote_files === false) {
+        error_log('Could not retrieve file list from FTP directory: ' . $remote_xml_dir);
+        if ($is_ssl) {
+            @ftp_close($ftp_conn);
+        } else {
+            ftp_close($ftp_conn);
+        }
+        return false;
+    }
+
+    // Find the first XML file in the directory
+    $xml_file_found = false;
+    $remote_xml_path = '';
+
+    foreach ($remote_files as $file) {
+        $filename = basename($file);
+        if (pathinfo($filename, PATHINFO_EXTENSION) === 'xml') {
+            $remote_xml_path = $remote_xml_dir . $filename;
+            $xml_file_found = true;
+            error_log('Found XML file: ' . $filename);
+            break;
+        }
+    }
+
+    if (!$xml_file_found) {
+        error_log('No XML file found in directory: ' . $remote_xml_dir);
+        if ($is_ssl) {
+            @ftp_close($ftp_conn);
+        } else {
+            ftp_close($ftp_conn);
+        }
+        return false;
+    }
+
+    // Download XML file to temporary location
+    if (!@ftp_get($ftp_conn, $temp_xml_path, $remote_xml_path, FTP_BINARY)) {
+        error_log('Failed to download XML file from: ' . $remote_xml_path);
+        if ($is_ssl) {
+            @ftp_close($ftp_conn);
+        } else {
+            ftp_close($ftp_conn);
+        }
+        return false;
+    }
+
+    // Verify the downloaded XML is valid
+    $xml_content = file_get_contents($temp_xml_path);
+    if (!$xml_content || !simplexml_load_string($xml_content)) {
+        error_log('Downloaded XML file is invalid or empty');
+        unlink($temp_xml_path);
+        if ($is_ssl) {
+            @ftp_close($ftp_conn);
+        } else {
+            ftp_close($ftp_conn);
+        }
+        return false;
+    }
+
+    // Replace old XML file with new one
+    if (file_exists($local_xml_path)) {
+        unlink($local_xml_path);
+    }
+    rename($temp_xml_path, $local_xml_path);
+
+    // Properly close the connection
+    if ($is_ssl) {
+        @ftp_close($ftp_conn);
+    } else {
+        ftp_close($ftp_conn);
+    }
+
+    return true;
+}
+
+/**
+ * Ensure all images from XML exist locally
+ */
+function ensure_all_images_exist() {
+    if (!file_exists(LOCAL_XML_PATH)) {
+        error_log('XML file not found');
+        return false;
+    }
+
+    $xml_content = file_get_contents(LOCAL_XML_PATH);
+    if (!$xml_content) {
+        error_log('Could not read XML file');
+        return false;
+    }
+
+    $xml = new SimpleXMLElement($xml_content);
+    if (!$xml) {
+        error_log('Error parsing XML content');
+        return false;
+    }
+
+    $missing_images = [];
+    $max_retries = 3;
+    $retry_count = 0;
+
+    // Collect all image filenames from XML
+    foreach ($xml->voertuig as $car) {
+        if (isset($car->afbeeldingen)) {
+            foreach ($car->afbeeldingen->children() as $afbeelding) {
+                if ($afbeelding->getName() === 'afbeelding') {
+                    // Skip images that already contain a full URL – these are hosted remotely
+                    if (isset($afbeelding->url) && trim((string)$afbeelding->url) !== '') {
+                        continue;
+                    }
+                    if (isset($afbeelding->bestandsnaam)) {
+                        $filename = trim((string)$afbeelding->bestandsnaam);
+                        if ($filename !== '') {
+                            $local_file = LOCAL_IMAGES_PATH . $filename;
+                            if (!file_exists($local_file)) {
+                                $missing_images[] = $filename;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // If there are missing images, try to download them
+    while (!empty($missing_images) && $retry_count < $max_retries) {
+        $retry_count++;
+        error_log("Attempt $retry_count to download missing images. Missing count: " . count($missing_images));
+
+        // Set FTP timeout
+        $timeout = 30;
+        $is_ssl = false;
+
+        $settings = vwe_get_ftp_settings();
+
+        // Try SSL connection first
+        if (function_exists('ftp_ssl_connect')) {
+            $ftp_conn = @ftp_ssl_connect($settings['ftp_server'], 21, $timeout);
+            if ($ftp_conn) {
+                $is_ssl = true;
+            }
+        }
+
+        // Fallback to regular FTP if SSL fails
+        if (!$ftp_conn) {
+            $ftp_conn = @ftp_connect($settings['ftp_server'], 21, $timeout);
+        }
+
+        if (!$ftp_conn) {
+            error_log('Could not connect to FTP server: ' . $settings['ftp_server']);
+            continue;
+        }
+
+        // Set additional FTP options
+        ftp_set_option($ftp_conn, FTP_TIMEOUT_SEC, $timeout);
+        ftp_set_option($ftp_conn, FTP_AUTOSEEK, true);
+
+        if (!@ftp_login($ftp_conn, $settings['ftp_user'], $settings['ftp_pass'])) {
+            if ($is_ssl) {
+                @ftp_close($ftp_conn);
+            } else {
+                ftp_close($ftp_conn);
+            }
+            error_log('FTP login failed for user: ' . $settings['ftp_user']);
+            continue;
+        }
+
+        ftp_pasv($ftp_conn, true);
+
+        // Enable SSL if available
+        if ($is_ssl) {
+            ftp_set_option($ftp_conn, FTP_USEPASVADDRESS, true);
+        }
+
+        $still_missing = [];
+        foreach ($missing_images as $filename) {
+            $remote_file = $settings['remote_images_path'] . $filename;
+            $local_file = LOCAL_IMAGES_PATH . $filename;
+
+            if (@ftp_get($ftp_conn, $local_file, $remote_file, FTP_BINARY)) {
+                // Optimize the downloaded image
+                optimize_downloaded_image($local_file);
+                error_log("Successfully downloaded and optimized: $filename");
+            } else {
+                $still_missing[] = $filename;
+                error_log("Failed to download: $filename");
+            }
+        }
+
+        // Properly close the connection
+        if ($is_ssl) {
+            @ftp_close($ftp_conn);
+        } else {
+            ftp_close($ftp_conn);
+        }
+
+        // Update missing images list
+        $missing_images = $still_missing;
+
+        // If we still have missing images, wait before retrying
+        if (!empty($missing_images)) {
+            sleep(5); // Wait 5 seconds before retrying
+        }
+    }
+
+    // Log final status
+    if (empty($missing_images)) {
+        error_log("All images successfully downloaded after $retry_count attempts");
+        return true;
+    } else {
+        error_log("Failed to download " . count($missing_images) . " images after $max_retries attempts");
+        return false;
+    }
+}
+
+/**
+ * Create a new XML file with the correct structure
+ */
+function create_new_xml_file($data) {
+    // Create the XML structure
+    $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><voertuigen></voertuigen>');
+
+    // Add each vehicle to the XML
+    foreach ($data as $vehicle) {
+        $voertuig = $xml->addChild('voertuig');
+
+        // Add basic vehicle information
+        $voertuig->addChild('merk', htmlspecialchars($vehicle['merk']));
+        $voertuig->addChild('model', htmlspecialchars($vehicle['model']));
+        $voertuig->addChild('titel', htmlspecialchars($vehicle['titel']));
+        $voertuig->addChild('bouwjaar', htmlspecialchars($vehicle['bouwjaar']));
+        $voertuig->addChild('verkoopprijs_particulier', htmlspecialchars($vehicle['prijs']));
+        // Ensure numeric value only for tellerstand
+        $clean_km = preg_replace('/[^0-9]/', '', (string) $vehicle['kilometerstand']);
+        $voertuig->addChild('tellerstand', htmlspecialchars($clean_km));
+        $voertuig->addChild('brandstof', htmlspecialchars($vehicle['brandstof']));
+        $voertuig->addChild('transmissie', htmlspecialchars($vehicle['transmissie']));
+        $voertuig->addChild('carrosserie', htmlspecialchars($vehicle['carrosserie']));
+        $voertuig->addChild('aantal_deuren', htmlspecialchars($vehicle['deuren']));
+        $voertuig->addChild('cilinder_inhoud', htmlspecialchars($vehicle['cilinder_inhoud']));
+        $voertuig->addChild('vermogen_motor_pk', htmlspecialchars($vehicle['vermogen_pk']));
+        $voertuig->addChild('kenteken', htmlspecialchars($vehicle['kenteken']));
+        $voertuig->addChild('massa', htmlspecialchars($vehicle['gewicht']));
+        $voertuig->addChild('aantal_zitplaatsen', htmlspecialchars($vehicle['aantal_zitplaatsen']));
+        $voertuig->addChild('interieurkleur', htmlspecialchars($vehicle['interieurkleur']));
+        $voertuig->addChild('bekleding', htmlspecialchars($vehicle['bekleding']));
+        $voertuig->addChild('opmerkingen', htmlspecialchars($vehicle['opmerkingen']));
+        $voertuig->addChild('opties', htmlspecialchars($vehicle['opties']));
+
+        // Add status information
+        $voertuig->addChild('verkocht', $vehicle['status'] === 'verkocht' ? 'j' : 'n');
+        $voertuig->addChild('gereserveerd', $vehicle['status'] === 'gereserveerd' ? 'j' : 'n');
+
+        // Add images
+        if (!empty($vehicle['afbeeldingen'])) {
+            $afbeeldingen = $voertuig->addChild('afbeeldingen');
+            foreach ($vehicle['afbeeldingen'] as $image) {
+                $afbeelding = $afbeeldingen->addChild('afbeelding');
+                $afbeelding->addChild('bestandsnaam', basename($image));
+            }
+        }
+    }
+
+    // Format the XML with proper indentation
+    $dom = new DOMDocument('1.0');
+    $dom->preserveWhiteSpace = false;
+    $dom->formatOutput = true;
+    $dom->loadXML($xml->asXML());
+
+    // Save the XML file
+    $xml_content = $dom->saveXML();
+    $temp_file = LOCAL_XML_PATH . '.new';
+
+    if (file_put_contents($temp_file, $xml_content)) {
+        // If successful, replace the old file with the new one
+        if (file_exists(LOCAL_XML_PATH)) {
+            unlink(LOCAL_XML_PATH);
+        }
+        rename($temp_file, LOCAL_XML_PATH);
+        return true;
+    }
+
+    return false;
+}
+
+/**
+ * Update all data (XML and images)
+ */
+function update_all_data() {
+    if (needs_update()) {
+        if (DEBUG_MODE) {
+            error_log('Performing daily update');
+        }
+
+        // Download and update XML file
+        if (!download_xml_from_ftp()) {
+            error_log('Failed to update XML file');
+            return false;
+        }
+
+        // Get the current XML data
+        $xml = get_xml_data();
+        if (!$xml) {
+            error_log('Failed to get XML data');
+            return false;
+        }
+
+        // Convert XML to array format
+        $cars_data = [];
+        foreach ($xml->voertuig as $car) {
+            $cars_data[] = extract_car_data($car, get_image_base_url());
+        }
+
+        // Create new XML file with the data
+        if (!create_new_xml_file($cars_data)) {
+            error_log('Failed to create new XML file');
+            return false;
+        }
+
+        // Update images and ensure all images exist
+        fetch_images_from_ftp();
+        ensure_all_images_exist();
+        cleanup_unused_images();
+        vwe_create_occasion_posts(); // Add this line
+        update_timestamp();
+
+        if (DEBUG_MODE) {
+            error_log('Update completed successfully');
+        }
+    }
+    return true;
+}
+
+// Update the get_xml_data function to use the new update mechanism
+function get_xml_data() {
+    // Only check for updates, don't run them during frontend requests
+    // This prevents the heavy update process from running on every page load
+    if (needs_update() && !is_admin()) {
+        error_log('Update needed but skipping during frontend request - will run via cron');
+        // Don't call update_all_data() here - let the cron job handle it
+    }
+
+    // Look for XML files in the plugin directory first
+    $plugin_xml_dir = VWE_PLUGIN_DIR;
+    $xml_files = glob($plugin_xml_dir . '*.xml');
+
+    // If no XML files found in plugin directory, try the shared /plugins/xml/ directory
+    if (empty($xml_files)) {
+        $xml_dir = WP_CONTENT_DIR . '/plugins/xml/';
+        $xml_files = glob($xml_dir . '*.xml');
+    }
+
+    // If still no XML files found, try the specific path mentioned by user
+    if (empty($xml_files)) {
+        $specific_xml_dir = WP_CONTENT_DIR . '/plugins/VWE-auto-manager/xml/';
+        if (is_dir($specific_xml_dir)) {
+            $xml_files = glob($specific_xml_dir . '*.xml');
+        }
+    }
+
+    if (empty($xml_files)) {
+        error_log('No XML files found in any of the expected directories');
+        error_log('Searched in: ' . $plugin_xml_dir . ', ' . WP_CONTENT_DIR . '/plugins/xml/, and ' . WP_CONTENT_DIR . '/plugins/VWE-auto-manager/xml/');
+        return false;
+    }
+
+    $xml_file = $xml_files[0];
+    error_log('Using XML file: ' . $xml_file);
+
+    // Read XML file in chunks to handle large files
+    $xml_content = '';
+    $handle = fopen($xml_file, 'r');
+    if ($handle) {
+        while (!feof($handle)) {
+            $xml_content .= fread($handle, 8192); // Read in 8KB chunks
+        }
+        fclose($handle);
+    } else {
+        error_log('Could not open XML file: ' . $xml_file);
+        return false;
+    }
+
+    if (empty($xml_content)) {
+        error_log('XML file is empty: ' . $xml_file);
+        return false;
+    }
+
+    // Repareer niet-standaard XML-entiteiten zodat SimpleXML kan parsen
+    if (function_exists('fixXmlEntities')) {
+        $xml_content = fixXmlEntities($xml_content);
+    } else {
+        // Fallback: vervang veelvoorkomende entiteiten manueel
+        $xml_content = str_replace(['&euro;', '&pound;'], ['€', '£'], $xml_content);
+    }
+
+    $xml = simplexml_load_string($xml_content);
+    if (!$xml) {
+        error_log('Error parsing XML content from: ' . $xml_file);
+        return false;
+    }
+
+    // Log the number of vehicles found in XML
+    $vehicle_count = count($xml->voertuig);
+    error_log('Found ' . $vehicle_count . ' vehicles in XML data');
+
+    // Only ensure images exist during admin requests or when explicitly needed
+    if (is_admin() || isset($_GET['force_image_check'])) {
+        ensure_all_images_exist();
+    }
+
+    return $xml;
+}
 
 // Check if fixXmlEntities is not available (this file may be standalone)
 if (!function_exists('fixXmlEntities')) {
@@ -1851,8 +2393,12 @@ add_shortcode('vwe_debug_images', 'vwe_debug_images');
  * Initialize plugin
  */
 function vwe_init() {
-    // Plugin initialization - no longer creating local directories
-    // All data is now fetched from remote FTP server via admin settings
+    // Maak benodigde directories aan
+    if (!file_exists(LOCAL_IMAGES_PATH)) {
+        wp_mkdir_p(LOCAL_IMAGES_PATH);
+    }
+
+    // Synchronisatie van WP-posts gebeurt nu alleen nog na een geslaagde XML-update via update_all_data()
 }
 
 /**
@@ -2334,6 +2880,7 @@ function vwe_debug_images($atts) {
     // Test different image locations
     $locations = [
         'Plugin Directory' => VWE_PLUGIN_DIR . 'images/',
+        'Shared Images Path' => SHARED_IMAGES_PATH,
         'Image URL Base' => get_image_base_url(),
         'Plugin URL' => VWE_PLUGIN_URL . 'images/'
     ];
@@ -2348,9 +2895,11 @@ function vwe_debug_images($atts) {
 
     // Test if we can find any images
     $plugin_images = glob(VWE_PLUGIN_DIR . 'images/*.{jpg,jpeg,png,gif,JPG,JPEG,PNG,GIF}', GLOB_BRACE);
+    $shared_images = glob(SHARED_IMAGES_PATH . '*.{jpg,jpeg,png,gif,JPG,JPEG,PNG,GIF}', GLOB_BRACE);
 
     $output .= '<h4>Found Images:</h4>';
     $output .= '<p><strong>Plugin directory:</strong> ' . count($plugin_images) . ' images</p>';
+    $output .= '<p><strong>Shared directory:</strong> ' . count($shared_images) . ' images</p>';
 
     if (count($plugin_images) > 0) {
         $output .= '<p><strong>First 3 plugin images:</strong></p><ul>';
@@ -2405,7 +2954,7 @@ function vwe_latest_cars_shortcode() {
 
     // Header met titel en knop
     $occasions_url = htmlspecialchars('/occasions');
-    echo '<div class="vwe-cards-header">';
+    echo '<div class="vwe-cards-header" style="display:flex;justify-content:space-between;align-items:center;gap:20px;">';
     echo '<h2 class="vwe-cards-title">Laatste occasions</h2>';
     echo '<a class="vwe-cheapest-cars-btn" href="' . $occasions_url . '">Bekijk alle occasions <span>&rarr;</span></a>';
     echo '</div>';
@@ -2620,7 +3169,7 @@ function vwe_settings_page() {
                     <th scope="row">FTP Server</th>
                     <td>
                         <input type="text" name="vwe_ftp_settings[ftp_server]"
-                               value="<?php echo esc_attr($settings['ftp_server'] ?? ''); ?>"
+                               value="<?php echo esc_attr($settings['ftp_server'] ?? FTP_SERVER); ?>"
                                class="regular-text" />
                     </td>
                 </tr>
@@ -2628,7 +3177,7 @@ function vwe_settings_page() {
                     <th scope="row">FTP Gebruikersnaam</th>
                     <td>
                         <input type="text" name="vwe_ftp_settings[ftp_user]"
-                               value="<?php echo esc_attr($settings['ftp_user'] ?? ''); ?>"
+                               value="<?php echo esc_attr($settings['ftp_user'] ?? FTP_USER); ?>"
                                class="regular-text" />
                     </td>
                 </tr>
@@ -2636,7 +3185,7 @@ function vwe_settings_page() {
                     <th scope="row">FTP Wachtwoord</th>
                     <td>
                         <input type="password" name="vwe_ftp_settings[ftp_pass]"
-                               value="<?php echo esc_attr($settings['ftp_pass'] ?? ''); ?>"
+                               value="<?php echo esc_attr($settings['ftp_pass'] ?? FTP_PASS); ?>"
                                class="regular-text" />
                     </td>
                 </tr>
@@ -2644,7 +3193,7 @@ function vwe_settings_page() {
                     <th scope="row">Remote Images Pad</th>
                     <td>
                         <input type="text" name="vwe_ftp_settings[remote_images_path]"
-                               value="<?php echo esc_attr($settings['remote_images_path'] ?? ''); ?>"
+                               value="<?php echo esc_attr($settings['remote_images_path'] ?? REMOTE_IMAGES_PATH); ?>"
                                class="regular-text" />
                     </td>
                 </tr>
@@ -2652,7 +3201,7 @@ function vwe_settings_page() {
                     <th scope="row">Remote Image HTTP URL</th>
                     <td>
                         <input type="text" name="vwe_ftp_settings[remote_image_http]"
-                               value="<?php echo esc_attr($settings['remote_image_http'] ?? ''); ?>"
+                               value="<?php echo esc_attr($settings['remote_image_http'] ?? REMOTE_IMAGE_HTTP); ?>"
                                class="regular-text" />
                     </td>
                 </tr>
@@ -2660,7 +3209,7 @@ function vwe_settings_page() {
                     <th scope="row">Remote XML Directory</th>
                     <td>
                         <input type="text" name="vwe_ftp_settings[remote_xml_dir]"
-                               value="<?php echo esc_attr($settings['remote_xml_dir'] ?? ''); ?>"
+                               value="<?php echo esc_attr($settings['remote_xml_dir'] ?? '/staging.mvsautomotive.nl/wp-content/plugins/VWE-auto-manager/xml/'); ?>"
                                class="regular-text" />
                         <p class="description">Directory containing the XML file (e.g., /path/to/xml/)</p>
                     </td>
@@ -2774,7 +3323,21 @@ function vwe_save_ftp_settings() {
     }
 }
 
+/**
+ * Haal FTP instellingen op
+ */
+function vwe_get_ftp_settings() {
+    $settings = get_option('vwe_ftp_settings', array());
 
+    return array(
+        'ftp_server' => $settings['ftp_server'] ?? FTP_SERVER,
+        'ftp_user' => $settings['ftp_user'] ?? FTP_USER,
+        'ftp_pass' => $settings['ftp_pass'] ?? FTP_PASS,
+        'remote_images_path' => $settings['remote_images_path'] ?? REMOTE_IMAGES_PATH,
+        'remote_image_http' => $settings['remote_image_http'] ?? REMOTE_IMAGE_HTTP,
+        'remote_xml_dir' => $settings['remote_xml_dir'] ?? '/staging.mvsautomotive.nl/wp-content/plugins/VWE-auto-manager/xml/'
+    );
+}
 
 // AJAX handlers
 add_action('wp_ajax_vwe_test_ftp', 'vwe_test_ftp_ajax');
@@ -2828,3 +3391,73 @@ function vwe_manual_update_ajax() {
         wp_send_json_error('Update mislukt: ' . $e->getMessage());
     }
 }
+
+/**
+ * Shortcode to output a hero/header section for a single car.
+ * Usage: [vwe_car_header slug="volkswagen-polo-1-2-tdi-bluemotion-nl-auto"]
+ * If no slug attribute provided, it will try to use the current `occasion` query var (single occasion page).
+ */
+function vwe_car_header_shortcode( $atts ) {
+    // Ensure XML helpers are available
+    if ( ! function_exists( 'get_xml_data' ) || ! function_exists( 'extract_car_data' ) ) {
+        return '';
+    }
+
+    $atts = shortcode_atts( [
+        'slug' => '',
+    ], $atts, 'vwe_car_header' );
+
+    $target_slug = sanitize_title( $atts['slug'] );
+
+    // If no slug provided, try query var from pretty permalink (single occasion page)
+    if ( empty( $target_slug ) && get_query_var( 'occasion' ) ) {
+        $target_slug = sanitize_title( get_query_var( 'occasion' ) );
+    }
+
+    $xml = get_xml_data();
+    if ( ! $xml ) {
+        return '';
+    }
+
+    $image_base = get_image_base_url();
+    $selected_car = null;
+
+    // Iterate through cars and find matching slug (or pick the first as fallback)
+    foreach ( $xml->voertuig as $car ) {
+        $car_data = extract_car_data( $car, $image_base );
+        if ( $target_slug && $car_data['slug'] === $target_slug ) {
+            $selected_car = $car_data;
+            break;
+        }
+        if ( ! $target_slug && ! $selected_car ) {
+            // Fallback to first available car
+            $selected_car = $car_data;
+        }
+    }
+
+    if ( ! $selected_car ) {
+        return '';
+    }
+
+    // Build hero HTML
+    $bg_url   = esc_url( $selected_car['eersteAfbeelding'] );
+    $title    = esc_html( $selected_car['titel'] );
+    $subline  = esc_html( $selected_car['merk'] . ' • ' . $selected_car['bouwjaar'] . ' • ' . $selected_car['kilometerstand'] );
+    $price    = is_numeric( preg_replace( '/[^0-9]/', '', $selected_car['prijs'] ) ) ? '€ ' . number_format( (int) preg_replace( '/[^0-9]/', '', $selected_car['prijs'] ), 0, ',', '.' ) : esc_html( $selected_car['prijs'] );
+    $link_url = esc_url( home_url( '/occasions/' . $selected_car['slug'] . '/' ) );
+
+    ob_start();
+    ?>
+    <section class="vwe-car-hero" style="position:relative;overflow:hidden;width:100vw;margin-left:calc(50% - 50vw);height:65vh;min-height:350px;">
+        <img src="<?php echo $bg_url; ?>" class="vwe-car-hero__bg" style="width:100%;height:100%;max-width:none;display:block;filter:brightness(0.6);object-fit:cover;object-position:center 75%;" alt="<?php echo $title; ?>" />
+        <div class="vwe-car-hero__content" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:#fff;padding:0 20px 80px;max-width:90vw;">
+            <h1 style="margin:0 0 10px;font-size:clamp(24px,5vw,48px);line-height:1.2;"><?php echo $title; ?></h1>
+            <p style="margin:0 0 20px;font-size:clamp(14px,2vw,20px);opacity:0.9;"><?php echo $subline; ?></p>
+            <div style="font-size:clamp(18px,3vw,28px);font-weight:600;margin-bottom:25px;"><?php echo $price; ?></div>
+            <a href="<?php echo $link_url; ?>" class="vwe-hero-btn" style="display:inline-block;background:#e4002b;color:#fff;padding:12px 26px;font-weight:600;text-decoration:none;border-radius:4px;">Bekijk deze auto →</a>
+        </div>
+    </section>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode( 'vwe_car_header', 'vwe_car_header_shortcode' );
